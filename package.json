@@ -1,0 +1,38 @@
+{
+  "name": "@celerik/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JS wrappers and theming for the Celerik UI PHP component suite.",
+  "license": "MIT",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "lint": "eslint resources/js tests/js",
+    "pretest": "php tests/js/fixtures/build.php",
+    "test": "jest"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.7",
+    "datatables.net-bs5": "^2.1.8",
+    "datatables.net-buttons-bs5": "^3.2.0",
+    "inputmask": "^5.0.9",
+    "parsleyjs": "^2.9.2"
+  },
+  "peerDependencies": {
+    "jquery": "^3.7.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@eslint/js": "^9.17.0",
+    "axe-core": "^4.10.2",
+    "babel-jest": "^29.7.0",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jquery": "^3.7.1",
+    "sass": "^1.83.0",
+    "vite": "^6.0.7"
+  }
+}

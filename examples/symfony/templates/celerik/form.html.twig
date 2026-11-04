@@ -1,0 +1,11 @@
+{% extends 'celerik/base.html.twig' %}
+
+{% block title %}Form{% endblock %}
+
+{% block content %}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success" role="status">{{ message }}</div>
+    {% endfor %}
+
+    {{ celerik(form) }}
+{% endblock %}

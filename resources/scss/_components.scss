@@ -1,0 +1,36 @@
+@use 'variables' as *;
+
+.celerik-grid {
+  thead th {
+    background-color: $celerik-grid-header-bg;
+    font-weight: $celerik-grid-header-font-weight;
+  }
+
+  caption {
+    caption-side: top;
+  }
+}
+
+// Keyboard focus must stay visible on sortable headers (WCAG 2.4.7).
+.dt-container th.dt-orderable-asc,
+.dt-container th.dt-orderable-desc {
+  &:focus-visible {
+    outline: 0;
+    box-shadow: $celerik-focus-ring;
+  }
+}
+
+.celerik-chart {
+  margin: 0 0 1rem;
+
+  &__canvas {
+    position: relative;
+    min-height: $celerik-chart-min-height;
+  }
+}
+
+.celerik-form {
+  .celerik-required {
+    color: $celerik-required-color;
+  }
+}

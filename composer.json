@@ -1,0 +1,57 @@
+{
+    "name": "celerik/ui",
+    "description": "Open-source, Bootstrap-based UI component suite for PHP, with optional Laravel and Symfony adapters.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["ui", "components", "bootstrap", "datatables", "chartjs", "laravel", "symfony", "grid", "chart", "form"],
+    "authors": [
+        {
+            "name": "Boss",
+            "email": "ibmussafb@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "illuminate/database": "^11.0 || ^12.0 || ^13.0",
+        "phpunit/phpunit": "^11.5",
+        "squizlabs/php_codesniffer": "^3.11",
+        "twig/twig": "^3.14"
+    },
+    "suggest": {
+        "laravel/framework": "Laravel 11+ for the Blade components and Eloquent data source",
+        "symfony/framework-bundle": "Symfony 7 for the bundle and Twig extension",
+        "twig/twig": "Required by the Symfony Twig extension",
+        "doctrine/orm": "Required by the Doctrine data source"
+    },
+    "autoload": {
+        "psr-4": {
+            "Celerik\\Ui\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Celerik\\Ui\\Tests\\": "tests/php/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Celerik\\Ui\\Adapters\\Laravel\\CelerikServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "phpcs",
+        "lint:fix": "phpcbf",
+        "fixtures": "php tests/js/fixtures/build.php"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}

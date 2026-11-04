@@ -1,0 +1,16 @@
+* text=auto eol=lf
+
+/.github           export-ignore
+/doc               export-ignore
+/examples          export-ignore
+/resources         export-ignore
+/tests             export-ignore
+/.gitattributes    export-ignore
+/.gitignore        export-ignore
+/babel.config.cjs  export-ignore
+/eslint.config.mjs export-ignore
+/jest.config.cjs   export-ignore
+/package.json      export-ignore
+/phpcs.xml.dist    export-ignore
+/phpunit.xml.dist  export-ignore
+/vite.config.mjs   export-ignore
