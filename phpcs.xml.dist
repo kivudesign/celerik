@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ruleset name="Celerik">
+    <description>PSR-12 coding standard for Celerik UI.</description>
+    <file>src</file>
+    <file>tests/php</file>
+    <file>examples</file>
+    <exclude-pattern>*.blade.php</exclude-pattern>
+    <exclude-pattern>*.twig</exclude-pattern>
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+    <rule ref="PSR12"/>
+    <!-- Tests compare long literal HTML strings. -->
+    <rule ref="Generic.Files.LineLength">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+</ruleset>
