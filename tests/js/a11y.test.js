@@ -26,6 +26,11 @@ describe('accessibility (axe-core, WCAG 2.1 AA)', () => {
     grid.destroy();
   });
 
+  test('scheduler markup from PHP (no-JS fallback list)', async () => {
+    loadFixture('scheduler');
+    expect(await violations()).toEqual([]);
+  });
+
   test('chart markup from PHP', async () => {
     loadFixture('chart');
     expect(await violations()).toEqual([]);

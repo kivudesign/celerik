@@ -29,6 +29,31 @@
   }
 }
 
+// FullCalendar reads its colors from CSS variables: map them to Bootstrap's.
+.celerik-scheduler {
+  --fc-border-color: var(--bs-border-color);
+  --fc-page-bg-color: var(--bs-body-bg);
+  --fc-neutral-bg-color: var(--bs-tertiary-bg);
+  --fc-list-event-hover-bg-color: var(--bs-tertiary-bg);
+  --fc-today-bg-color: #{$celerik-scheduler-today-bg};
+  --fc-event-bg-color: var(--bs-primary);
+  --fc-event-border-color: var(--bs-primary);
+  --fc-button-bg-color: var(--bs-primary);
+  --fc-button-border-color: var(--bs-primary);
+  --fc-button-hover-bg-color: var(--bs-primary-text-emphasis);
+  --fc-button-hover-border-color: var(--bs-primary-text-emphasis);
+  --fc-button-active-bg-color: var(--bs-primary-text-emphasis);
+  --fc-button-active-border-color: var(--bs-primary-text-emphasis);
+
+  .fc-button:focus-visible {
+    box-shadow: $celerik-focus-ring;
+  }
+
+  .fc-toolbar-title {
+    font-size: $celerik-scheduler-title-font-size;
+  }
+}
+
 .celerik-form {
   .celerik-required {
     color: $celerik-required-color;
