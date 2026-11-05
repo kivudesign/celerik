@@ -15,6 +15,14 @@ for (const theme of THEMES) {
         expect(await axeViolations(page)).toEqual([]);
       });
 
+      test('no axe-core violations after failed validation, with the error summary', async ({ page }) => {
+        await openComponents(page, { theme, mode });
+        await page.locator('#article').getByRole('textbox', { name: /Title/ }).fill('');
+        await page.locator('#article').getByRole('button', { name: 'Publish' }).click();
+        await expect(page.locator('#article .celerik-error-summary')).toBeVisible();
+        expect(await axeViolations(page, { include: '#article' })).toEqual([]);
+      });
+
       test('no axe-core violations with the modal open', async ({ page }) => {
         await openComponents(page, { theme, mode });
         await page.getByRole('button', { name: 'Contact us' }).click();

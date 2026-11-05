@@ -94,6 +94,15 @@ $fixtures = [
         )
         ->submit('Publish'),
 
+    'form-summary' => Form::make('order')
+        ->errorSummary()
+        ->add(
+            Field::text('name')->required(),
+            Field::email('email')->required(),
+            Field::editor('notes')->required(),
+        )
+        ->submit('Order'),
+
     'form' => Form::make('signup')
         ->action('/signup')
         ->csrf('test-token')

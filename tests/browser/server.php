@@ -132,6 +132,7 @@ $components = [
         ->submit('Create account'),
 
     Form::make('article')
+        ->errorSummary()
         ->action('/articles')
         ->csrf('test-token')
         ->add(

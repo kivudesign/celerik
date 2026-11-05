@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { openComponents } from './helpers.mjs';
+import { axeViolations, openComponents } from './helpers.mjs';
 
 // Keyboard behaviour does not depend on the theme: these run once, in the default theme.
 test.beforeEach(async ({ page }) => {
@@ -83,6 +83,23 @@ test.describe('form', () => {
     const name = form.getByRole('textbox', { name: /Name/ });
     await expect(name).toBeFocused();
     await expect(name).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  test('with an error summary, a failed submit focuses the summary and its links reach the fields', async ({ page }) => {
+    const form = page.locator('#article');
+    await form.getByRole('textbox', { name: /Title/ }).fill('');
+    await form.getByRole('button', { name: 'Publish' }).focus();
+    await page.keyboard.press('Enter');
+
+    const summary = form.locator('.celerik-error-summary');
+    await expect(summary).toBeVisible();
+    await expect(summary).toBeFocused();
+    await expect(summary.getByRole('heading', { name: 'There is a problem' })).toBeVisible();
+    expect(await axeViolations(page, { include: '#article' })).toEqual([]);
+
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expect(form.getByRole('textbox', { name: /Title/ })).toBeFocused();
   });
 
   test('the rich text editor is reachable and editable from the keyboard', async ({ page }) => {

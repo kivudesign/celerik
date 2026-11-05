@@ -41,6 +41,8 @@ final class Form extends Component
     /** @var array<string, mixed> */
     private array $values = [];
 
+    private ?string $errorSummaryTitle = null;
+
     public static function name(): string
     {
         return 'form';
@@ -113,6 +115,19 @@ final class Form extends Component
     }
 
     /**
+     * Lists every error at the top of the form, with a link to each field, and moves focus
+     * to the list after a failed submit (server-side or in the browser). Screen readers then
+     * announce the problems once, instead of one live region per field (WCAG 3.3.1).
+     * The messages next to the fields stay.
+     */
+    public function errorSummary(bool $enabled = true, string $title = 'There is a problem'): self
+    {
+        $this->errorSummaryTitle = $enabled ? $title : null;
+
+        return $this;
+    }
+
+    /**
      * Server-side validation errors, field name => message or list of messages.
      *
      * @param array<string, string|list<string>> $errors
@@ -141,6 +156,7 @@ final class Form extends Component
         return array_filter([
             // Name of the hidden CSRF input, which async uploads send as a header.
             'csrf' => $this->csrfToken === null || $this->method === 'GET' ? null : ['field' => $this->csrfField],
+            'errorSummary' => $this->errorSummaryTitle === null ? null : true,
             'options' => $this->options,
         ], static fn (mixed $value): bool => $value !== null && $value !== []);
     }
@@ -160,6 +176,10 @@ final class Form extends Component
 
         if ($spoofed) {
             $content .= Html::tag('input', ['type' => 'hidden', 'name' => '_method', 'value' => $this->method]);
+        }
+
+        if ($this->errorSummaryTitle !== null) {
+            $content .= $this->renderErrorSummary();
         }
 
         foreach ($this->fields as $field) {
@@ -198,6 +218,29 @@ final class Form extends Component
         }
 
         return false;
+    }
+
+    private function renderErrorSummary(): string
+    {
+        $titleId = $this->id . '-error-summary-title';
+        $items = '';
+        foreach ($this->fields as $field) {
+            $error = $this->errorFor($field);
+            if ($error !== null) {
+                $href = '#' . Field::fieldId($this->id, $field->getName());
+                $items .= Html::tag('li', [], Html::tag('a', ['href' => $href, 'class' => 'alert-link'], Html::escape($error)));
+            }
+        }
+
+        // Hidden until there are errors; form.js fills it after a failed browser validation.
+        return Html::tag('div', [
+            'id' => $this->id . '-error-summary',
+            'class' => 'alert alert-danger celerik-error-summary',
+            'tabindex' => '-1',
+            'aria-labelledby' => $titleId,
+            'hidden' => $items === '',
+        ], Html::tag('h2', ['id' => $titleId, 'class' => 'h6'], Html::escape((string) $this->errorSummaryTitle))
+            . Html::tag('ul', ['class' => 'mb-0'], $items));
     }
 
     private function errorFor(Field $field): ?string
