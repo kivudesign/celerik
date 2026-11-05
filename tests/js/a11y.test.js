@@ -45,6 +45,13 @@ describe('accessibility (axe-core, WCAG 2.1 AA)', () => {
     parsley.destroy();
   }, 30000);
 
+  test('file manager markup from PHP (elFinder itself is checked in tests/browser)', async () => {
+    const element = loadFixture('filemanager');
+    expect(element.getAttribute('role')).toBe('region');
+    expect(element.getAttribute('aria-label')).toBe('Shared files');
+    expect(await violations()).toEqual([]);
+  });
+
   test('chart markup from PHP', async () => {
     loadFixture('chart');
     expect(await violations()).toEqual([]);

@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use Celerik\Ui\Components\Chart;
+use Celerik\Ui\Components\FileManager;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
 use Celerik\Ui\Components\Grid;
@@ -54,6 +55,11 @@ $fixtures = [
         ->title('Monthly revenue')
         ->labels(['Jan', 'Feb', 'Mar'])
         ->dataset('Revenue', [1200, 1900, 1500]),
+
+    'filemanager' => FileManager::make('files')
+        ->title('Shared files')
+        ->url('/files/connector')
+        ->assetsUrl('/elfinder'),
 
     'modal' => Modal::make('contact-modal')
         ->title('Contact us')
