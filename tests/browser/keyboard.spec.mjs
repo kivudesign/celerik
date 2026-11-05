@@ -139,11 +139,12 @@ test.describe('scheduler', () => {
 
 test.describe('notification', () => {
   test('a toast can be dismissed from the keyboard', async ({ page }) => {
-    const dismiss = page.getByRole('button', { name: /Dismiss/i }).first();
+    // The error toast stays until dismissed; the others may expire during the test.
+    const toast = page.locator('.celerik-toast-error');
+    const dismiss = toast.getByRole('button', { name: /Dismiss/i });
     await expect(dismiss).toBeVisible();
-    const count = await page.locator('.notyf__toast').count();
     await dismiss.focus();
     await page.keyboard.press('Enter');
-    await expect(page.locator('.notyf__toast')).toHaveCount(count - 1);
+    await expect(toast).toHaveCount(0);
   });
 });

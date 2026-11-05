@@ -37,6 +37,7 @@ async function invisibleFocus(page, stops) {
 }
 
 test('focus stays visible on every tab stop', async ({ page }) => {
+  test.setTimeout(180_000); // 120 tab stops
   await openComponents(page);
   await page.locator('h1').click();
   const { invisible, components } = await invisibleFocus(page, 120);
