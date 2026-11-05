@@ -77,6 +77,22 @@
   .fc-toolbar-title {
     font-size: var(--celerik-scheduler-title-font-size);
   }
+
+  // FullCalendar fades days of other months to 30% opacity, far below 4.5:1 (WCAG 1.4.3).
+  // The muted text color still sets them apart.
+  .fc-day-other .fc-daygrid-day-top {
+    opacity: 1;
+  }
+
+  .fc-day-other .fc-daygrid-day-number {
+    color: var(--bs-secondary-color);
+  }
+
+  // Dot events (timed events in month view) are links: Bootstrap gives them the link
+  // color, which is too light on today's tinted background.
+  .fc-daygrid-dot-event {
+    color: var(--bs-body-color);
+  }
 }
 
 .celerik-form {

@@ -15,12 +15,18 @@ function hideDecorativeIcons(element) {
   }
 }
 
+// Month view cells are labelled by their day number link ("November 3, 2026"), which
+// hides the events inside them from the cell's name (WCAG 2.5.3). The link keeps its label.
+function unlabelDayCell({ el }) {
+  el.removeAttribute('aria-labelledby');
+}
+
 export function initScheduler(element, options) {
   // Replace the server-rendered fallback list with the calendar.
   element.replaceChildren();
 
   const config = buildSchedulerConfig(options);
-  const datesSet = config.datesSet;
+  const { datesSet, dayCellDidMount } = config;
 
   const calendar = new Calendar(element, {
     plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
@@ -30,6 +36,10 @@ export function initScheduler(element, options) {
     datesSet(info) {
       hideDecorativeIcons(element);
       datesSet?.(info);
+    },
+    dayCellDidMount(info) {
+      unlabelDayCell(info);
+      dayCellDidMount?.(info);
     },
   });
   calendar.render();

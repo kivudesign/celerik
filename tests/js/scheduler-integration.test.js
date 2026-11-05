@@ -34,6 +34,20 @@ describe('scheduler integration (FullCalendar)', () => {
     calendar.destroy();
   }, 30000); // axe needs several seconds on the month and week grids in jsdom
 
+  test('month view cells are not named by their day number alone', () => {
+    const element = loadFixture('scheduler');
+    const dayCellDidMount = jest.fn();
+    const calendar = initScheduler(element, { ...readOptions(element), options: { dayCellDidMount } });
+    calendar.changeView('dayGridMonth');
+
+    const cells = element.querySelectorAll('td.fc-daygrid-day');
+    expect(cells.length).toBeGreaterThan(27);
+    expect(element.querySelectorAll('td.fc-daygrid-day[aria-labelledby]')).toHaveLength(0);
+    expect(element.querySelector('.fc-daygrid-day-number').getAttribute('aria-label')).toMatch(/2026/);
+    expect(dayCellDidMount).toHaveBeenCalled();
+    calendar.destroy();
+  });
+
   test('a user datesSet callback from PHP options still runs', () => {
     const element = loadFixture('scheduler');
     const datesSet = jest.fn();
