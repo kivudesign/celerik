@@ -7,6 +7,12 @@
 | Accessibility | axe-core (WCAG 2.1 A/AA tags) | `npm test` | `tests/js/a11y.test.js` |
 | Code style | PHP_CodeSniffer (PSR-12), ESLint | `composer lint`, `npm run lint` | – |
 
+Integration testing in a real application (HTTP and browser checks, CSP, File Manager security) is documented in [celerik-doc](https://github.com/bim-g/celerik-doc). To work on it next to the code, clone it into `documentation/`, which this repository ignores:
+
+```bash
+git clone https://github.com/bim-g/celerik-doc.git documentation
+```
+
 ## PHP Tests
 
 - Components: rendering, escaping, ARIA attributes, option serialization, validation of arguments.
