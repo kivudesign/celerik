@@ -14,17 +14,24 @@ use Doctrine\ORM\QueryBuilder;
  * `new DoctrineDataSource($repository->createQueryBuilder('u')->select('u.id, u.name, u.email'))`.
  *
  * Plain fields resolve against the root alias (`name` => `u.name`); dotted fields are used
- * as-is, so `a.name` works after `->join('u.author', 'a')`. Select scalar fields rather than
- * whole entities: rows are returned with getArrayResult().
+ * as-is (`a.name`). For joined columns shown in a Grid, select them under an alias and map
+ * that alias to its DQL path, so the same field name sorts, searches and appears in the rows:
+ *
+ *     $qb->select('b.id, b.title, a.name AS author')->join('b.author', 'a');
+ *     new DoctrineDataSource($qb, fieldMap: ['author' => 'a.name']);
+ *
+ * Select scalar fields rather than whole entities: rows are returned with getArrayResult().
  */
 final class DoctrineDataSource implements DataSourceInterface
 {
     /**
      * @param list<string> $searchable Search fields used when the request does not specify any.
+     * @param array<string, string> $fieldMap Public field name => DQL path (e.g. 'author' => 'a.name').
      */
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
         private readonly array $searchable = [],
+        private readonly array $fieldMap = [],
     ) {
     }
 
@@ -37,13 +44,18 @@ final class DoctrineDataSource implements DataSourceInterface
 
         $fields = $request->searchFields !== [] ? $request->searchFields : $this->searchable;
 
-        if ($request->search !== null && $fields !== []) {
+        $pattern = $request->likePattern();
+
+        if ($pattern !== null && $fields !== []) {
             $search = $query->expr()->orX();
             foreach ($fields as $field) {
-                $search->add($query->expr()->like('LOWER(' . $this->path($alias, $field) . ')', ':celerik_search'));
+                $search->add(sprintf(
+                    "LOWER(%s) LIKE :celerik_search ESCAPE '%s'",
+                    $this->path($alias, $field),
+                    DataRequest::LIKE_ESCAPE,
+                ));
             }
-            $query->andWhere($search)
-                ->setParameter('celerik_search', '%' . addcslashes(mb_strtolower($request->search), '%_\\') . '%');
+            $query->andWhere($search)->setParameter('celerik_search', mb_strtolower($pattern));
         }
 
         $index = 0;
@@ -80,6 +92,10 @@ final class DoctrineDataSource implements DataSourceInterface
 
     private function path(string $alias, string $field): string
     {
+        if (isset($this->fieldMap[$field])) {
+            return $this->fieldMap[$field];
+        }
+
         return str_contains($field, '.') ? $field : $alias . '.' . $field;
     }
 }
