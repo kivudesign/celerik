@@ -60,6 +60,10 @@ Map database columns to grid columns like this:
 - **Grid**: `GET /<resource>/data` → `$grid->respond($source, $query)`.
 - **Chart**: `GET /<resource>/stats` → `['data' => $chart->toData()]` for `Chart::url()`.
 - **Form**: a normal POST. On failure, render again with `errors()` and `values()`.
+- **Scheduler**:
+  - `GET /<resource>/events?start=…&end=…` → `$scheduler->respond($source, $query)`. Answer 400 on `InvalidArgumentException`.
+  - `POST /<resource>/events/{create,update,delete}` with a JSON body and the `X-CSRF-TOKEN` header. Validate with `Event::fromArray()` and answer `{data: event}` (`{data: null}` for delete). Any non-2xx status rolls the change back in the calendar.
+  - Convert dates to the server/app time zone before saving: Eloquent and Doctrine drop UTC offsets.
 
 ### Integration snippets
 

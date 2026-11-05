@@ -2,9 +2,9 @@
 
 An open-source, Bootstrap-based UI component suite for PHP, inspired by Telerik UI. It works with plain PHP and has optional adapters for **Laravel 11+** and **Symfony 7**.
 
-Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js and Inputmask.
+Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask and FullCalendar. Each library is loaded only on pages that use it.
 
-> **Status: Phase 1 (MVP).** Grid, Chart and Form are available. See the [roadmap](ROADMAP.md).
+> **Status: Phase 2 in progress.** Grid, Chart, Form and Scheduler are available. See the [roadmap](ROADMAP.md).
 
 ## Quick look
 
@@ -42,21 +42,22 @@ Load Bootstrap 5.3 and jQuery 3.7, then the Celerik bundle:
 | Symfony | add `CelerikUiBundle` to `config/bundles.php`, then `php bin/console assets:install` | `{{ celerik_assets() }}` | `{{ celerik(grid) }}` |
 | Plain PHP | serve the package's `public/` folder | `<?= Assets::tags('/assets') ?>` | `<?= $grid ?>` |
 
-## Components (Phase 1)
+## Components
 
 | Component | PHP class | Library | Highlights |
 |---|---|---|---|
 | Grid | `Components\Grid` | DataTables 2 | Client- or server-side, export, caption, column whitelisting |
 | Chart | `Components\Chart` | Chart.js 4 | Embedded or remote data, `fromRows()`, hidden data table as text alternative |
 | Form | `Components\Form` | Parsley.js, Inputmask | HTML5 rules, masks, CSRF, method spoofing, server errors and old input |
+| Scheduler | `Components\Scheduler` | FullCalendar 6 (MIT plugins) | Month, week, day and list views; create, move, resize and delete through your endpoints, rolled back if the server refuses |
 
 The full Telerik → open-source mapping is in [Components.md](Components.md).
 
 ## Examples
 
 - [`examples/plain`](examples/plain): no framework. Run `php -S localhost:8000 examples/plain/index.php`.
-- [`examples/laravel`](examples/laravel): Eloquent grid, chart and validated form.
-- [`examples/symfony`](examples/symfony): Doctrine grid, chart and validated form.
+- [`examples/laravel`](examples/laravel): Eloquent grid, chart, validated form and scheduler.
+- [`examples/symfony`](examples/symfony): Doctrine grid, chart, validated form and scheduler.
 
 ## Development
 
@@ -70,6 +71,19 @@ npm run lint         # ESLint
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [TESTING.md](TESTING.md).
+
+## Content Security Policy
+
+Components emit no inline scripts, so a strict policy works. Pass a nonce to the assets tag (`<x-celerik-assets nonce="..." />`, `celerik_assets(null, nonce)` or `Assets::tags($url, $nonce)`). It is also printed as `<meta name="csp-nonce">`, which FullCalendar uses for the styles it injects.
+
+Tested policy:
+
+```text
+default-src 'self'; script-src 'self' 'nonce-…'; style-src 'self' 'nonce-…';
+img-src 'self' data:; font-src 'self' data:; connect-src 'self'
+```
+
+`font-src data:` is needed for the Scheduler's toolbar icons. Add your CDN to `script-src` and `style-src` if Bootstrap and jQuery come from one.
 
 ## Documentation Pack
 
