@@ -6,9 +6,9 @@ describe('form integration (Parsley + Inputmask)', () => {
   let form;
   let parsley;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     form = loadFixture('form');
-    parsley = initForm(form, readOptions(form));
+    parsley = await initForm(form, readOptions(form));
   });
 
   afterEach(() => parsley.destroy());

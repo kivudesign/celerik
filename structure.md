@@ -33,7 +33,12 @@ celerik/
 │   ├── Support/
 │   │   ├── Html.php              # Escaping HTML builder
 │   │   ├── Arr.php               # Dot-notation helpers
-│   │   └── Dates.php             # Strict ISO 8601 parsing
+│   │   ├── Dates.php             # Strict ISO 8601 parsing
+│   │   └── EditorHtml.php        # Sanitizes rich text editor output
+│   ├── Upload/
+│   │   ├── UploadRules.php       # Accepted types, size, count (field + server)
+│   │   ├── UploadHandler.php     # process / revert / claim / store / purge
+│   │   ├── UploadedFile.php  StoredFile.php  UploadException.php
 │   └── Adapters/
 │       ├── Laravel/
 │       │   ├── CelerikServiceProvider.php
@@ -56,6 +61,8 @@ celerik/
 │   │   ├── chart.js  chart-config.js
 │   │   ├── form.js   form-config.js
 │   │   ├── scheduler.js  scheduler-config.js
+│   │   ├── editor.js  editor-config.js      # Quill, loaded only for forms with an editor
+│   │   ├── upload.js  upload-config.js      # FilePond, loaded only for forms with uploads
 │   │   └── jquery-global.js      # `jquery` → window.jQuery (peer dependency)
 │   └── scss/
 │       ├── _variables.scss
@@ -66,17 +73,17 @@ celerik/
 ├── public/                       # Build output, shipped with the package
 │   ├── celerik.js                # ES module entry (~3 KB)
 │   ├── celerik.css
-│   └── chunks/                   # grid, chart, form, scheduler: loaded on demand
+│   └── chunks/                   # grid, chart, form, scheduler, editor, upload (JS + CSS): loaded on demand
 │
 ├── tests/
 │   ├── php/                      # PHPUnit (Celerik\Ui\Tests\)
-│   │   ├── Components/  Data/  Support/
+│   │   ├── Components/  Data/  Support/  Upload/
 │   │   └── Adapters/Laravel/  Adapters/Symfony/
 │   └── js/                       # Jest + axe-core
 │       ├── fixtures/build.php    # Renders PHP components to HTML fixtures
 │       ├── core.test.js  grid.test.js  chart.test.js  form.test.js  a11y.test.js
-│       ├── scheduler.test.js  scheduler-integration.test.js
-│       └── helpers.js  setup.js
+│       ├── scheduler.test.js  scheduler-integration.test.js  editor.test.js  upload.test.js
+│       └── helpers.js  setup.js  style-stub.js
 │
 ├── examples/
 │   ├── plain/                    # php -S localhost:8000 examples/plain/index.php

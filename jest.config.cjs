@@ -5,7 +5,14 @@ module.exports = {
   transform: {
     '\\.m?js$': 'babel-jest',
   },
-  // FullCalendar and Preact ship ES modules only for the browser; transform them too.
-  transformIgnorePatterns: ['/node_modules/(?!(preact|@fullcalendar)/)'],
+  // These packages ship ES modules only for the browser; transform them too.
+  transformIgnorePatterns: ['/node_modules/(?!(preact|@fullcalendar|quill|parchment|lodash-es)/)'],
+  moduleNameMapper: {
+    // Stylesheets imported by Quill and FilePond modules are irrelevant in jsdom.
+    '\\.css$': '<rootDir>/tests/js/style-stub.js',
+  },
+  // With a cold cache (always the case in CI) the first test that imports Quill or
+  // FilePond spends several seconds transforming them, beyond Jest's 5 s default.
+  testTimeout: 30000,
   collectCoverageFrom: ['resources/js/**/*.js', '!resources/js/index.js'],
 };

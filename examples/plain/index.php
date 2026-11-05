@@ -66,6 +66,7 @@ session_start();
 $_SESSION['csrf'] ??= bin2hex(random_bytes(16));
 
 require __DIR__ . '/calendar.php';
+require __DIR__ . '/article.php';
 
 $errors = [];
 $message = null;
@@ -137,6 +138,26 @@ $form = Form::make('contact')
             <div class="alert alert-success" role="status"><?= htmlspecialchars($message) ?></div>
         <?php endif ?>
         <?= $form ?>
+    </section>
+
+    <section class="mb-5" aria-labelledby="article-title">
+        <h2 id="article-title" class="h5">Rich text and uploads</h2>
+        <?php if ($article !== null) : ?>
+            <div class="alert alert-success" role="status">
+                <p class="mb-2">Published “<?= htmlspecialchars($article['title']) ?>”.</p>
+                <p class="mb-2 small">
+                    Cover: <?= htmlspecialchars($article['cover']->originalName) ?>
+                    (<?= htmlspecialchars($article['cover']->mimeType) ?>,
+                    stored as <?= htmlspecialchars($article['cover']->name) ?>)
+                    <?php foreach ($article['attachments'] as $file) : ?>
+                        <br>Attachment: <?= htmlspecialchars($file->originalName) ?>
+                    <?php endforeach ?>
+                </p>
+                <?php /* Sanitized by EditorHtml::sanitize(), so it is safe to output as HTML. */ ?>
+                <div class="border rounded p-2 bg-body"><?= $article['body'] ?></div>
+            </div>
+        <?php endif ?>
+        <?= $articleForm ?>
     </section>
 </main>
 </body>

@@ -1,0 +1,17 @@
+{% extends 'celerik/base.html.twig' %}
+
+{% block title %}Rich text and uploads{% endblock %}
+
+{% block content %}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success" role="status">
+            <p class="mb-2">{{ message }}</p>
+            {% if body %}
+                {# Sanitized by EditorHtml::sanitize(), so it is safe to output unescaped. #}
+                <div class="border rounded p-2 bg-body">{{ body|raw }}</div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    {{ celerik(form) }}
+{% endblock %}

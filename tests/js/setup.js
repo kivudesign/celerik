@@ -12,5 +12,14 @@ if (!window.matchMedia) {
   });
 }
 
+// FilePond checks these at import time and refuses to run without them.
+if (!window.URL.createObjectURL) {
+  window.URL.createObjectURL = () => 'blob:jsdom';
+  window.URL.revokeObjectURL = () => {};
+}
+if (!window.CSS?.supports) {
+  window.CSS = { ...window.CSS, supports: () => true };
+}
+
 // jsdom has no canvas backend; axe-core probes it and only needs a null context.
 HTMLCanvasElement.prototype.getContext = () => null;

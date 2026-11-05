@@ -59,3 +59,53 @@
     color: $celerik-required-color;
   }
 }
+
+// Rich text editor (Quill, snow theme) in Bootstrap form styling.
+.celerik-editor {
+  background-color: var(--bs-body-bg);
+  border-bottom-left-radius: var(--bs-border-radius);
+  border-bottom-right-radius: var(--bs-border-radius);
+
+  .ql-editor {
+    min-height: $celerik-editor-min-height;
+    font-size: 1rem;
+  }
+
+}
+
+.ql-toolbar.ql-snow {
+  border-top-left-radius: var(--bs-border-radius);
+  border-top-right-radius: var(--bs-border-radius);
+}
+
+.ql-toolbar.ql-snow,
+.ql-container.ql-snow {
+  border-color: var(--bs-border-color);
+}
+
+.ql-container.ql-snow:focus-within {
+  box-shadow: $celerik-focus-ring;
+}
+
+.ql-container.ql-snow.is-invalid {
+  border-color: var(--bs-form-invalid-border-color);
+}
+
+// File uploads (FilePond) on Bootstrap colors.
+.filepond--root {
+  margin-bottom: 0.25rem;
+  font-family: inherit;
+}
+
+.filepond--panel-root {
+  background-color: var(--bs-tertiary-bg);
+  border: 1px dashed var(--bs-border-color);
+}
+
+.filepond--drop-label {
+  color: var(--bs-body-color);
+}
+
+.filepond--label-action {
+  text-decoration-color: var(--bs-primary);
+}

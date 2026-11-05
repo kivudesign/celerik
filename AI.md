@@ -64,6 +64,12 @@ Map database columns to grid columns like this:
   - `GET /<resource>/events?start=…&end=…` → `$scheduler->respond($source, $query)`. Answer 400 on `InvalidArgumentException`.
   - `POST /<resource>/events/{create,update,delete}` with a JSON body and the `X-CSRF-TOKEN` header. Validate with `Event::fromArray()` and answer `{data: event}` (`{data: null}` for delete). Any non-2xx status rolls the change back in the calendar.
   - Convert dates to the server/app time zone before saving: Eloquent and Doctrine drop UTC offsets.
+- **Uploads** (`Field::file()->upload($url)`):
+  - `POST $url` with one file → `UploadHandler::process()` → answer the id as `text/plain` (422 with the message on `UploadException`).
+  - `DELETE $url` with the id as body → `UploadHandler::revert()`.
+  - On form submit, the field holds ids → `claim($id, $dir)`. If the browser sent real files instead (no JavaScript), use `store()`.
+  - One `UploadRules` per field, shared by the field and its handler. Directories outside the web root.
+- **Editor**: always `EditorHtml::sanitize()` the submitted HTML before storing it.
 
 ### Integration snippets
 

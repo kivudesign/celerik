@@ -21,7 +21,8 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: true,
     modulePreload: false,
-    cssCodeSplit: false,
+    // CSS imported by a lazy chunk (Quill, FilePond) is loaded with that chunk only.
+    cssCodeSplit: true,
     // CommonJS libraries (Parsley, parts of DataTables) call require('jquery'): give them
     // the shim's default export (window.jQuery), not its module namespace object.
     commonjsOptions: {
@@ -33,7 +34,8 @@ export default defineConfig({
       output: {
         entryFileNames: 'celerik.js',
         chunkFileNames: 'chunks/[name]-[hash].js',
-        assetFileNames: (asset) => (asset.names?.some((name) => name.endsWith('.css')) ? 'celerik.css' : 'assets/[name]-[hash][extname]'),
+        // The entry stylesheet keeps its stable name; chunk stylesheets are hashed.
+        assetFileNames: (asset) => (asset.names?.includes('index.css') ? 'celerik.css' : 'chunks/[name]-[hash][extname]'),
       },
     },
   },

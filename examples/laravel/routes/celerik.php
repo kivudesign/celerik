@@ -4,6 +4,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\CelerikArticleController;
 use App\Http\Controllers\CelerikCalendarController;
 use App\Http\Controllers\CelerikDemoController;
 use Illuminate\Support\Facades\Route;
@@ -25,4 +26,15 @@ Route::prefix('celerik/scheduler')
         Route::post('/events/create', 'create')->name('.create');
         Route::post('/events/update', 'update')->name('.update');
         Route::post('/events/delete', 'delete')->name('.delete');
+    });
+
+Route::prefix('celerik/article')
+    ->name('celerik.article')
+    ->controller(CelerikArticleController::class)
+    ->group(static function (): void {
+        Route::get('/', 'show');
+        Route::post('/', 'submit')->name('.submit');
+        Route::match(['POST', 'DELETE'], '/upload/{field}', 'upload')
+            ->whereIn('field', ['cover', 'attachments'])
+            ->name('.upload');
     });
