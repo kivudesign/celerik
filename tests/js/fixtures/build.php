@@ -12,6 +12,7 @@ use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
 use Celerik\Ui\Components\Grid;
 use Celerik\Ui\Components\Scheduler;
+use Celerik\Ui\Upload\UploadRules;
 
 require dirname(__DIR__, 3) . '/vendor/autoload.php';
 
@@ -49,6 +50,20 @@ $fixtures = [
         ->title('Monthly revenue')
         ->labels(['Jan', 'Feb', 'Mar'])
         ->dataset('Revenue', [1200, 1900, 1500]),
+
+    'form-rich' => Form::make('article')
+        ->action('/articles')
+        ->csrf('test-token')
+        ->add(
+            Field::text('title')->required(),
+            Field::editor('body', 'Article')
+                ->required()
+                ->help('Headings, lists and links are allowed.')
+                ->value('<h2>Intro</h2><p>Hello <strong>world</strong></p><script>alert(1)</script>'),
+            Field::file('cover', 'Cover image')->rules(UploadRules::images()->maxSize('2M'))->upload('/uploads')->required(),
+            Field::file('attachments')->rules(UploadRules::documents()->maxFiles(3))->upload('/uploads'),
+        )
+        ->submit('Publish'),
 
     'form' => Form::make('signup')
         ->action('/signup')

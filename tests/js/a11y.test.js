@@ -31,6 +31,20 @@ describe('accessibility (axe-core, WCAG 2.1 AA)', () => {
     expect(await violations()).toEqual([]);
   });
 
+  test('form with editor and uploads: PHP markup, then Quill and FilePond, then failed validation', async () => {
+    const form = loadFixture('form-rich');
+    expect(await violations()).toEqual([]);
+
+    const parsley = await initForm(form, readOptions(form));
+    expect(await violations()).toEqual([]);
+
+    form.querySelector('textarea[name="body"]').celerikEditor.setText('', 'user');
+    parsley.validate();
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    expect(await violations()).toEqual([]);
+    parsley.destroy();
+  }, 30000);
+
   test('chart markup from PHP', async () => {
     loadFixture('chart');
     expect(await violations()).toEqual([]);
@@ -40,7 +54,7 @@ describe('accessibility (axe-core, WCAG 2.1 AA)', () => {
     const form = loadFixture('form');
     expect(await violations()).toEqual([]);
 
-    const parsley = initForm(form, readOptions(form));
+    const parsley = await initForm(form, readOptions(form));
     parsley.validate();
     expect(await violations()).toEqual([]);
     parsley.destroy();
