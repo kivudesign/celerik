@@ -43,8 +43,8 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 
 | Component | Library | License | Phase |
 |---|---|---|---|
-| Scheduler | FullCalendar (standard plugins) | MIT | 2 |
-| Calendar | FullCalendar / Flatpickr inline | MIT | 2 |
+| Scheduler | FullCalendar (standard plugins) | MIT | 2 ✅ |
+| Calendar | FullCalendar (`Scheduler` month view) / Flatpickr inline | MIT | 2 ✅ |
 | Gantt | Frappe Gantt | MIT | – |
 
 > FullCalendar's resource and timeline views are **premium** (commercial). Only the MIT standard plugins are bundled.

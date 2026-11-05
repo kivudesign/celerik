@@ -1,6 +1,6 @@
 # Laravel example
 
-Drop-in files for a fresh Laravel 11+ application (verified on Laravel 13), showing a server-side Grid (Eloquent), a Chart and a validated Form.
+Drop-in files for a fresh Laravel 11+ application (verified on Laravel 13), showing a server-side Grid (Eloquent), a Chart, a validated Form and an editable Scheduler.
 
 ## Setup
 
@@ -17,7 +17,9 @@ Copy the example files into the app:
 
 | From `examples/laravel/` | To the app |
 |---|---|
-| `app/Http/Controllers/CelerikDemoController.php` | `app/Http/Controllers/` |
+| `app/Http/Controllers/CelerikDemoController.php`, `CelerikCalendarController.php` | `app/Http/Controllers/` |
+| `app/Models/Meeting.php` | `app/Models/` |
+| `database/migrations/*_create_meetings_table.php` | `database/migrations/` (then run `php artisan migrate`) |
 | `routes/celerik.php` | `routes/` (then add `require __DIR__ . '/celerik.php';` to `routes/web.php`) |
 | `resources/views/celerik/*.blade.php` | `resources/views/celerik/` |
 
@@ -28,7 +30,7 @@ php artisan tinker --execute="App\Models\User::factory(120)->create()"
 php artisan serve
 ```
 
-Then open `/celerik/grid`, `/celerik/chart` and `/celerik/form`.
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form` and `/celerik/scheduler`.
 
 ## What it shows
 
@@ -40,3 +42,8 @@ Then open `/celerik/grid`, `/celerik/chart` and `/celerik/form`.
 - **Form**
   - Client-side validation uses Parsley.
   - Laravel's `$request->validate()` stays the source of truth. Its errors and old input are passed back with `errors()` and `values()`.
+- **Scheduler + `EloquentEventSource`**
+  - Only meetings overlapping the visible range are queried.
+  - Changes are POSTed as JSON with the `X-CSRF-TOKEN` header, which Laravel's CSRF middleware accepts natively. `Event::fromArray()` validates them.
+  - Dates are converted to the app time zone before saving, because Eloquent drops UTC offsets.
+  - If the server refuses a change (validation, CSRF, 404), the calendar rolls it back.

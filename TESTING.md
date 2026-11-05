@@ -10,10 +10,10 @@
 ## PHP Tests
 
 - Components: rendering, escaping, ARIA attributes, option serialization, validation of arguments.
-- Data layer: both request formats, field whitelisting, clamping, `ArrayDataSource` paging, search and sort.
-- Laravel adapter: `EloquentDataSource` runs against in-memory SQLite (`illuminate/database` is a dev dependency).
-- Symfony adapter: the Twig extension renders through a real `Twig\Environment`.
-- `DoctrineDataSource` has no automated test yet (it needs `doctrine/orm`; planned).
+- Data layer: both request formats, field whitelisting, clamping, literal `%`/`_` in search, `ArrayDataSource` paging, search and sort.
+- Events: strict ISO 8601 dates, validation (title, end ≥ start, safe colors and URLs), date ranges and overlap rules.
+- Laravel adapter: `EloquentDataSource` and `EloquentEventSource` run against in-memory SQLite (`illuminate/database` is a dev dependency).
+- Symfony adapter: the Twig extension renders through a real `Twig\Environment`. `DoctrineDataSource` and `DoctrineEventSource` run against in-memory SQLite (`doctrine/orm` is a dev dependency).
 
 ## JavaScript Tests
 
@@ -22,8 +22,10 @@
   - DataTables paging, search and export buttons
   - Parsley rules and Bootstrap classes
   - Inputmask masks
+  - FullCalendar month, week and list views
 - `npm test` first runs `tests/js/fixtures/build.php`, which renders the PHP components to HTML. JS tests always use the markup PHP really produces.
 - Chart.js rendering is not tested in jsdom (no canvas); only its config is.
+- Scheduler changes (create, move, resize, delete) are tested with an injected request function, including the rollback when the server refuses a change.
 
 ## Accessibility Tests
 

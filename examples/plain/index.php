@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Framework-free example: Grid (server-side), Chart and Form with plain PHP.
+ * Framework-free example: Grid (server-side), Chart, Scheduler and Form with plain PHP.
  *
  *     composer install && npm install && npm run build
  *     php -S localhost:8000 examples/plain/index.php
@@ -64,6 +64,9 @@ $chart = Chart::make('cities')
 
 session_start();
 $_SESSION['csrf'] ??= bin2hex(random_bytes(16));
+
+require __DIR__ . '/calendar.php';
+
 $errors = [];
 $message = null;
 
@@ -118,6 +121,14 @@ $form = Form::make('contact')
     <section class="mb-5" aria-labelledby="chart-title">
         <h2 id="chart-title" class="h5">Chart</h2>
         <?= $chart ?>
+    </section>
+
+    <section class="mb-5" aria-labelledby="scheduler-title">
+        <h2 id="scheduler-title" class="h5">Scheduler</h2>
+        <p class="text-body-secondary small">
+            Drag or resize an event to move it, select a time range to create one, click an event to delete it.
+        </p>
+        <?= $scheduler ?>
     </section>
 
     <section class="mb-5" aria-labelledby="form-title">

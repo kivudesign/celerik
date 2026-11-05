@@ -1,6 +1,6 @@
 # Symfony example
 
-Drop-in files for a Symfony 7 web application, showing a server-side Grid (Doctrine), a Chart and a validated Form.
+Drop-in files for a Symfony 7 web application, showing a server-side Grid (Doctrine), a Chart, a validated Form and an editable Scheduler.
 
 ## Setup
 
@@ -26,8 +26,8 @@ Copy the example files into the app:
 
 | From `examples/symfony/` | To the app |
 |---|---|
-| `src/Controller/CelerikDemoController.php` | `src/Controller/` |
-| `src/Entity/Product.php`, `src/Repository/ProductRepository.php` | `src/Entity/`, `src/Repository/` |
+| `src/Controller/CelerikDemoController.php`, `CelerikCalendarController.php` | `src/Controller/` |
+| `src/Entity/Product.php`, `Meeting.php` and their repositories | `src/Entity/`, `src/Repository/` |
 | `templates/celerik/*.html.twig` | `templates/celerik/` |
 
 Create the table and some data, for example with SQLite (`DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"`):
@@ -38,7 +38,7 @@ php bin/console dbal:run-sql "INSERT INTO product (name, category, price) VALUES
 symfony serve
 ```
 
-Then open `/celerik/grid`, `/celerik/chart` and `/celerik/form`.
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form` and `/celerik/scheduler`.
 
 ## What it shows
 
@@ -50,3 +50,8 @@ Then open `/celerik/grid`, `/celerik/chart` and `/celerik/form`.
 - **Form**
   - The CSRF token is checked with `isCsrfTokenValid()`.
   - The Validator component stays the source of truth; its violations are passed back with `errors()`.
+- **Scheduler + `DoctrineEventSource`**
+  - Only meetings overlapping the visible range are queried.
+  - Changes are POSTed as JSON with the `X-CSRF-TOKEN` header, checked with `isCsrfTokenValid()`. `Event::fromArray()` validates them.
+  - Dates are converted to the server time zone before saving, because Doctrine drops UTC offsets.
+  - If the server refuses a change (validation, CSRF, 404), the calendar rolls it back.

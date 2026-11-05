@@ -9,6 +9,8 @@ Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The prebuilt bundle i
 | [Chart.js](https://www.chartjs.org) | 4.x | MIT | `chunks/chart-*.js` |
 | [Parsley.js](https://parsleyjs.org) | 2.9 | MIT | `chunks/form-*.js` |
 | [Inputmask](https://github.com/RobinHerbots/Inputmask) | 5.x | MIT | `chunks/form-*.js` |
+| [FullCalendar](https://fullcalendar.io) (`core`, `daygrid`, `timegrid`, `list`, `interaction`) | 6.x | MIT | `chunks/scheduler-*.js` |
+| [Preact](https://preactjs.com) (FullCalendar dependency) | 10.x | MIT | `chunks/scheduler-*.js` |
 
 ## Peer dependencies (not bundled, loaded by the application)
 

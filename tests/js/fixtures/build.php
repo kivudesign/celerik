@@ -11,10 +11,25 @@ use Celerik\Ui\Components\Chart;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
 use Celerik\Ui\Components\Grid;
+use Celerik\Ui\Components\Scheduler;
 
 require dirname(__DIR__, 3) . '/vendor/autoload.php';
 
 $fixtures = [
+    'scheduler' => Scheduler::make('team-calendar')
+        ->title('Team calendar')
+        ->view('list')
+        ->date('2026-11-05')
+        ->timeZone('UTC')
+        ->firstDay(1)
+        ->events([
+            ['id' => 1, 'title' => 'Kick-off', 'start' => '2026-11-03T09:00:00Z', 'end' => '2026-11-03T10:00:00Z'],
+            ['id' => 2, 'title' => 'Design review', 'start' => '2026-11-05T14:00:00Z', 'end' => '2026-11-05T15:30:00Z'],
+            ['id' => 3, 'title' => 'Holiday', 'start' => '2026-11-06'],
+        ])
+        ->updateUrl('/events/update')
+        ->csrf('test-token'),
+
     'grid' => Grid::make('users')
         ->caption('Users')
         ->column('id', 'ID')

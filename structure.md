@@ -20,26 +20,33 @@ celerik/
 │   │   ├── Grid/Column.php
 │   │   ├── Chart.php
 │   │   ├── Form.php
-│   │   └── Form/Field.php
+│   │   ├── Form/Field.php
+│   │   └── Scheduler.php
 │   ├── Data/
 │   │   ├── DataSourceInterface.php
 │   │   ├── DataRequest.php       # Parses DataTables + simple query formats
 │   │   ├── DataResult.php        # {data, meta}
-│   │   └── ArrayDataSource.php
+│   │   ├── ArrayDataSource.php
+│   │   ├── Event.php             # Validated calendar event (FullCalendar format)
+│   │   ├── DateRange.php         # Visible range from ?start=&end=
+│   │   ├── EventSourceInterface.php  ArrayEventSource.php  EventResult.php
 │   ├── Support/
 │   │   ├── Html.php              # Escaping HTML builder
-│   │   └── Arr.php               # Dot-notation helpers
+│   │   ├── Arr.php               # Dot-notation helpers
+│   │   └── Dates.php             # Strict ISO 8601 parsing
 │   └── Adapters/
 │       ├── Laravel/
 │       │   ├── CelerikServiceProvider.php
 │       │   ├── EloquentDataSource.php
+│       │   ├── EloquentEventSource.php
 │       │   └── View/
 │       │       ├── CelerikComponent.php    # <x-celerik :component="..." />
 │       │       └── AssetsComponent.php     # <x-celerik-assets />
 │       └── Symfony/
 │           ├── CelerikUiBundle.php
 │           ├── CelerikTwigExtension.php    # celerik(), celerik_assets()
-│           └── DoctrineDataSource.php
+│           ├── DoctrineDataSource.php
+│           └── DoctrineEventSource.php
 │
 ├── resources/                    # Frontend sources (not shipped in the Composer dist)
 │   ├── js/
@@ -47,7 +54,9 @@ celerik/
 │   │   ├── core.js               # register / init / deepMerge
 │   │   ├── grid.js   grid-config.js
 │   │   ├── chart.js  chart-config.js
-│   │   └── form.js   form-config.js
+│   │   ├── form.js   form-config.js
+│   │   ├── scheduler.js  scheduler-config.js
+│   │   └── jquery-global.js      # `jquery` → window.jQuery (peer dependency)
 │   └── scss/
 │       ├── _variables.scss
 │       ├── _components.scss
@@ -55,8 +64,9 @@ celerik/
 │           └── bootstrap.scss    # material.scss, tailwind.scss in Phase 2
 │
 ├── public/                       # Build output, shipped with the package
-│   ├── celerik.js  celerik.js.map
-│   └── celerik.css
+│   ├── celerik.js                # ES module entry (~3 KB)
+│   ├── celerik.css
+│   └── chunks/                   # grid, chart, form, scheduler: loaded on demand
 │
 ├── tests/
 │   ├── php/                      # PHPUnit (Celerik\Ui\Tests\)
@@ -65,6 +75,7 @@ celerik/
 │   └── js/                       # Jest + axe-core
 │       ├── fixtures/build.php    # Renders PHP components to HTML fixtures
 │       ├── core.test.js  grid.test.js  chart.test.js  form.test.js  a11y.test.js
+│       ├── scheduler.test.js  scheduler-integration.test.js
 │       └── helpers.js  setup.js
 │
 ├── examples/
