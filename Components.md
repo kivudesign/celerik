@@ -89,8 +89,8 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 | Component | Library | License | Phase |
 |---|---|---|---|
 | Form validation | Parsley.js 🧩 | MIT | 1 ✅ |
-| Upload | FilePond / Dropzone | MIT | 2 |
-| Rich Text Editor | Quill / Editor.js | BSD-3 / Apache 2.0 | 2 |
+| Upload | FilePond (+ validate-type, validate-size, image-preview plugins) | MIT | 2 ✅ (`Field::file`) |
+| Rich Text Editor | Quill 2 | BSD-3 | 2 ✅ (`Field::editor`) |
 | Markdown Editor | EasyMDE | MIT | – |
 | File Manager | elFinder 🧩 | BSD-3 | 2 |
 

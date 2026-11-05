@@ -11,6 +11,10 @@ Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The prebuilt bundle i
 | [Inputmask](https://github.com/RobinHerbots/Inputmask) | 5.x | MIT | `chunks/form-*.js` |
 | [FullCalendar](https://fullcalendar.io) (`core`, `daygrid`, `timegrid`, `list`, `interaction`) | 6.x | MIT | `chunks/scheduler-*.js` |
 | [Preact](https://preactjs.com) (FullCalendar dependency) | 10.x | MIT | `chunks/scheduler-*.js` |
+| [FilePond](https://pqina.nl/filepond/) and its `file-validate-type`, `file-validate-size`, `image-preview` plugins | 4.x | MIT | `chunks/upload-*.js`, `chunks/upload-*.css` |
+| [Quill](https://quilljs.com) | 2.x | BSD-3-Clause | `chunks/editor-*.js`, `chunks/editor-*.css` |
+| [Parchment](https://github.com/slab/parchment) (Quill dependency) | 3.x | BSD-3-Clause | `chunks/editor-*.js` |
+| [quill-delta](https://github.com/slab/delta), [eventemitter3](https://github.com/primus/eventemitter3), [lodash-es](https://lodash.com) (Quill dependencies) | – | MIT | `chunks/editor-*.js` |
 
 ## Peer dependencies (not bundled, loaded by the application)
 

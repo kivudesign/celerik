@@ -2,7 +2,7 @@
 
 An open-source, Bootstrap-based UI component suite for PHP, inspired by Telerik UI. It works with plain PHP and has optional adapters for **Laravel 11+** and **Symfony 7**.
 
-Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask and FullCalendar. Each library is loaded only on pages that use it.
+Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask, FullCalendar, Quill and FilePond. Each library (and its stylesheet) is loaded only on pages that use it.
 
 > **Status: Phase 2 in progress.** Grid, Chart, Form and Scheduler are available. See the [roadmap](ROADMAP.md).
 
@@ -49,6 +49,8 @@ Load Bootstrap 5.3 and jQuery 3.7, then the Celerik bundle:
 | Grid | `Components\Grid` | DataTables 2 | Client- or server-side, export, caption, column whitelisting |
 | Chart | `Components\Chart` | Chart.js 4 | Embedded or remote data, `fromRows()`, hidden data table as text alternative |
 | Form | `Components\Form` | Parsley.js, Inputmask | HTML5 rules, masks, CSRF, method spoofing, server errors and old input |
+| File upload | `Field::file()` + `Upload\UploadHandler` | FilePond 4 | Async or classic uploads; real MIME detection, extension whitelist, random names; falls back to a plain file input |
+| Rich text editor | `Field::editor()` + `Support\EditorHtml` | Quill 2 | Toolbar presets, accessible labelling, server-side sanitizing (`symfony/html-sanitizer`) |
 | Scheduler | `Components\Scheduler` | FullCalendar 6 (MIT plugins) | Month, week, day and list views; create, move, resize and delete through your endpoints, rolled back if the server refuses |
 
 The full Telerik → open-source mapping is in [Components.md](Components.md).
@@ -56,8 +58,8 @@ The full Telerik → open-source mapping is in [Components.md](Components.md).
 ## Examples
 
 - [`examples/plain`](examples/plain): no framework. Run `php -S localhost:8000 examples/plain/index.php`.
-- [`examples/laravel`](examples/laravel): Eloquent grid, chart, validated form and scheduler.
-- [`examples/symfony`](examples/symfony): Doctrine grid, chart, validated form and scheduler.
+- [`examples/laravel`](examples/laravel): Eloquent grid, chart, validated form, scheduler, and an article form with rich text and uploads.
+- [`examples/symfony`](examples/symfony): Doctrine grid, chart, validated form, scheduler, and an article form with rich text and uploads.
 
 ## Development
 
