@@ -32,7 +32,19 @@ php artisan serve
 
 The article form also needs the sanitizer: `composer require symfony/html-sanitizer`.
 
-Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article` and `/celerik/ui`.
+The file manager also needs elFinder, its assets and an authorization gate:
+
+```bash
+composer require studio-42/elfinder
+php artisan vendor:publish --tag=celerik-elfinder   # copies elFinder's css, img, js, sounds to public/vendor/elfinder
+```
+
+```php
+// app/Providers/AppServiceProvider.php, in boot(). Replace with your own rule, e.g. $user->is_admin.
+Gate::define('manage-files', fn (?User $user) => app()->isLocal());
+```
+
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article`, `/celerik/ui` and `/celerik/files`.
 
 > **Windows:** `php artisan serve` starts PHP without the `TEMP`/`TMP` environment variables, so every upload fails with "unable to create a temporary file". Use `cd public && php -S 127.0.0.1:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php` instead, or set `upload_tmp_dir` in `php.ini`.
 
@@ -58,3 +70,6 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/schedule
 - **Tabs, Modal and Notification** (`/celerik/ui`)
   - The newsletter form sits in a Modal. When `$request->validate()` fails, `open($errors !== [])` reopens the modal with the errors.
   - On success the controller redirects `with('success', ...)`, and `Notification::make()->fromFlash(session()->only([...]))` shows it as a toast.
+- **File manager** (`/celerik/files`)
+  - Both the page and the connector check the `manage-files` gate. Files live in `storage/app/private/files`, outside `public/`.
+  - Requests carry Laravel's CSRF token (`FileManager::csrf()`) and elFinder's own token; uploads are checked by content like `UploadHandler`.
