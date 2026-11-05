@@ -1,5 +1,39 @@
-import Chart from 'chart.js/auto';
+import {
+  ArcElement,
+  BarController,
+  BarElement,
+  BubbleController,
+  CategoryScale,
+  Chart,
+  Colors,
+  DoughnutController,
+  Filler,
+  Legend,
+  LinearScale,
+  LineController,
+  LineElement,
+  LogarithmicScale,
+  PieController,
+  PointElement,
+  PolarAreaController,
+  RadarController,
+  RadialLinearScale,
+  ScatterController,
+  SubTitle,
+  Title,
+  Tooltip,
+} from 'chart.js';
 import { buildChartConfig, renderDataTable } from './chart-config.js';
+
+// Everything the PHP Chart types and common options need. Time scales are left out:
+// they require a date adapter that Celerik does not ship.
+Chart.register(
+  LineController, BarController, PieController, DoughnutController,
+  RadarController, PolarAreaController, ScatterController, BubbleController,
+  LineElement, BarElement, ArcElement, PointElement,
+  CategoryScale, LinearScale, LogarithmicScale, RadialLinearScale,
+  Colors, Filler, Legend, Title, SubTitle, Tooltip,
+);
 
 export function initChart(element, options) {
   const canvas = element.querySelector('canvas');
