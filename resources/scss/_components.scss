@@ -241,3 +241,48 @@
     scroll-behavior: auto !important;
   }
 }
+
+// Forced-colors mode (Windows High Contrast) does not paint box-shadow, which Bootstrap
+// and the themes use for focus rings, nor author backgrounds. Show focus with an outline
+// and selection with system colors (WCAG 2.4.7, 1.4.11).
+@media (forced-colors: active) {
+  // !important: FullCalendar and elFinder remove outlines with more specific selectors.
+  :is(.dt-container, .celerik-form, .celerik-scheduler, .celerik-tabs, .celerik-filemanager, .celerik-modal, .notyf)
+    :focus-visible,
+  [aria-haspopup='dialog'][data-bs-toggle='modal']:focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px;
+  }
+
+  .ql-container.ql-snow:focus-within,
+  .celerik-modal:focus-visible .modal-content {
+    outline: 2px solid Highlight;
+  }
+
+  .celerik-tabs .nav-link.active {
+    border-bottom: 3px solid Highlight;
+  }
+
+  .celerik-scheduler .fc-day-today {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .celerik-grid .page-item.active .page-link,
+  .dt-container .page-item.active .page-link {
+    forced-color-adjust: none;
+    color: HighlightText;
+    background-color: Highlight;
+  }
+
+  .celerik-filemanager.elfinder .ui-state-active,
+  .celerik-filemanager.elfinder .ui-selected {
+    forced-color-adjust: none;
+    color: HighlightText;
+    background: Highlight;
+  }
+
+  .notyf__toast {
+    border: 1px solid CanvasText;
+  }
+}
