@@ -70,6 +70,15 @@ final class Scheduler extends Component
 
     private string $csrfHeader = 'X-CSRF-TOKEN';
 
+    /** Texts of the prompts and of the event dialog, with their English defaults in scheduler-config.js. */
+    public const LABELS = [
+        'newEvent', 'confirmDelete', 'createEvent', 'editEvent', 'title', 'allDay', 'start', 'end',
+        'save', 'cancel', 'delete', 'titleRequired', 'startRequired', 'endBeforeStart',
+    ];
+
+    /** @var array<string, string> */
+    private array $labels = [];
+
     public static function name(): string
     {
         return 'scheduler';
@@ -229,7 +238,8 @@ final class Scheduler extends Component
     }
 
     /**
-     * Endpoint receiving moved and resized events.
+     * Endpoint receiving moved and resized events, from dragging or from the event dialog
+     * (Enter, Space or a click on an event), so dates can be changed without a mouse.
      */
     public function updateUrl(string $url): self
     {
@@ -239,7 +249,8 @@ final class Scheduler extends Component
     }
 
     /**
-     * Endpoint receiving deleted events (clicking an event without a URL deletes it).
+     * Endpoint receiving deleted events. With updateUrl() the event dialog has a Delete
+     * button; otherwise clicking (or Enter on) an event without a URL asks to delete it.
      */
     public function deleteUrl(string $url): self
     {
@@ -259,6 +270,28 @@ final class Scheduler extends Component
 
         $this->csrfToken = $token;
         $this->csrfHeader = $header;
+
+        return $this;
+    }
+
+    /**
+     * Translates the prompts and the event dialog, e.g. ['save' => 'Enregistrer'].
+     * "{title}" in confirmDelete and editEvent is replaced by the event title.
+     *
+     * @param array<string, string> $labels Keys from self::LABELS.
+     */
+    public function labels(array $labels): self
+    {
+        foreach ($labels as $key => $text) {
+            if (!in_array($key, self::LABELS, true)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Unknown scheduler label "%s". Available: %s.',
+                    $key,
+                    implode(', ', self::LABELS),
+                ));
+            }
+            $this->labels[$key] = $text;
+        }
 
         return $this;
     }
@@ -303,6 +336,7 @@ final class Scheduler extends Component
             'updateUrl' => $this->updateUrl,
             'deleteUrl' => $this->deleteUrl,
             'csrf' => $this->csrfToken === null ? null : ['header' => $this->csrfHeader, 'token' => $this->csrfToken],
+            'labels' => $this->labels,
             'options' => $this->options,
         ], static fn (mixed $value): bool => $value !== null && $value !== []);
     }

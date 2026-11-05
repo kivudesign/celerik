@@ -118,6 +118,21 @@ final class SchedulerTest extends TestCase
         yield 'bad csrf header' => [static fn (Scheduler $s) => $s->csrf('t', "X-Token\r\nInjected: 1")];
     }
 
+    public function testLabelsAreEscapedOptions(): void
+    {
+        $scheduler = Scheduler::make('team')
+            ->updateUrl('/events/update')
+            ->labels(['save' => 'Enregistrer', 'editEvent' => 'Modifier « {title} »'])
+            ->labels(['cancel' => '<Annuler>']);
+
+        self::assertSame(
+            ['save' => 'Enregistrer', 'editEvent' => 'Modifier « {title} »', 'cancel' => '<Annuler>'],
+            $scheduler->toArray()['labels'],
+        );
+        self::assertArrayNotHasKey('labels', Scheduler::make()->toArray());
+        self::assertStringContainsString('&quot;cancel&quot;:&quot;&lt;Annuler&gt;&quot;', $scheduler->render());
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('invalidConfigurations')]
     public function testRejectsInvalidConfiguration(callable $configure): void
     {

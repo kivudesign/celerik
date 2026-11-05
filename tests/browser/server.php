@@ -77,6 +77,15 @@ if ($path === '/files/connector') {
     );
 }
 
+// Scheduler endpoints: accept every change and echo the event, as a real endpoint would.
+if (in_array($path, ['/events/create', '/events/update', '/events/delete'], true)) {
+    $event = json_decode((string) file_get_contents('php://input'), true) ?? [];
+    $event['id'] ??= 'new-' . bin2hex(random_bytes(4));
+    header('Content-Type: application/json');
+    echo json_encode(['data' => $event, 'meta' => []]);
+    exit;
+}
+
 if ($path !== '/') {
     http_response_code(404);
     exit('Not found.');
@@ -143,7 +152,9 @@ $components = [
             ['id' => 2, 'title' => 'Design review', 'start' => '2026-11-05T14:00:00Z', 'end' => '2026-11-05T15:30:00Z', 'color' => '#ffc107'],
             ['id' => 3, 'title' => 'Holiday', 'start' => '2026-11-06'],
         ])
+        ->createUrl('/events/create')
         ->updateUrl('/events/update')
+        ->deleteUrl('/events/delete')
         ->csrf('test-token'),
 
     Tabs::make('account')

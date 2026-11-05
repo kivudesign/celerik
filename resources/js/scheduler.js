@@ -21,18 +21,56 @@ function unlabelDayCell({ el }) {
   el.removeAttribute('aria-labelledby');
 }
 
+// After a change FullCalendar renders the event again, sometimes after the request has
+// finished: focus the element it renders next (or the current one), so keyboard users
+// do not land at the top of the page.
+function eventFocuser(element) {
+  let pending = null;
+  const find = (id) => [...element.querySelectorAll('[data-celerik-event-id]')]
+    .find((el) => el.dataset.celerikEventId === id);
+
+  return {
+    focus(id) {
+      if (id === undefined || id === null || id === '') {
+        return;
+      }
+      pending = String(id);
+      setTimeout(() => {
+        if (pending === String(id)) {
+          find(pending)?.focus();
+        }
+      }, 50);
+      setTimeout(() => {
+        pending = null;
+      }, 1000);
+    },
+    mounted(el, id) {
+      if (pending !== null && pending === id) {
+        setTimeout(() => el.isConnected && el.focus(), 0);
+      }
+    },
+  };
+}
+
 export function initScheduler(element, options) {
   // Replace the server-rendered fallback list with the calendar.
   element.replaceChildren();
 
   const config = buildSchedulerConfig(options);
-  const { datesSet, dayCellDidMount } = config;
+  const { datesSet, dayCellDidMount, eventDidMount } = config;
+  let calendar = null;
+  const focuser = eventFocuser(element);
+  const { customButtons, ...handlers } = createChangeHandlers(element, options, {
+    calendar: () => calendar,
+    focusEvent: focuser.focus,
+  });
 
-  const calendar = new Calendar(element, {
+  calendar = new Calendar(element, {
     plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
     locales: allLocales,
     ...config,
-    ...createChangeHandlers(element, options),
+    ...handlers,
+    customButtons: { ...config.customButtons, ...customButtons },
     datesSet(info) {
       hideDecorativeIcons(element);
       datesSet?.(info);
@@ -40,6 +78,11 @@ export function initScheduler(element, options) {
     dayCellDidMount(info) {
       unlabelDayCell(info);
       dayCellDidMount?.(info);
+    },
+    eventDidMount(info) {
+      info.el.dataset.celerikEventId = info.event.id;
+      focuser.mounted(info.el, info.event.id);
+      eventDidMount?.(info);
     },
   });
   calendar.render();

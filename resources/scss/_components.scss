@@ -95,6 +95,21 @@
   }
 }
 
+// Event dialog (scheduler-dialog.js): a native <dialog> in the top layer, on Bootstrap colors.
+.celerik-scheduler-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1.5rem;
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--celerik-radius);
+  box-shadow: var(--bs-box-shadow-lg);
+
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
 .celerik-form {
   .celerik-required {
     color: var(--celerik-required-color);
@@ -247,7 +262,8 @@
 // and selection with system colors (WCAG 2.4.7, 1.4.11).
 @media (forced-colors: active) {
   // !important: FullCalendar and elFinder remove outlines with more specific selectors.
-  :is(.dt-container, .celerik-form, .celerik-scheduler, .celerik-tabs, .celerik-filemanager, .celerik-modal, .notyf)
+  :is(.dt-container, .celerik-form, .celerik-scheduler, .celerik-scheduler-dialog, .celerik-tabs, .celerik-filemanager,
+    .celerik-modal, .notyf)
     :focus-visible,
   [aria-haspopup='dialog'][data-bs-toggle='modal']:focus-visible {
     outline: 2px solid Highlight !important;
