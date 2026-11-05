@@ -34,7 +34,7 @@ describe('scheduler config', () => {
       headerToolbar: { end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
     });
     expect(config.events.map((e) => e.title)).toEqual(['Kick-off', 'Design review', 'Holiday']);
-    expect(config).not.toHaveProperty('locale');
+    expect(config.locale).toBe('en'); // not FullCalendar's first bundled locale (Afrikaans)
   });
 
   test('remote events unwrap the {data, meta} envelope', () => {
