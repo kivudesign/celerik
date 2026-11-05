@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 export const THEMES = ['bootstrap', 'material', 'tailwind'];
 export const MODES = ['light', 'dark'];
-export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
+export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 // Opens the test page and waits until every [data-celerik] component has fired
 // celerik:ready. Console errors are collected and returned.

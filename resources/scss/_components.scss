@@ -236,6 +236,16 @@
   }
 }
 
+// elFinder's folder-tree expand arrow is 12 x 14 px: give it a 24 x 24 px hit area without
+// changing how it looks (WCAG 2.5.8, Target Size). The root folder's arrow is only 6 px
+// from the tree's edge, so the area also covers the edge of the folder icon next to it.
+.celerik-filemanager.elfinder .elfinder-navbar-arrow::after {
+  position: absolute;
+  inset: -5px -6px;
+  z-index: 1;
+  content: '';
+}
+
 // Less motion when the user asks for it (WCAG 2.3.3). Bootstrap already removes its own
 // transitions (fades, modal slide). Notyf removes toasts on animationend, so its
 // animations are shortened rather than removed. Chart.js animation is turned off in JS.
