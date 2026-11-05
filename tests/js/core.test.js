@@ -1,4 +1,4 @@
-import { deepMerge, init, readOptions, register } from '../../resources/js/core.js';
+import { deepMerge, init, prefersReducedMotion, readOptions, register } from '../../resources/js/core.js';
 
 describe('core', () => {
   test('initialises each element once and passes parsed options', async () => {
@@ -82,5 +82,14 @@ describe('core', () => {
   test('deepMerge merges objects and replaces arrays', () => {
     expect(deepMerge({ a: { b: 1, c: 2 }, list: [1, 2] }, { a: { c: 3 }, list: [9] }))
       .toEqual({ a: { b: 1, c: 3 }, list: [9] });
+  });
+
+  test('prefersReducedMotion reads the media query, and is false without matchMedia', () => {
+    const original = window.matchMedia;
+    window.matchMedia = jest.fn((query) => ({ matches: query === '(prefers-reduced-motion: reduce)' }));
+    expect(prefersReducedMotion()).toBe(true);
+    window.matchMedia = undefined;
+    expect(prefersReducedMotion()).toBe(false);
+    window.matchMedia = original;
   });
 });

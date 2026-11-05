@@ -1,12 +1,14 @@
 import { deepMerge } from './core.js';
 
-export function buildChartConfig(options) {
+// reducedMotion: the user asked for less motion. Animation options from PHP still win.
+export function buildChartConfig(options, { reducedMotion = false } = {}) {
   return {
     type: options.type ?? 'line',
     data: options.data ?? { labels: [], datasets: [] },
     options: deepMerge({
       responsive: true,
       maintainAspectRatio: !options.height,
+      ...(reducedMotion ? { animation: false } : {}),
       plugins: {
         title: { display: Boolean(options.title), text: options.title ?? '' },
       },

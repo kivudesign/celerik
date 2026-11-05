@@ -220,3 +220,24 @@
     border-color: transparent;
   }
 }
+
+// Less motion when the user asks for it (WCAG 2.3.3). Bootstrap already removes its own
+// transitions (fades, modal slide). Notyf removes toasts on animationend, so its
+// animations are shortened rather than removed. Chart.js animation is turned off in JS.
+@media (prefers-reduced-motion: reduce) {
+  .notyf__toast,
+  .notyf__wrapper,
+  .notyf__ripple,
+  .notyf__message,
+  .notyf__icon {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+  }
+
+  .celerik-scheduler *,
+  .celerik-filemanager *,
+  .filepond--root * {
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -22,6 +22,14 @@ describe('chart config', () => {
     expect(config.options.plugins.title.display).toBe(false);
   });
 
+  test('reduced motion turns animation off, unless PHP options set it', () => {
+    expect(buildChartConfig({}).options.animation).toBeUndefined();
+    expect(buildChartConfig({}, { reducedMotion: true }).options.animation).toBe(false);
+
+    const config = buildChartConfig({ options: { animation: { duration: 200 } } }, { reducedMotion: true });
+    expect(config.options.animation).toEqual({ duration: 200 });
+  });
+
   test('renders an accessible data table for remote data', () => {
     document.body.innerHTML = '<figure id="f"></figure>';
     const table = renderDataTable(document.getElementById('f'), 'Signups', {
