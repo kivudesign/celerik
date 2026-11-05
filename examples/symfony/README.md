@@ -51,7 +51,7 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/schedule
 
 ## What it shows
 
-- **`{{ celerik_assets(asset('bundles/celerikui')) }}`** prints the `<link>` and `<script>` tags for the bundle. Load jQuery and Bootstrap before it.
+- **`{{ celerik_assets(asset('bundles/celerikui')) }}`** prints the `<link>` and `<script>` tags for the bundle. Load jQuery and Bootstrap before it. Add `theme: 'material'` or `theme: 'tailwind'` for another look.
 - **`{{ celerik(grid) }}`** renders any Celerik component. The output is already escaped, and the function is marked `is_safe`.
 - **`Grid::respond()` + `DoctrineDataSource`**
   - Paging, sorting and search run in DQL.

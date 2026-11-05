@@ -85,6 +85,10 @@ if ($path === '/contact' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $message = $errors === [] ? 'Thanks, your message was sent.' : null;
 }
 
+// Theme preview: ?theme=material|tailwind and ?mode=dark.
+$theme = in_array($_GET['theme'] ?? '', Assets::THEMES, true) ? $_GET['theme'] : 'bootstrap';
+$mode = ($_GET['mode'] ?? '') === 'dark' ? 'dark' : 'light';
+
 $form = Form::make('contact')
     ->action('/contact')
     ->csrf($_SESSION['csrf'])
@@ -97,6 +101,7 @@ $form = Form::make('contact')
     ->errors($errors)
     // Only re-fill this form when it is the one that was posted.
     ->values($path === '/contact' && $message === null ? $_POST : [])
+    ->floatingLabels($theme === 'material')
     ->submit('Send');
 
 require __DIR__ . '/ui.php';
@@ -104,7 +109,7 @@ require __DIR__ . '/files.php';
 
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="<?= $mode ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -112,11 +117,20 @@ require __DIR__ . '/files.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <?= Assets::tags('/assets') ?>
+    <?= Assets::tags('/assets', theme: $theme) ?>
 </head>
 <body>
 <main class="container py-4">
-    <h1 class="h3 mb-4">Celerik UI — plain PHP</h1>
+    <h1 class="h3 mb-3">Celerik UI — plain PHP</h1>
+    <nav class="mb-4 small" aria-label="Theme">
+        Theme:
+        <?php foreach (Assets::THEMES as $name) : ?>
+            <?php foreach (['light', 'dark'] as $m) : ?>
+                <?php $current = $name === $theme && $m === $mode ? ' aria-current="page"' : '' ?>
+                <a href="?theme=<?= $name ?>&amp;mode=<?= $m ?>"<?= $current ?>><?= ucfirst($name) ?> <?= $m ?></a>
+            <?php endforeach ?>
+        <?php endforeach ?>
+    </nav>
 
     <section class="mb-5" aria-labelledby="grid-title">
         <h2 id="grid-title" class="h5">Grid (server-side)</h2>
