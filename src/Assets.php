@@ -18,11 +18,17 @@ final class Assets
     public const STYLESHEET = 'celerik.css';
     public const SCRIPT = 'celerik.js';
 
+    /**
+     * @param string|null $nonce CSP nonce. Also printed as <meta name="csp-nonce">, which
+     *                           FullCalendar reads to allow the styles it injects at runtime.
+     */
     public static function tags(string $baseUrl, ?string $nonce = null): string
     {
         $baseUrl = rtrim($baseUrl, '/');
+        $meta = $nonce === null ? '' : Html::tag('meta', ['name' => 'csp-nonce', 'content' => $nonce]) . "\n";
 
-        return Html::tag('link', ['rel' => 'stylesheet', 'href' => $baseUrl . '/' . self::STYLESHEET])
+        return $meta
+            . Html::tag('link', ['rel' => 'stylesheet', 'href' => $baseUrl . '/' . self::STYLESHEET])
             . "\n"
             . Html::tag('script', ['type' => 'module', 'src' => $baseUrl . '/' . self::SCRIPT, 'nonce' => $nonce]);
     }

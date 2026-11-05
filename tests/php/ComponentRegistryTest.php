@@ -48,6 +48,16 @@ final class ComponentRegistryTest extends TestCase
     {
         self::assertSame(
             '<link rel="stylesheet" href="/vendor/celerik/celerik.css">' . "\n"
+            . '<script type="module" src="/vendor/celerik/celerik.js"></script>',
+            Assets::tags('/vendor/celerik/'),
+        );
+    }
+
+    public function testAssetTagsWithNonceIncludeCspNonceMetaForFullCalendar(): void
+    {
+        self::assertSame(
+            '<meta name="csp-nonce" content="abc">' . "\n"
+            . '<link rel="stylesheet" href="/vendor/celerik/celerik.css">' . "\n"
             . '<script type="module" src="/vendor/celerik/celerik.js" nonce="abc"></script>',
             Assets::tags('/vendor/celerik/', 'abc'),
         );
