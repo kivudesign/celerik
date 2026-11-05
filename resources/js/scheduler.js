@@ -42,7 +42,7 @@ function eventFocuser(element) {
       }, 50);
       setTimeout(() => {
         pending = null;
-      }, 1000);
+      }, 5000); // the request and the new render can be slow
     },
     mounted(el, id) {
       if (pending !== null && pending === id) {
