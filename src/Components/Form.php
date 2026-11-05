@@ -126,7 +126,11 @@ final class Form extends Component
 
     public function toArray(): array
     {
-        return $this->options === [] ? [] : ['options' => $this->options];
+        return array_filter([
+            // Name of the hidden CSRF input, which async uploads send as a header.
+            'csrf' => $this->csrfToken === null || $this->method === 'GET' ? null : ['field' => $this->csrfField],
+            'options' => $this->options,
+        ], static fn (mixed $value): bool => $value !== null && $value !== []);
     }
 
     public function render(): string
@@ -161,10 +165,22 @@ final class Form extends Component
         $attributes = array_merge($this->rootAttributes(['celerik-form']), [
             'action' => $this->action,
             'method' => $spoofed ? 'POST' : $this->method,
+            'enctype' => $this->hasFileField() ? 'multipart/form-data' : null,
             'novalidate' => true,
         ]);
 
         return Html::tag('form', $attributes, $content);
+    }
+
+    private function hasFileField(): bool
+    {
+        foreach ($this->fields as $field) {
+            if ($field->isFile()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function errorFor(Field $field): ?string

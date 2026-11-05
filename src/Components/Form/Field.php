@@ -6,6 +6,7 @@ namespace Celerik\Ui\Components\Form;
 
 use Celerik\Ui\Support\Arr;
 use Celerik\Ui\Support\Html;
+use Celerik\Ui\Upload\UploadRules;
 use InvalidArgumentException;
 
 /**
@@ -20,6 +21,13 @@ final class Field
         'text', 'email', 'password', 'number', 'tel', 'url', 'date', 'time', 'datetime-local', 'search', 'hidden',
     ];
     private const REQUIRED_MARKER = ' <span class="celerik-required" aria-hidden="true">*</span>';
+    private const TOOLBARS = ['basic', 'standard', 'full'];
+
+    private ?UploadRules $uploadRules = null;
+    private ?string $uploadUrl = null;
+
+    /** @var string|list<mixed> */
+    private string|array $toolbar = 'standard';
 
     private ?string $placeholder = null;
     private ?string $help = null;
@@ -106,6 +114,71 @@ final class Field
     public static function checkbox(string $name, ?string $label = null): self
     {
         return new self('checkbox', $name, $label ?? self::humanize($name));
+    }
+
+    /**
+     * File upload. Without upload() it is a plain file input (the form switches to
+     * multipart); with upload() FilePond sends each file to that endpoint first.
+     */
+    public static function file(string $name, ?string $label = null): self
+    {
+        return (new self('file', $name, $label ?? self::humanize($name)))->rules(UploadRules::images());
+    }
+
+    /**
+     * Rich text editor (Quill). Submits HTML: always sanitize it on the server
+     * (see EditorHtml::sanitize()).
+     */
+    public static function editor(string $name, ?string $label = null): self
+    {
+        return new self('editor', $name, $label ?? self::humanize($name));
+    }
+
+    /**
+     * Accepted files for a file field (defaults to UploadRules::images()). Use the same
+     * rules in the UploadHandler.
+     */
+    public function rules(UploadRules $rules): self
+    {
+        $this->assertType('file', 'rules');
+        $this->uploadRules = $rules;
+
+        return $this;
+    }
+
+    /**
+     * Uploads each file asynchronously to this endpoint (FilePond server protocol: POST
+     * returns the id as text/plain, DELETE with the id as body reverts it). The form then
+     * submits the ids; claim them with UploadHandler::claim().
+     */
+    public function upload(string $url): self
+    {
+        $this->assertType('file', 'upload');
+        $this->uploadUrl = $url;
+
+        return $this;
+    }
+
+    /**
+     * Editor toolbar: "basic", "standard" (default), "full", or a Quill toolbar array.
+     *
+     * @param string|list<mixed> $toolbar
+     */
+    public function toolbar(string|array $toolbar): self
+    {
+        $this->assertType('editor', 'toolbar');
+
+        if (is_string($toolbar) && !in_array($toolbar, self::TOOLBARS, true)) {
+            throw new InvalidArgumentException(sprintf(
+                'Unknown toolbar "%s". Use %s or a Quill toolbar array.',
+                $toolbar,
+                implode(', ', self::TOOLBARS),
+            ));
+        }
+
+        $this->toolbar = $toolbar;
+
+        return $this;
     }
 
     public function required(bool $required = true): self
@@ -229,13 +302,16 @@ final class Field
             ]);
         }
 
-        $helpId = $this->help === null ? null : $id . '-help';
+        $helpText = $this->help ?? ($this->type === 'file' ? $this->uploadRules?->describe() : null);
+        $helpId = $helpText === null ? null : $id . '-help';
         $errorId = $error === null ? null : $id . '-error';
+        $asyncUpload = $this->type === 'file' && $this->uploadUrl !== null;
 
         $attributes = array_merge($this->attributes, [
             'id' => $id,
             'name' => $this->name,
-            'required' => $this->required,
+            // FilePond enforces "required" itself (see upload.js); the native attribute would block it.
+            'required' => $this->required && !$asyncUpload,
             'placeholder' => $this->placeholder,
             'aria-describedby' => Html::classes([$helpId, $errorId]),
             'aria-invalid' => $error === null ? null : 'true',
@@ -255,6 +331,19 @@ final class Field
                 $attributes + ['class' => $this->controlClass('form-select', $error)],
                 $this->renderChoices($value),
             ),
+            'file' => $this->renderFile($attributes, $error),
+            'editor' => Html::tag(
+                'textarea',
+                $attributes + [
+                    'class' => $this->controlClass('form-control celerik-editor-source', $error),
+                    'rows' => 8,
+                    'data-celerik-editor' => self::json([
+                        'toolbar' => $this->toolbar,
+                        'placeholder' => $this->placeholder,
+                    ]),
+                ],
+                Html::escape(Arr::toText($value)),
+            ),
             'checkbox' => Html::tag('input', $attributes + [
                 'type' => 'checkbox',
                 'value' => '1',
@@ -270,13 +359,18 @@ final class Field
 
         $label = Html::tag(
             'label',
-            ['for' => $id, 'class' => $this->type === 'checkbox' ? 'form-check-label' : 'form-label'],
+            [
+                'for' => $id,
+                // The editor's content area and FilePond's input are labelled by id (aria-labelledby).
+                'id' => in_array($this->type, ['editor', 'file'], true) ? $id . '-label' : null,
+                'class' => $this->type === 'checkbox' ? 'form-check-label' : 'form-label',
+            ],
             Html::escape($this->label) . ($this->required ? self::REQUIRED_MARKER : ''),
         );
 
         $help = $helpId === null
             ? ''
-            : Html::tag('div', ['id' => $helpId, 'class' => 'form-text'], Html::escape($this->help));
+            : Html::tag('div', ['id' => $helpId, 'class' => 'form-text'], Html::escape($helpText));
         $feedback = $errorId === null ? '' : Html::tag(
             'div',
             ['id' => $errorId, 'class' => 'invalid-feedback celerik-server-error'],
@@ -293,6 +387,59 @@ final class Field
     public static function fieldId(string $formId, string $name): string
     {
         return $formId . '-' . trim((string) preg_replace('/[^A-Za-z0-9_-]+/', '-', $name), '-');
+    }
+
+    public function isFile(): bool
+    {
+        return $this->type === 'file';
+    }
+
+    /**
+     * @param array<string, string|int|float|bool|null> $attributes
+     */
+    private function renderFile(array $attributes, ?string $error): string
+    {
+        $rules = $this->uploadRules ?? UploadRules::images();
+        $multiple = $rules->maxFiles > 1;
+
+        $attributes['name'] = $multiple && !str_ends_with($this->name, '[]') ? $this->name . '[]' : $this->name;
+        $attributes['placeholder'] = null;
+
+        $upload = $this->uploadUrl === null ? null : self::json([
+            'url' => $this->uploadUrl,
+            'required' => $this->required,
+            'maxFiles' => $rules->maxFiles,
+            'maxSize' => $rules->maxSize,
+            'types' => array_keys($rules->types),
+        ]);
+
+        return Html::tag('input', $attributes + [
+            'type' => 'file',
+            'accept' => $rules->accept(),
+            'multiple' => $multiple,
+            'class' => $this->controlClass('form-control', $error),
+            'data-celerik-upload' => $upload,
+            // FilePond replaces this input; it validates the files itself.
+            'data-parsley-excluded' => $upload === null ? null : 'true',
+        ]);
+    }
+
+    private function assertType(string $type, string $method): void
+    {
+        if ($this->type !== $type) {
+            throw new InvalidArgumentException(sprintf('%s() is only available on %s fields.', $method, $type));
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private static function json(array $data): string
+    {
+        return json_encode(
+            array_filter($data, static fn (mixed $value): bool => $value !== null),
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+        );
     }
 
     private function controlClass(string $base, ?string $error): string

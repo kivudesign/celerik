@@ -6,6 +6,7 @@ namespace Celerik\Ui\Tests\Components;
 
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
+use Celerik\Ui\Upload\UploadRules;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -80,6 +81,67 @@ final class FormTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         Form::make()->method('TRACE');
+    }
+
+    public function testPlainFileFieldMakesTheFormMultipartAndDescribesTheRules(): void
+    {
+        $html = Form::make('f')->add(
+            Field::file('cv', 'CV')->rules(UploadRules::types('application/pdf')->maxSize('2M'))->required(),
+        )->render();
+
+        self::assertStringContainsString('enctype="multipart/form-data"', $html);
+        self::assertStringContainsString(
+            '<input id="f-cv" name="cv" required aria-describedby="f-cv-help" type="file" accept="application/pdf,.pdf" class="form-control">',
+            $html,
+        );
+        self::assertStringContainsString('<div id="f-cv-help" class="form-text">PDF. Up to 2 MB.</div>', $html);
+        self::assertStringNotContainsString('data-celerik-upload', $html);
+    }
+
+    public function testAsyncFileFieldPassesUploadOptionsAndAppendsBracketsForMultipleFiles(): void
+    {
+        $form = Form::make('f')->csrf('tok')->add(
+            Field::file('photos')->rules(UploadRules::images()->maxFiles(3))->upload('/uploads')->required(),
+        );
+        $html = $form->render();
+
+        self::assertStringContainsString('name="photos[]"', $html);
+        self::assertStringContainsString(' multiple ', $html);
+        self::assertStringContainsString('data-parsley-excluded="true"', $html);
+        self::assertStringNotContainsString(' required ', $html, 'FilePond enforces required itself.');
+        self::assertStringContainsString(
+            'data-celerik-upload="{&quot;url&quot;:&quot;/uploads&quot;,&quot;required&quot;:true,&quot;maxFiles&quot;:3,&quot;maxSize&quot;:5242880,'
+            . '&quot;types&quot;:[&quot;image/jpeg&quot;,&quot;image/png&quot;,&quot;image/gif&quot;,&quot;image/webp&quot;]}"',
+            $html,
+        );
+        self::assertSame(['csrf' => ['field' => '_token']], $form->toArray());
+    }
+
+    public function testEditorRendersALabelledTextareaWithEscapedContent(): void
+    {
+        $html = Form::make('f')->add(
+            Field::editor('body', 'Article')->toolbar('basic')->placeholder('Write…')->required()->value('<p>Hi</p><script>x</script>'),
+        )->render();
+
+        self::assertStringContainsString('<label for="f-body" id="f-body-label" class="form-label">Article', $html);
+        self::assertStringContainsString('class="form-control celerik-editor-source" rows="8"', $html);
+        self::assertStringContainsString('data-celerik-editor="{&quot;toolbar&quot;:&quot;basic&quot;,&quot;placeholder&quot;:&quot;Write…&quot;}"', $html);
+        self::assertStringContainsString('&lt;p&gt;Hi&lt;/p&gt;&lt;script&gt;x&lt;/script&gt;</textarea>', $html);
+        self::assertStringNotContainsString('enctype', $html);
+    }
+
+    public function testFieldSpecificOptionsAreRejectedOnOtherTypes(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Field::text('name')->upload('/uploads');
+    }
+
+    public function testRejectsUnknownToolbar(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Field::editor('body')->toolbar('everything');
     }
 
     public function testRejectsInvalidFieldName(): void
