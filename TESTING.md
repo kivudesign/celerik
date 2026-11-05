@@ -4,7 +4,8 @@
 |---|---|---|---|
 | PHP unit + adapter tests | PHPUnit 11 | `composer test` | `tests/php/` |
 | JS unit + integration tests | Jest 29 (jsdom) | `npm test` | `tests/js/` |
-| Accessibility | axe-core (WCAG 2.1 A/AA tags) | `npm test` | `tests/js/a11y.test.js` |
+| Accessibility (markup) | axe-core in jsdom (WCAG 2.1 A/AA tags) | `npm test` | `tests/js/a11y.test.js` |
+| Accessibility (browser) | Playwright + axe-core, with color contrast | `npm run test:a11y` | `tests/browser/` |
 | Code style | PHP_CodeSniffer (PSR-12), ESLint | `composer lint`, `npm run lint` | – |
 
 ## PHP Tests
@@ -36,8 +37,27 @@
 ## Accessibility Tests
 
 - axe-core checks every component's markup with the `wcag2a`, `wcag2aa`, `wcag21a` and `wcag21aa` rules, both before and after JS enhancement (and after a failed form validation).
-- Color contrast can't be computed in jsdom. It's checked manually in a browser for now, with automated browser runs (Playwright + axe) planned for Phase 3.
-- Keyboard navigation has to be checked manually for each component until then.
+- Color contrast can't be computed in jsdom, so a second suite runs axe-core in a real browser.
+
+### Browser matrix (`npm run test:a11y`)
+
+`tests/browser/server.php` renders every component on one page (Grid, Chart, Forms with the editor and an upload, Scheduler in month view, Tabs, File Manager with a real connector, Modal, Notifications). Bootstrap, jQuery and elFinder are served locally, so results don't depend on a CDN. Playwright starts it with PHP's built-in server.
+
+For each theme (bootstrap, material, tailwind) in light and dark mode, the tests check:
+
+- every component fires `celerik:ready`, with no console errors;
+- axe-core finds no violations of the WCAG 2.1 A/AA rules, color contrast included;
+- the same with the modal open.
+
+```bash
+npm run build                       # the tests use the bundle in public/
+npx playwright install chromium     # once; or use an installed browser:
+npm run test:a11y                   # PLAYWRIGHT_CHANNEL=msedge (or chrome) npm run test:a11y
+```
+
+On failure, `test-results/` holds a screenshot and a trace for each failed test (`npx playwright show-trace <trace.zip>`); in CI they are uploaded as the `playwright-results` artifact. Playwright starts its own browser with a temporary profile, so it never touches open browser windows.
+
+- Keyboard navigation and screen readers still have to be checked manually.
 
 ## Theme Tests
 
