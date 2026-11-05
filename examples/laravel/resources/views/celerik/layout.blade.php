@@ -19,6 +19,7 @@
             <li class="nav-item"><a class="nav-link" href="{{ route('celerik.form') }}">Form</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ route('celerik.scheduler') }}">Scheduler</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ route('celerik.article') }}">Article</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('celerik.ui') }}">Tabs &amp; modal</a></li>
         </ul>
     </div>
 </nav>

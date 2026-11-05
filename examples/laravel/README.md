@@ -1,6 +1,6 @@
 # Laravel example
 
-Drop-in files for a fresh Laravel 11+ application (verified on Laravel 13), showing a server-side Grid (Eloquent), a Chart, a validated Form, an editable Scheduler, and an article form with a rich text editor and uploads.
+Drop-in files for a fresh Laravel 11+ application (verified on Laravel 13), showing a server-side Grid (Eloquent), a Chart, a validated Form, an editable Scheduler, an article form with a rich text editor and uploads, and a page with Tabs, a Modal and Notifications.
 
 ## Setup
 
@@ -17,7 +17,7 @@ Copy the example files into the app:
 
 | From `examples/laravel/` | To the app |
 |---|---|
-| `app/Http/Controllers/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php` | `app/Http/Controllers/` |
+| `app/Http/Controllers/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php`, `CelerikUiController.php` | `app/Http/Controllers/` |
 | `app/Models/Meeting.php` | `app/Models/` |
 | `database/migrations/*_create_meetings_table.php` | `database/migrations/` (then run `php artisan migrate`) |
 | `routes/celerik.php` | `routes/` (then add `require __DIR__ . '/celerik.php';` to `routes/web.php`) |
@@ -32,7 +32,7 @@ php artisan serve
 
 The article form also needs the sanitizer: `composer require symfony/html-sanitizer`.
 
-Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler` and `/celerik/article`.
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article` and `/celerik/ui`.
 
 > **Windows:** `php artisan serve` starts PHP without the `TEMP`/`TMP` environment variables, so every upload fails with "unable to create a temporary file". Use `cd public && php -S 127.0.0.1:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php` instead, or set `upload_tmp_dir` in `php.ini`.
 
@@ -55,3 +55,6 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/schedule
   - FilePond uploads each file to `/celerik/article/upload/{field}` with the CSRF header; `UploadHandler` validates it and answers an id.
   - On submit, the ids are claimed into `storage/app/private`, outside `public/`. Without JavaScript the real files are stored instead.
   - The editor HTML is cleaned with `EditorHtml::sanitize()` before it is stored or displayed.
+- **Tabs, Modal and Notification** (`/celerik/ui`)
+  - The newsletter form sits in a Modal. When `$request->validate()` fails, `open($errors !== [])` reopens the modal with the errors.
+  - On success the controller redirects `with('success', ...)`, and `Notification::make()->fromFlash(session()->only([...]))` shows it as a toast.

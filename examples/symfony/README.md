@@ -1,6 +1,6 @@
 # Symfony example
 
-Drop-in files for a Symfony 7 web application, showing a server-side Grid (Doctrine), a Chart, a validated Form, an editable Scheduler, and an article form with a rich text editor and uploads.
+Drop-in files for a Symfony 7 web application, showing a server-side Grid (Doctrine), a Chart, a validated Form, an editable Scheduler, an article form with a rich text editor and uploads, and a page with Tabs, a Modal and Notifications.
 
 ## Setup
 
@@ -26,7 +26,7 @@ Copy the example files into the app:
 
 | From `examples/symfony/` | To the app |
 |---|---|
-| `src/Controller/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php` | `src/Controller/` |
+| `src/Controller/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php`, `CelerikUiController.php` | `src/Controller/` |
 | `src/Entity/Product.php`, `Meeting.php` and their repositories | `src/Entity/`, `src/Repository/` |
 | `templates/celerik/*.html.twig` | `templates/celerik/` |
 
@@ -40,7 +40,7 @@ symfony serve
 
 The article form also needs the sanitizer: `composer require symfony/html-sanitizer`.
 
-Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler` and `/celerik/article`.
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article` and `/celerik/ui`.
 
 ## What it shows
 
@@ -61,3 +61,6 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/schedule
   - FilePond uploads each file to `/celerik/article/upload/{field}` with the token in the `X-CSRF-TOKEN` header, checked with `isCsrfTokenValid()`.
   - On submit, the ids are claimed into `var/uploads`, outside `public/`. Without JavaScript the real files are stored instead.
   - The editor HTML is cleaned with `EditorHtml::sanitize()` before it is stored or displayed.
+- **Tabs, Modal and Notification** (`/celerik/ui`)
+  - The newsletter form sits in a Modal and reopens it with the errors when validation fails (`open()`).
+  - On success the controller adds a flash message, and `Notification::make()->fromFlash($session->getFlashBag()->all())` shows it as a toast.
