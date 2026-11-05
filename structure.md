@@ -7,7 +7,7 @@ celerik/
 ├── Components.md                 # Telerik → open-source mapping, licenses, phases
 ├── AI.md                         # Notes for AI-assisted development
 ├── structure.md                  # This file
-├── CONTRIBUTING.md  CODE_OF_CONDUCT.md  SECURITY.md  TESTING.md  ROADMAP.md
+├── CONTRIBUTING.md  CODE_OF_CONDUCT.md  SECURITY.md  TESTING.md  ACCESSIBILITY.md  ROADMAP.md
 ├── LICENSE.md                    # MIT
 ├── THIRD_PARTY_NOTICES.md        # Licenses of bundled libraries
 │
@@ -62,11 +62,11 @@ celerik/
 ├── resources/                    # Frontend sources (not shipped in the Composer dist)
 │   ├── js/
 │   │   ├── index.js              # Bundle entry, registers initializers, window.Celerik
-│   │   ├── core.js               # register / init / deepMerge
+│   │   ├── core.js               # register / init / deepMerge / prefersReducedMotion
 │   │   ├── grid.js   grid-config.js
 │   │   ├── chart.js  chart-config.js
 │   │   ├── form.js   form-config.js
-│   │   ├── scheduler.js  scheduler-config.js
+│   │   ├── scheduler.js  scheduler-config.js  scheduler-dialog.js  # event dialog (keyboard editing)
 │   │   ├── editor.js  editor-config.js      # Quill, loaded only for forms with an editor
 │   │   ├── upload.js  upload-config.js      # FilePond, loaded only for forms with uploads
 │   │   ├── modal.js  tabs.js  bootstrap-global.js   # Bootstrap JS (peer dependency)
@@ -91,12 +91,18 @@ celerik/
 │   ├── php/                      # PHPUnit (Celerik\Ui\Tests\)
 │   │   ├── Components/  Data/  Support/  Upload/  FileManager/
 │   │   └── Adapters/Laravel/  Adapters/Symfony/
-│   └── js/                       # Jest + axe-core
-│       ├── fixtures/build.php    # Renders PHP components to HTML fixtures
-│       ├── core.test.js  grid.test.js  chart.test.js  form.test.js  a11y.test.js
-│       ├── scheduler.test.js  scheduler-integration.test.js  editor.test.js  upload.test.js
-│       ├── ui.test.js  notification.test.js  filemanager.test.js  themes.test.js
-│       └── helpers.js  setup.js  style-stub.js
+│   ├── js/                       # Jest + axe-core
+│   │   ├── fixtures/build.php    # Renders PHP components to HTML fixtures
+│   │   ├── core.test.js  grid.test.js  chart.test.js  form.test.js  a11y.test.js
+│   │   ├── scheduler.test.js  scheduler-dialog.test.js  scheduler-integration.test.js
+│   │   ├── editor.test.js  upload.test.js  ui.test.js  notification.test.js
+│   │   ├── filemanager.test.js  themes.test.js
+│   │   └── helpers.js  setup.js  style-stub.js
+│   └── browser/                  # Playwright + axe-core in a real browser (npm run test:a11y)
+│       ├── server.php            # Test page with every component, served by PHP's built-in server
+│       ├── a11y.spec.mjs  keyboard.spec.mjs  scheduler.spec.mjs  forced-colors.spec.mjs
+│       ├── motion.spec.mjs  wcag22.spec.mjs  chart.spec.mjs
+│       └── helpers.mjs
 │
 ├── examples/
 │   ├── plain/                    # php -S localhost:8000 examples/plain/index.php
@@ -109,5 +115,5 @@ celerik/
 │   └── workflows/ci.yml
 │
 ├── composer.json  phpunit.xml.dist  phpcs.xml.dist
-└── package.json  vite.config.mjs  jest.config.cjs  babel.config.cjs  eslint.config.mjs
+└── package.json  vite.config.mjs  jest.config.cjs  playwright.config.mjs  babel.config.cjs  eslint.config.mjs
 ```

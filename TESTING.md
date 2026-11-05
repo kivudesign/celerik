@@ -65,7 +65,9 @@ On failure, `test-results/` holds a screenshot and a trace for each failed test 
 - Form: a failed submit focuses the first invalid field; the rich text editor can be reached and typed in.
 - Scheduler: toolbar navigation. Notifications: dismiss with Enter.
 
-Screen readers and elFinder's own keyboard shortcuts are still checked manually.
+Other browser checks: `forced-colors.spec.mjs` (focus visible on every tab stop in Windows High Contrast), `motion.spec.mjs` (reduced motion), `wcag22.spec.mjs` (target size, focus not obscured), `scheduler.spec.mjs` (event dialog) and `chart.spec.mjs` (series without color).
+
+Screen readers and elFinder's own keyboard shortcuts are still checked manually: see the test plan in [ACCESSIBILITY.md](ACCESSIBILITY.md#manual-test-plan).
 
 ## Theme Tests
 

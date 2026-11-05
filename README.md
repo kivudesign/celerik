@@ -54,10 +54,10 @@ Load Bootstrap 5.3 (CSS, and `bootstrap.bundle.js` for Modal and Tabs) and jQuer
 | Modal | `Components\Modal` | Bootstrap 5 | Labelled dialog, footer buttons that submit a form inside, opens on load after server errors |
 | Tabs | `Components\Tabs` | Bootstrap 5 | WAI-ARIA tabs with arrow keys, tabs/pills/underline styles, selected tab kept in the URL hash |
 | Notification | `Components\Notification` | Notyf 3 | Toasts from flash messages (`fromFlash()`) or `Celerik.notify()`; messages are always text; errors stay until dismissed |
+| Scheduler | `Components\Scheduler` | FullCalendar 6 (MIT plugins) | Month, week, day and list views; create, move, resize and delete through your endpoints (also from the keyboard), rolled back if the server refuses |
 | File manager | `Components\FileManager` + `FileManager\FileManagerConnector` | elFinder 2.1 | Locked-down local volume, mandatory authorization, content-checked uploads, elFinder CSRF plus the framework's; see [SECURITY.md](SECURITY.md#file-manager) |
 
 Content passed to Modal and Tabs follows one rule: a string is escaped text, and a `Stringable` (another component, or `Html::raw()` for markup you trust) is inserted as HTML.
-| Scheduler | `Components\Scheduler` | FullCalendar 6 (MIT plugins) | Month, week, day and list views; create, move, resize and delete through your endpoints, rolled back if the server refuses |
 
 The full Telerik → open-source mapping is in [Components.md](Components.md).
 
@@ -88,6 +88,7 @@ composer install && npm install
 npm run build        # public/celerik.js + public/celerik.css
 composer test        # PHPUnit
 npm test             # Jest + axe-core (renders PHP fixtures first)
+npm run test:a11y    # Playwright + axe-core in a real browser, every theme (after npm run build)
 composer lint        # PSR-12
 npm run lint         # ESLint
 ```
@@ -109,6 +110,10 @@ img-src 'self' data:; font-src 'self' data:; connect-src 'self'
 
 The File Manager also needs `style-src-attr 'unsafe-inline'`: elFinder builds its interface with inline `style` attributes. That directive allows style attributes only (they cannot run code); scripts and `<style>` elements still require the nonce.
 
+## Accessibility
+
+Components target WCAG 2.2 AA in every theme, light and dark, and respect reduced motion and Windows High Contrast. Every pull request runs axe-core in a real browser, plus keyboard, forced-colors and target-size tests. See [ACCESSIBILITY.md](ACCESSIBILITY.md) for the status of each component, the known limits of the bundled libraries and the manual test plan.
+
 ## Documentation Pack
 
 | Document | Purpose |
@@ -117,6 +122,7 @@ The File Manager also needs `style-src-attr 'unsafe-inline'`: elFinder builds it
 | [Components.md](Components.md) | Telerik → open-source component mapping, licenses, phases |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, project rules, adding a component |
 | [TESTING.md](TESTING.md) | Test suites and how to run them |
+| [ACCESSIBILITY.md](ACCESSIBILITY.md) | Conformance target, per-component status, manual test plan |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
 | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Licenses of bundled libraries |
 | [AI.md](AI.md) | Notes for AI-assisted development |
