@@ -10,7 +10,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * {{ celerik_assets() }} — load jQuery and Bootstrap before it.
+ * {{ celerik_assets() }} or {{ celerik_assets(theme: 'material') }} — load jQuery and Bootstrap before it.
  * {{ celerik(grid) }}    — renders any Celerik component.
  */
 final class CelerikTwigExtension extends AbstractExtension
@@ -32,8 +32,8 @@ final class CelerikTwigExtension extends AbstractExtension
         return $component->render();
     }
 
-    public function assets(?string $baseUrl = null, ?string $nonce = null): string
+    public function assets(?string $baseUrl = null, ?string $nonce = null, string $theme = 'bootstrap'): string
     {
-        return Assets::tags($baseUrl ?? $this->assetsBaseUrl, $nonce);
+        return Assets::tags($baseUrl ?? $this->assetsBaseUrl, $nonce, $theme);
     }
 }
