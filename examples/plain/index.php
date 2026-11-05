@@ -20,14 +20,17 @@ require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 
-// Serve the prebuilt bundle from the package's public/ directory.
+// Serve the prebuilt bundle (celerik.js, celerik.css, chunks/*) from the package's public/ directory.
 if (str_starts_with($path, '/assets/')) {
-    $file = realpath(dirname(__DIR__, 2) . '/public/' . basename($path));
-    if ($file === false || !is_file($file)) {
+    $public = realpath(dirname(__DIR__, 2) . '/public');
+    $file = realpath($public . '/' . substr($path, strlen('/assets/')));
+    $inside = $public !== false && $file !== false && str_starts_with($file, $public . DIRECTORY_SEPARATOR);
+    if (!$inside || !is_file($file)) {
         http_response_code(404);
         exit('Asset not found. Run "npm run build" first.');
     }
-    header('Content-Type: ' . (str_ends_with($file, '.css') ? 'text/css' : 'application/javascript'));
+    $types = ['css' => 'text/css', 'js' => 'text/javascript', 'map' => 'application/json'];
+    header('Content-Type: ' . ($types[pathinfo($file, PATHINFO_EXTENSION)] ?? 'application/octet-stream'));
     readfile($file);
     exit;
 }

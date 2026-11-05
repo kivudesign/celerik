@@ -21,7 +21,7 @@ final class CelerikTwigExtensionTest extends TestCase
 
         $html = $twig->render('page', ['grid' => Grid::make('users')->column('name')->rows([['name' => '<i>Ada</i>']])]);
 
-        self::assertStringContainsString('<script src="/bundles/celerikui/celerik.js" defer></script>', $html);
+        self::assertStringContainsString('<script type="module" src="/bundles/celerikui/celerik.js"></script>', $html);
         self::assertStringContainsString('<table id="users"', $html);
         self::assertStringContainsString('<td>&lt;i&gt;Ada&lt;/i&gt;</td>', $html);
     }

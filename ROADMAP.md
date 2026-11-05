@@ -1,7 +1,5 @@
 # Roadmap
 
-The detailed plan lives in [doc/Phases.md](doc/Phases.md).
-
 ## Short term — Phase 1 (MVP)
 
 - Grid, Chart and Form components.

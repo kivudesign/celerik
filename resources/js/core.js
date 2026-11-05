@@ -25,8 +25,12 @@ export function readOptions(element) {
   }
 }
 
+// Elements whose initializer has started (it may still be loading its library).
+const started = new WeakSet();
+
 // Initialises every component inside `root` (and `root` itself). Safe to call again
-// after injecting HTML: already initialised elements are skipped.
+// after injecting HTML: elements already initialised or loading are skipped.
+// Initializers may be async; the returned promise settles when all of them have.
 export function init(root = document) {
   const elements = [];
   if (root instanceof Element && root.matches('[data-celerik]')) {
@@ -34,8 +38,9 @@ export function init(root = document) {
   }
   elements.push(...root.querySelectorAll('[data-celerik]'));
 
+  const pending = [];
   for (const element of elements) {
-    if (element.celerik) {
+    if (started.has(element)) {
       continue;
     }
     const name = element.getAttribute('data-celerik');
@@ -44,12 +49,25 @@ export function init(root = document) {
       console.warn(`Celerik: no initializer registered for "${name}".`);
       continue;
     }
-    element.celerik = initializer(element, readOptions(element)) ?? true;
-    element.dispatchEvent(new CustomEvent('celerik:ready', {
-      bubbles: true,
-      detail: { instance: element.celerik },
-    }));
+    started.add(element);
+    pending.push(start(element, name, initializer));
   }
+
+  return Promise.all(pending);
+}
+
+async function start(element, name, initializer) {
+  try {
+    element.celerik = (await initializer(element, readOptions(element))) ?? true;
+  } catch (error) {
+    started.delete(element);
+    console.error(`Celerik: failed to initialise "${name}" #${element.id}`, error);
+    return;
+  }
+  element.dispatchEvent(new CustomEvent('celerik:ready', {
+    bubbles: true,
+    detail: { instance: element.celerik },
+  }));
 }
 
 export function autoInit() {
