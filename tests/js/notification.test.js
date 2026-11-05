@@ -1,6 +1,8 @@
 import {
   buildNotyfConfig,
+  durationFor,
   escapeHtml,
+  pausableTimer,
   toastFor,
   unescapeHtml,
 } from '../../resources/js/notification-config.js';
@@ -26,6 +28,33 @@ describe('notification config', () => {
     expect(types.success).toMatchObject({ duration: 3000, dismissible: false, background: 'var(--bs-success)' });
     expect(types.error).toMatchObject({ duration: 0, dismissible: true, background: 'var(--bs-danger)' });
     expect(types.warning.className).toBe('celerik-toast celerik-toast-warning');
+  });
+});
+
+describe('pausableTimer', () => {
+  test('pausing keeps the remaining time', () => {
+    let now = 0;
+    const timers = [];
+    const clock = {
+      set: (callback, ms) => timers.push({ callback, at: now + ms }) - 1,
+      clear: (id) => { timers[id] = null; },
+      now: () => now,
+    };
+    const expired = jest.fn();
+    const timer = pausableTimer(1000, expired, clock);
+
+    now = 400;
+    timer.pause();
+    timer.pause();
+    now = 5000;
+    timer.resume();
+    expect(timers.filter(Boolean)).toEqual([{ callback: expired, at: 5600 }]);
+  });
+
+  test('durationFor uses the type, then the default', () => {
+    const config = buildNotyfConfig({ duration: 3000 });
+    expect(durationFor(config, 'success')).toBe(3000);
+    expect(durationFor(config, 'error')).toBe(0);
   });
 });
 
@@ -71,6 +100,28 @@ describe('notification integration (Notyf)', () => {
     expect(disappearing('warning')).toBe(true);
     expect(disappearing('error')).toBe(false);
     expect(document.querySelector('.celerik-toast-error .notyf__dismiss-btn')).not.toBeNull();
+  });
+
+  test('a toast waits while hovered or focused, then closes after the time left', () => {
+    notify('success', 'Saved.');
+    const toast = document.querySelector('.celerik-toast-success');
+    const disappearing = () => toast.classList.contains('notyf__toast--disappear');
+
+    jest.advanceTimersByTime(3000);
+    toast.dispatchEvent(new MouseEvent('mouseenter'));
+    jest.advanceTimersByTime(20000);
+    expect(disappearing()).toBe(false);
+
+    toast.querySelector('.notyf__dismiss-btn').dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    toast.dispatchEvent(new MouseEvent('mouseleave'));
+    jest.advanceTimersByTime(20000);
+    expect(disappearing()).toBe(false); // still focused
+
+    toast.querySelector('.notyf__dismiss-btn').dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    jest.advanceTimersByTime(1900);
+    expect(disappearing()).toBe(false);
+    jest.advanceTimersByTime(200);
+    expect(disappearing()).toBe(true); // 5 s in total, pauses excluded
   });
 
   test('rendered toasts have no WCAG 2.1 A/AA violations', async () => {

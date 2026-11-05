@@ -1,11 +1,34 @@
 import { Notyf } from 'notyf';
 import 'notyf/notyf.min.css';
-import { buildNotyfConfig, toastFor, unescapeHtml } from './notification-config.js';
+import {
+  buildNotyfConfig, durationFor, pausableTimer, toastFor, unescapeHtml,
+} from './notification-config.js';
 
 let shared = null;
 
+// Notyf's own timer cannot pause: toasts are opened without one, and this timer
+// dismisses them, waiting while the pointer or keyboard focus is on the toast.
+function dismissWhenUnused(notyf, notification, duration) {
+  const node = notyf.view?.notifications?.find((entry) => entry.notification === notification)?.node;
+  const timer = pausableTimer(duration, () => notyf.dismiss(notification));
+  if (!node) {
+    return;
+  }
+  let hovered = false;
+  let focused = false;
+  const update = () => (hovered || focused ? timer.pause() : timer.resume());
+  node.addEventListener('mouseenter', () => { hovered = true; update(); });
+  node.addEventListener('mouseleave', () => { hovered = false; update(); });
+  node.addEventListener('focusin', () => { focused = true; update(); });
+  node.addEventListener('focusout', (event) => {
+    focused = node.contains(event.relatedTarget);
+    update();
+  });
+}
+
 function create(options) {
-  const notyf = new Notyf(buildNotyfConfig(options));
+  const config = buildNotyfConfig(options);
+  const notyf = new Notyf(config);
   const dismissLabel = options.labels?.dismiss ?? 'Dismiss notification';
 
   // Messages reach Notyf escaped; its live-region announcer (textContent) must read the
@@ -19,9 +42,13 @@ function create(options) {
   return {
     // Notyf's dismiss buttons have no accessible name (WCAG 4.1.2): add one.
     open(toast) {
-      const notification = notyf.open(toast);
+      const duration = durationFor(config, toast.type);
+      const notification = notyf.open({ ...toast, duration: 0 });
       for (const button of document.querySelectorAll('.notyf__dismiss-btn:not([aria-label])')) {
         button.setAttribute('aria-label', dismissLabel);
+      }
+      if (duration > 0) {
+        dismissWhenUnused(notyf, notification, duration);
       }
       return notification;
     },

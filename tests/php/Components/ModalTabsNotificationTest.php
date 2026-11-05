@@ -35,7 +35,7 @@ final class ModalTabsNotificationTest extends TestCase
         $html = $modal->render();
 
         self::assertStringContainsString(
-            '<div id="contact-modal" class="modal fade" data-celerik="modal" data-celerik-options="{}" tabindex="-1" '
+            '<div id="contact-modal" class="modal fade celerik-modal" data-celerik="modal" data-celerik-options="{}" tabindex="-1" '
             . 'aria-labelledby="contact-modal-title" aria-hidden="true" data-bs-backdrop="static">',
             $html,
         );

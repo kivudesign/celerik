@@ -219,7 +219,7 @@ final class Modal extends Component
             $header . Html::tag('div', ['class' => 'modal-body'], Html::content($this->body)) . $footer,
         ));
 
-        return Html::tag('div', array_merge($this->rootAttributes(['modal', 'fade']), [
+        return Html::tag('div', array_merge($this->rootAttributes(['modal', 'fade', 'celerik-modal']), [
             'tabindex' => '-1',
             'aria-labelledby' => $titleId,
             'aria-hidden' => 'true',

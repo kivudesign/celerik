@@ -36,6 +36,8 @@ final class Chart extends Component
 
     private ?int $height = null;
 
+    private ?bool $patterns = null;
+
     public static function name(): string
     {
         return 'chart';
@@ -142,6 +144,18 @@ final class Chart extends Component
     /**
      * @return array{labels: list<string|int|float>, datasets: list<array<string, mixed>>}
      */
+    /**
+     * Gives each series its own point shape and line dash, shown in the legend too, so series
+     * can be told apart without color (WCAG 1.4.1). On by default for line, radar and
+     * scatter charts; options set per dataset are kept.
+     */
+    public function patterns(bool $enabled = true): self
+    {
+        $this->patterns = $enabled;
+
+        return $this;
+    }
+
     public function toData(): array
     {
         return ['labels' => $this->labels, 'datasets' => $this->datasets];
@@ -155,6 +169,7 @@ final class Chart extends Component
             'url' => $this->url,
             'title' => $this->showTitle ? $this->title : null,
             'height' => $this->height,
+            'patterns' => $this->patterns,
             'options' => $this->options,
         ], static fn (mixed $value): bool => $value !== null && $value !== []);
     }

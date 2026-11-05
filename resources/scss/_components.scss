@@ -77,6 +77,37 @@
   .fc-toolbar-title {
     font-size: var(--celerik-scheduler-title-font-size);
   }
+
+  // FullCalendar fades days of other months to 30% opacity, far below 4.5:1 (WCAG 1.4.3).
+  // The muted text color still sets them apart.
+  .fc-day-other .fc-daygrid-day-top {
+    opacity: 1;
+  }
+
+  .fc-day-other .fc-daygrid-day-number {
+    color: var(--bs-secondary-color);
+  }
+
+  // Dot events (timed events in month view) are links: Bootstrap gives them the link
+  // color, which is too light on today's tinted background.
+  .fc-daygrid-dot-event {
+    color: var(--bs-body-color);
+  }
+}
+
+// Event dialog (scheduler-dialog.js): a native <dialog> in the top layer, on Bootstrap colors.
+.celerik-scheduler-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1.5rem;
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--celerik-radius);
+  box-shadow: var(--bs-box-shadow-lg);
+
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
 }
 
 .celerik-form {
@@ -202,5 +233,82 @@
     color: #212529;
     background: color-mix(in srgb, var(--bs-primary) 18%, #fff);
     border-color: transparent;
+  }
+}
+
+// elFinder's folder-tree expand arrow is 12 x 14 px: give it a 24 x 24 px hit area without
+// changing how it looks (WCAG 2.5.8, Target Size). The root folder's arrow is only 6 px
+// from the tree's edge, so the area also covers the edge of the folder icon next to it.
+.celerik-filemanager.elfinder .elfinder-navbar-arrow::after {
+  position: absolute;
+  inset: -5px -6px;
+  z-index: 1;
+  content: '';
+}
+
+// Less motion when the user asks for it (WCAG 2.3.3). Bootstrap already removes its own
+// transitions (fades, modal slide). Notyf removes toasts on animationend, so its
+// animations are shortened rather than removed. Chart.js animation is turned off in JS.
+@media (prefers-reduced-motion: reduce) {
+  .notyf__toast,
+  .notyf__wrapper,
+  .notyf__ripple,
+  .notyf__message,
+  .notyf__icon {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+  }
+
+  .celerik-scheduler *,
+  .celerik-filemanager *,
+  .filepond--root * {
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Forced-colors mode (Windows High Contrast) does not paint box-shadow, which Bootstrap
+// and the themes use for focus rings, nor author backgrounds. Show focus with an outline
+// and selection with system colors (WCAG 2.4.7, 1.4.11).
+@media (forced-colors: active) {
+  // !important: FullCalendar and elFinder remove outlines with more specific selectors.
+  :is(.dt-container, .celerik-form, .celerik-scheduler, .celerik-scheduler-dialog, .celerik-tabs, .celerik-filemanager,
+    .celerik-modal, .notyf)
+    :focus-visible,
+  [aria-haspopup='dialog'][data-bs-toggle='modal']:focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px;
+  }
+
+  .ql-container.ql-snow:focus-within,
+  .celerik-modal:focus-visible .modal-content {
+    outline: 2px solid Highlight;
+  }
+
+  .celerik-tabs .nav-link.active {
+    border-bottom: 3px solid Highlight;
+  }
+
+  .celerik-scheduler .fc-day-today {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .celerik-grid .page-item.active .page-link,
+  .dt-container .page-item.active .page-link {
+    forced-color-adjust: none;
+    color: HighlightText;
+    background-color: Highlight;
+  }
+
+  .celerik-filemanager.elfinder .ui-state-active,
+  .celerik-filemanager.elfinder .ui-selected {
+    forced-color-adjust: none;
+    color: HighlightText;
+    background: Highlight;
+  }
+
+  .notyf__toast {
+    border: 1px solid CanvasText;
   }
 }

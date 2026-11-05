@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import 'parsleyjs';
 import Inputmask from 'inputmask';
-import { buildParsleyConfig } from './form-config.js';
+import { buildParsleyConfig, renderErrorSummary } from './form-config.js';
 import { csrfTokenFor } from './upload-config.js';
 
 export async function initForm(element, options) {
@@ -22,6 +22,11 @@ export async function initForm(element, options) {
     }
   });
 
+  const summary = options.errorSummary ? element.querySelector('.celerik-error-summary') : null;
+  if (summary) {
+    initErrorSummary(element, summary, parsley);
+  }
+
   // Quill and FilePond are large: load them only for forms that use them.
   const enhancements = [];
   if (element.querySelector('textarea[data-celerik-editor]')) {
@@ -34,4 +39,32 @@ export async function initForm(element, options) {
   await Promise.all(enhancements);
 
   return parsley;
+}
+
+// The error summary: filled and focused after a failed submit, focused on load when the
+// server rendered errors, and its links move focus to the field (or its editor).
+function initErrorSummary(element, summary, parsley) {
+  parsley.on('form:error', () => {
+    const errors = parsley.fields
+      .filter((field) => field.validationResult !== true)
+      .map((field) => ({ id: field.$element[0].id, message: field.getErrorsMessages()[0] ?? '' }))
+      .filter(({ id, message }) => id && message);
+    renderErrorSummary(summary, errors);
+    summary.focus();
+  });
+  parsley.on('form:success', () => renderErrorSummary(summary, []));
+
+  summary.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href^="#"]');
+    const field = link && document.getElementById(link.getAttribute('href').slice(1));
+    if (!field) {
+      return;
+    }
+    event.preventDefault();
+    (field.celerikEditor?.root ?? field).focus();
+  });
+
+  if (!summary.hidden) {
+    summary.focus();
+  }
 }

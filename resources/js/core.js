@@ -92,3 +92,8 @@ export function deepMerge(target, source) {
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
+
+// The user asked the system for less motion (WCAG 2.3.3): components skip animations.
+export function prefersReducedMotion() {
+  return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}

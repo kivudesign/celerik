@@ -158,6 +158,37 @@ final class FormTest extends TestCase
         self::assertStringContainsString('<div class="mb-3"><label for="f-cv" id="f-cv-label" class="form-label">', $html, 'File fields keep their layout.');
     }
 
+    public function testErrorSummaryListsServerErrorsWithLinksToTheFields(): void
+    {
+        $form = Form::make('signup')
+            ->errorSummary(title: 'Fix <these> problems')
+            ->add(Field::text('name'), Field::email('email'), Field::text('address[city]', 'City'))
+            ->errors(['email' => 'This e-mail is taken.', 'address.city' => ['Enter a <city>.']]);
+        $html = $form->render();
+
+        self::assertStringContainsString(
+            '<div id="signup-error-summary" class="alert alert-danger celerik-error-summary" tabindex="-1" '
+            . 'aria-labelledby="signup-error-summary-title"><h2 id="signup-error-summary-title" class="h6">'
+            . 'Fix &lt;these&gt; problems</h2><ul class="mb-0"><li><a href="#signup-email" class="alert-link">This e-mail is taken.</a></li>'
+            . '<li><a href="#signup-address-city" class="alert-link">Enter a &lt;city&gt;.</a></li></ul></div>',
+            $html,
+        );
+        self::assertLessThan(strpos($html, 'id="signup-name"'), strpos($html, 'celerik-error-summary'), 'The summary comes first.');
+        self::assertTrue($form->toArray()['errorSummary']);
+    }
+
+    public function testErrorSummaryIsHiddenWithoutErrorsAndOffByDefault(): void
+    {
+        $html = Form::make('f')->errorSummary()->add(Field::text('name'))->render();
+        self::assertStringContainsString('class="alert alert-danger celerik-error-summary" tabindex="-1" aria-labelledby="f-error-summary-title" hidden>', $html);
+        self::assertStringContainsString('There is a problem', $html);
+
+        $plain = Form::make('f')->add(Field::text('name'))->errors(['name' => 'Required.']);
+        self::assertStringNotContainsString('celerik-error-summary', $plain->render());
+        self::assertArrayNotHasKey('errorSummary', $plain->toArray());
+        self::assertArrayNotHasKey('errorSummary', Form::make('f')->errorSummary()->errorSummary(false)->toArray());
+    }
+
     public function testRejectsUnknownToolbar(): void
     {
         $this->expectException(InvalidArgumentException::class);

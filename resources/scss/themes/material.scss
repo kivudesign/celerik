@@ -9,7 +9,7 @@ $primary-dark: #d0bcff;
 $primary-dark-hover: #e1d3ff;
 $on-primary-dark: #381e72;
 
-@mixin palette($primary, $primary-hover, $on-primary, $body-bg, $body-color, $muted, $surface, $border, $outline, $rgb) {
+@mixin palette($primary, $primary-hover, $on-primary, $body-bg, $body-color, $muted, $surface, $border, $outline, $error, $rgb) {
   --bs-primary: #{$primary};
   --bs-primary-rgb: #{$rgb};
   --bs-link-color: #{$primary};
@@ -28,15 +28,19 @@ $on-primary-dark: #381e72;
   --celerik-primary-hover: #{$primary-hover};
   // Material's "outline" color: form field borders need 3:1 (WCAG 1.4.11).
   --celerik-input-border: #{$outline};
+  // Material's "error" color: Bootstrap's red is below 4.5:1 on the tinted background.
+  --bs-form-invalid-color: #{$error};
+  --bs-form-invalid-border-color: #{$error};
+  --bs-danger-text-emphasis: #{$error};
 }
 
 :root,
 [data-bs-theme='light'] {
-  @include palette($primary, $primary-hover, $on-primary, #fffbfe, #1d1b20, #49454f, #f3edf7, #cac4d0, #79747e, '103, 80, 164');
+  @include palette($primary, $primary-hover, $on-primary, #fffbfe, #1d1b20, #49454f, #f3edf7, #cac4d0, #79747e, #b3261e, '103, 80, 164');
 }
 
 [data-bs-theme='dark'] {
-  @include palette($primary-dark, $primary-dark-hover, $on-primary-dark, #141218, #e6e0e9, #cac4d0, #211f26, #49454f, #938f99, '208, 188, 255');
+  @include palette($primary-dark, $primary-dark-hover, $on-primary-dark, #141218, #e6e0e9, #cac4d0, #211f26, #49454f, #938f99, #f2b8b5, '208, 188, 255');
 }
 
 :root {

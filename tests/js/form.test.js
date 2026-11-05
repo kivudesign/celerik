@@ -60,3 +60,52 @@ describe('form integration (Parsley + Inputmask)', () => {
     expect(field('phone').inputmask.isComplete()).toBe(false);
   });
 });
+
+describe('error summary', () => {
+  let form;
+  let parsley;
+
+  beforeEach(async () => {
+    form = loadFixture('form-summary');
+    parsley = await initForm(form, readOptions(form));
+  });
+
+  afterEach(() => parsley.destroy());
+
+  const summary = () => form.querySelector('.celerik-error-summary');
+  const submit = () => form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+  test('a failed submit lists each error with a link, focuses the summary only', () => {
+    expect(summary().hidden).toBe(true);
+    form.querySelector('[name="email"]').value = 'not-an-email';
+    submit();
+
+    expect(summary().hidden).toBe(false);
+    expect(document.activeElement).toBe(summary());
+    const links = [...summary().querySelectorAll('a')].map((a) => [a.getAttribute('href'), a.textContent]);
+    expect(links.map(([href]) => href)).toEqual(['#order-name', '#order-email', '#order-notes']);
+    expect(links.every(([, text]) => text.length > 0)).toBe(true);
+
+    // One announcement: the field errors are not live regions.
+    expect(form.querySelectorAll('[aria-live]')).toHaveLength(0);
+    expect(form.querySelector('#order-name').getAttribute('aria-invalid')).toBe('true');
+  });
+
+  test('links focus their field, or the rich text editor', () => {
+    submit();
+    summary().querySelector('a[href="#order-email"]').click();
+    expect(document.activeElement.id).toBe('order-email');
+
+    summary().querySelector('a[href="#order-notes"]').click();
+    expect(document.activeElement).toBe(form.querySelector('#order-notes').celerikEditor.root);
+  });
+
+  test('a successful validation hides it again', () => {
+    submit();
+    form.querySelector('[name="name"]').value = 'Ada';
+    form.querySelector('[name="email"]').value = 'ada@example.com';
+    form.querySelector('#order-notes').celerikEditor.setText('Two please', 'user');
+    expect(parsley.validate()).toBe(true);
+    expect(summary().hidden).toBe(true);
+  });
+});

@@ -49,6 +49,13 @@ final class ChartTest extends TestCase
         self::assertSame(['type' => 'line', 'url' => '/stats', 'height' => 300], $options);
     }
 
+    public function testPatternsAreLeftToTheChartTypeUnlessSet(): void
+    {
+        self::assertArrayNotHasKey('patterns', Chart::make()->toArray());
+        self::assertTrue(Chart::make()->type('bar')->patterns()->toArray()['patterns']);
+        self::assertFalse(Chart::make()->patterns(false)->toArray()['patterns']);
+    }
+
     public function testRawOptionsArePassedThrough(): void
     {
         $options = Chart::make()->options(['plugins' => ['legend' => ['position' => 'bottom']]])->toArray();
