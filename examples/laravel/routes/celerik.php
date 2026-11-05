@@ -7,6 +7,7 @@ declare(strict_types=1);
 use App\Http\Controllers\CelerikArticleController;
 use App\Http\Controllers\CelerikCalendarController;
 use App\Http\Controllers\CelerikDemoController;
+use App\Http\Controllers\CelerikFilesController;
 use App\Http\Controllers\CelerikUiController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,4 +47,12 @@ Route::prefix('celerik/ui')
     ->group(static function (): void {
         Route::get('/', 'show');
         Route::post('/subscribe', 'subscribe')->name('.subscribe');
+    });
+
+Route::prefix('celerik/files')
+    ->name('celerik.files')
+    ->controller(CelerikFilesController::class)
+    ->group(static function (): void {
+        Route::get('/', 'show');
+        Route::match(['GET', 'POST'], '/connector', 'connector')->name('.connector');
     });

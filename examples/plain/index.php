@@ -100,6 +100,7 @@ $form = Form::make('contact')
     ->submit('Send');
 
 require __DIR__ . '/ui.php';
+require __DIR__ . '/files.php';
 
 ?>
 <!doctype html>
@@ -138,6 +139,11 @@ require __DIR__ . '/ui.php';
     <section class="mb-5" aria-labelledby="form-title">
         <h2 id="form-title" class="h5">Form</h2>
         <?= $form ?>
+    </section>
+
+    <section class="mb-5" aria-labelledby="files-title">
+        <h2 id="files-title" class="h5">File manager</h2>
+        <?= $fileManager ?>
     </section>
 
     <section class="mb-5" aria-labelledby="ui-title">

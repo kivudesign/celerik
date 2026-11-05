@@ -40,7 +40,7 @@ final class UploadHandler
      */
     public function process(UploadedFile $file): string
     {
-        $checked = $this->validate($file);
+        $checked = $this->inspect($file);
         $id = bin2hex(random_bytes(16));
         $directory = $this->directory($this->temporaryDirectory);
 
@@ -111,7 +111,7 @@ final class UploadHandler
      */
     public function store(UploadedFile $file, string $directory): StoredFile
     {
-        return $this->storeAs($file->path, $directory, $this->validate($file));
+        return $this->storeAs($file->path, $directory, $this->inspect($file));
     }
 
     /**
@@ -133,10 +133,12 @@ final class UploadHandler
     }
 
     /**
+     * Validates a file without moving it (also used by the File Manager's upload hook).
+     *
      * @return array{originalName: string, mimeType: string, extension: string, size: int}
      * @throws UploadException
      */
-    private function validate(UploadedFile $file): array
+    public function inspect(UploadedFile $file): array
     {
         if ($file->error !== UPLOAD_ERR_OK) {
             throw new UploadException(match ($file->error) {

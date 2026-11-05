@@ -13,6 +13,7 @@
 - Data layer: both request formats, field whitelisting, clamping, literal `%`/`_` in search, `ArrayDataSource` paging, search and sort.
 - Events: strict ISO 8601 dates, validation (title, end ≥ start, safe colors and URLs), date ranges and overlap rules.
 - Uploads: real files (valid PNG and PDF) and attacks (PHP renamed `.png`, `shell.php.gif` polyglot, SVG with a script, HTML, `../` in names), size and type limits, claim-once ids, revert, purge.
+- File Manager: the locked-down elFinder options, safe-name rules, hidden dotfiles, and the upload hook rejecting content that does not match.
 - Editor HTML: what the toolbars produce is kept; scripts, event handlers, `javascript:` links, iframes and styles are removed.
 - Laravel adapter: `EloquentDataSource` and `EloquentEventSource` run against in-memory SQLite (`illuminate/database` is a dev dependency).
 - Symfony adapter: the Twig extension renders through a real `Twig\Environment`. `DoctrineDataSource` and `DoctrineEventSource` run against in-memory SQLite (`doctrine/orm` is a dev dependency).
@@ -27,6 +28,7 @@
   - FullCalendar month, week and list views
   - Quill (content loading, submitted value, validation state) and FilePond (labelling, required file, fallback to a plain input)
   - Bootstrap Modal (open on load, dialog semantics) and Tabs (URL hash, arrow keys), and Notyf (escaped messages, announcer text, sticky errors, named dismiss buttons)
+  - File Manager config and asset loading (CSP nonce, loaded once). elFinder itself is tested against the real connector over HTTP and in a browser, not in jsdom.
 - `npm test` first runs `tests/js/fixtures/build.php`, which renders the PHP components to HTML. JS tests always use the markup PHP really produces.
 - Chart.js rendering is not tested in jsdom (no canvas); only its config is.
 - Scheduler changes (create, move, resize, delete) are tested with an injected request function, including the rollback when the server refuses a change.

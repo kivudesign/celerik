@@ -15,6 +15,7 @@ use Illuminate\View\Compilers\BladeCompiler;
  *
  * Blade: <x-celerik-assets /> and <x-celerik :component="$grid" />
  * Assets: php artisan vendor:publish --tag=celerik-assets
+ * elFinder assets (File Manager): php artisan vendor:publish --tag=celerik-elfinder
  */
 final class CelerikServiceProvider extends ServiceProvider
 {
@@ -31,6 +32,16 @@ final class CelerikServiceProvider extends ServiceProvider
         $this->publishes([
             dirname(__DIR__, 3) . '/public' => $this->app->publicPath('vendor/celerik'),
         ], 'celerik-assets');
+
+        // elFinder's own JS, CSS, images and sounds, when studio-42/elfinder is installed.
+        $elfinder = $this->app->basePath('vendor/studio-42/elfinder');
+        if (is_dir($elfinder)) {
+            $paths = [];
+            foreach (['css', 'img', 'js', 'sounds'] as $directory) {
+                $paths[$elfinder . '/' . $directory] = $this->app->publicPath('vendor/elfinder/' . $directory);
+            }
+            $this->publishes($paths, 'celerik-elfinder');
+        }
 
         $this->callAfterResolving(BladeCompiler::class, static function (BladeCompiler $blade): void {
             $blade->component('celerik', CelerikComponent::class);

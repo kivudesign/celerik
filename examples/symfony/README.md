@@ -40,7 +40,14 @@ symfony serve
 
 The article form also needs the sanitizer: `composer require symfony/html-sanitizer`.
 
-Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article` and `/celerik/ui`.
+The file manager also needs elFinder and its assets:
+
+```bash
+composer require studio-42/elfinder
+mkdir -p public/elfinder && cp -r vendor/studio-42/elfinder/{css,img,js,sounds} public/elfinder/
+```
+
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article`, `/celerik/ui` and `/celerik/files`.
 
 ## What it shows
 
@@ -64,3 +71,6 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/schedule
 - **Tabs, Modal and Notification** (`/celerik/ui`)
   - The newsletter form sits in a Modal and reopens it with the errors when validation fails (`open()`).
   - On success the controller adds a flash message, and `Notification::make()->fromFlash($session->getFlashBag()->all())` shows it as a toast.
+- **File manager** (`/celerik/files`)
+  - `CelerikFilesController::isAllowed()` only allows the dev environment: **replace it** with your security rules (e.g. `isGranted('ROLE_FILE_MANAGER')`).
+  - Files live in `var/files`, outside `public/`. elFinder's CSRF token protects every command that changes files; uploads are checked by content like `UploadHandler`.

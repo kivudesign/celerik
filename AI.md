@@ -72,6 +72,7 @@ Map database columns to grid columns like this:
 - **Editor**: always `EditorHtml::sanitize()` the submitted HTML before storing it.
 - **Modal with a form**: put the form in `body()`, submit it with a footer button (`['type' => 'submit', 'form' => '<form id>']`), and call `open($errors !== [])` so server errors reopen it.
 - **Notifications**: Post/Redirect/Get with flash messages, then `Notification::make()->fromFlash(...)` in the layout. From JavaScript: `Celerik.notify(type, message)`.
+- **File manager**: one route accepting GET and POST that calls `FileManagerConnector::run(FileManagerConfig::local($rootOutsideWebRoot, $rules), authorized: <real check>)`. Never pass `true` unconditionally. Serve elFinder's assets (`vendor/studio-42/elfinder/{css,img,js,sounds}`) at `FileManager::assetsUrl()`.
 
 ### Integration snippets
 

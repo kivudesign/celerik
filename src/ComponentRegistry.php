@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Celerik\Ui;
 
 use Celerik\Ui\Components\Chart;
+use Celerik\Ui\Components\FileManager;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Grid;
 use Celerik\Ui\Components\Modal;
@@ -31,7 +32,8 @@ final class ComponentRegistry
             ->register(Scheduler::class)
             ->register(Modal::class)
             ->register(Tabs::class)
-            ->register(Notification::class);
+            ->register(Notification::class)
+            ->register(FileManager::class);
     }
 
     /**
