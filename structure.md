@@ -34,7 +34,8 @@ celerik/
 │   │   ├── Html.php              # Escaping HTML builder
 │   │   ├── Arr.php               # Dot-notation helpers
 │   │   ├── Dates.php             # Strict ISO 8601 parsing
-│   │   └── EditorHtml.php        # Sanitizes rich text editor output
+│   │   ├── EditorHtml.php        # Sanitizes rich text editor output
+│   │   └── RawHtml.php           # Trusted markup for Modal/Tabs content (Html::raw())
 │   ├── Upload/
 │   │   ├── UploadRules.php       # Accepted types, size, count (field + server)
 │   │   ├── UploadHandler.php     # process / revert / claim / store / purge
@@ -63,6 +64,8 @@ celerik/
 │   │   ├── scheduler.js  scheduler-config.js
 │   │   ├── editor.js  editor-config.js      # Quill, loaded only for forms with an editor
 │   │   ├── upload.js  upload-config.js      # FilePond, loaded only for forms with uploads
+│   │   ├── modal.js  tabs.js  bootstrap-global.js   # Bootstrap JS (peer dependency)
+│   │   ├── notification.js  notification-config.js  # Notyf, Celerik.notify()
 │   │   └── jquery-global.js      # `jquery` → window.jQuery (peer dependency)
 │   └── scss/
 │       ├── _variables.scss

@@ -2,9 +2,9 @@
 
 An open-source, Bootstrap-based UI component suite for PHP, inspired by Telerik UI. It works with plain PHP and has optional adapters for **Laravel 11+** and **Symfony 7**.
 
-Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask, FullCalendar, Quill and FilePond. Each library (and its stylesheet) is loaded only on pages that use it.
+Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask, FullCalendar, Quill, FilePond and Notyf. Each library (and its stylesheet) is loaded only on pages that use it.
 
-> **Status: Phase 2 in progress.** Grid, Chart, Form and Scheduler are available. See the [roadmap](ROADMAP.md).
+> **Status: Phase 2 in progress.** Grid, Chart, Form (with uploads and a rich text editor), Scheduler, Modal, Tabs and Notification are available. See the [roadmap](ROADMAP.md).
 
 ## Quick look
 
@@ -34,7 +34,7 @@ return response()->json($grid->respond(new EloquentDataSource(User::query()), $r
 composer require celerik/ui
 ```
 
-Load Bootstrap 5.3 and jQuery 3.7, then the Celerik bundle:
+Load Bootstrap 5.3 (CSS, and `bootstrap.bundle.js` for Modal and Tabs) and jQuery 3.7, then the Celerik bundle:
 
 | Setup | Publish assets | Assets tag | Render |
 |---|---|---|---|
@@ -51,6 +51,11 @@ Load Bootstrap 5.3 and jQuery 3.7, then the Celerik bundle:
 | Form | `Components\Form` | Parsley.js, Inputmask | HTML5 rules, masks, CSRF, method spoofing, server errors and old input |
 | File upload | `Field::file()` + `Upload\UploadHandler` | FilePond 4 | Async or classic uploads; real MIME detection, extension whitelist, random names; falls back to a plain file input |
 | Rich text editor | `Field::editor()` + `Support\EditorHtml` | Quill 2 | Toolbar presets, accessible labelling, server-side sanitizing (`symfony/html-sanitizer`) |
+| Modal | `Components\Modal` | Bootstrap 5 | Labelled dialog, footer buttons that submit a form inside, opens on load after server errors |
+| Tabs | `Components\Tabs` | Bootstrap 5 | WAI-ARIA tabs with arrow keys, tabs/pills/underline styles, selected tab kept in the URL hash |
+| Notification | `Components\Notification` | Notyf 3 | Toasts from flash messages (`fromFlash()`) or `Celerik.notify()`; messages are always text; errors stay until dismissed |
+
+Content passed to Modal and Tabs follows one rule: a string is escaped text, and a `Stringable` (another component, or `Html::raw()` for markup you trust) is inserted as HTML.
 | Scheduler | `Components\Scheduler` | FullCalendar 6 (MIT plugins) | Month, week, day and list views; create, move, resize and delete through your endpoints, rolled back if the server refuses |
 
 The full Telerik → open-source mapping is in [Components.md](Components.md).
@@ -58,8 +63,8 @@ The full Telerik → open-source mapping is in [Components.md](Components.md).
 ## Examples
 
 - [`examples/plain`](examples/plain): no framework. Run `php -S localhost:8000 examples/plain/index.php`.
-- [`examples/laravel`](examples/laravel): Eloquent grid, chart, validated form, scheduler, and an article form with rich text and uploads.
-- [`examples/symfony`](examples/symfony): Doctrine grid, chart, validated form, scheduler, and an article form with rich text and uploads.
+- [`examples/laravel`](examples/laravel): Eloquent grid, chart, validated form, scheduler, an article form with rich text and uploads, and a tabs/modal/notifications page.
+- [`examples/symfony`](examples/symfony): Doctrine grid, chart, validated form, scheduler, an article form with rich text and uploads, and a tabs/modal/notifications page.
 
 ## Development
 

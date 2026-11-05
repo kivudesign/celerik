@@ -57,7 +57,7 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 | ContextMenu | Bootstrap dropdown positioned with Popper | MIT | – |
 | Toolbar | Bootstrap `btn-toolbar` | MIT | – |
 | PanelBar | Bootstrap Accordion / Collapse | MIT | – |
-| TabStrip | Bootstrap Tabs | MIT | 2 |
+| TabStrip | Bootstrap Tabs | MIT | 2 ✅ (`Tabs`) |
 | Drawer | Bootstrap Offcanvas | MIT | – |
 | Splitter | Split.js | MIT | – |
 | Layout Manager | Gridstack.js / GoldenLayout | MIT | – |
@@ -66,8 +66,8 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 
 | Component | Library | License | Phase |
 |---|---|---|---|
-| Window / Dialog / Modal | Bootstrap Modal | MIT | 2 |
-| Notification | Notyf | MIT | 2 |
+| Window / Dialog / Modal | Bootstrap Modal | MIT | 2 ✅ (`Modal`) |
+| Notification | Notyf | MIT | 2 ✅ (`Notification`) |
 | ProgressBar | Bootstrap Progress | MIT | – |
 
 ### Charts & Visualization

@@ -26,6 +26,7 @@
   - Inputmask masks
   - FullCalendar month, week and list views
   - Quill (content loading, submitted value, validation state) and FilePond (labelling, required file, fallback to a plain input)
+  - Bootstrap Modal (open on load, dialog semantics) and Tabs (URL hash, arrow keys), and Notyf (escaped messages, announcer text, sticky errors, named dismiss buttons)
 - `npm test` first runs `tests/js/fixtures/build.php`, which renders the PHP components to HTML. JS tests always use the markup PHP really produces.
 - Chart.js rendering is not tested in jsdom (no canvas); only its config is.
 - Scheduler changes (create, move, resize, delete) are tested with an injected request function, including the rollback when the server refuses a change.
