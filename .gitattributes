@@ -13,4 +13,5 @@
 /package.json      export-ignore
 /phpcs.xml.dist    export-ignore
 /phpunit.xml.dist  export-ignore
+/playwright.config.mjs export-ignore
 /vite.config.mjs   export-ignore

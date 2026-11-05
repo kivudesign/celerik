@@ -3,35 +3,9 @@
  */
 import { compile } from 'sass';
 import { join } from 'node:path';
+import { contrast, properties } from './css-helpers.js';
 
 const themes = ['material', 'tailwind'];
-
-// Custom properties declared in a block whose selector list contains `selector`.
-function properties(css, selector) {
-  const values = {};
-  for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-    if (!selectors.split(',').map((s) => s.trim()).includes(selector)) {
-      continue;
-    }
-    for (const [, name, value] of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
-      values[name] = value.trim();
-    }
-  }
-  return values;
-}
-
-function luminance(hex) {
-  const value = hex.replace('#', '');
-  const full = value.length === 3 ? [...value].map((c) => c + c).join('') : value;
-  const [r, g, b] = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255)
-    .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-export function contrast(a, b) {
-  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
-  return (light + 0.05) / (dark + 0.05);
-}
 
 const PAIRS = [
   // [foreground, background, minimum, what]

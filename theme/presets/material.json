@@ -1,0 +1,30 @@
+{
+  "name": "Material",
+  "base": "material",
+  "light": {
+    "primary": "#6750a4",
+    "primaryHover": "#57438f",
+    "onPrimary": "#ffffff",
+    "bodyBg": "#fffbfe",
+    "bodyColor": "#1d1b20",
+    "muted": "#49454f",
+    "surface": "#f3edf7",
+    "border": "#cac4d0",
+    "inputBorder": "#79747e",
+    "danger": "#b3261e"
+  },
+  "dark": {
+    "primary": "#d0bcff",
+    "primaryHover": "#e1d3ff",
+    "onPrimary": "#381e72",
+    "bodyBg": "#141218",
+    "bodyColor": "#e6e0e9",
+    "muted": "#cac4d0",
+    "surface": "#211f26",
+    "border": "#49454f",
+    "inputBorder": "#938f99",
+    "danger": "#f2b8b5"
+  },
+  "radius": 0.75,
+  "shadow": "elevated"
+}

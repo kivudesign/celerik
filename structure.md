@@ -59,6 +59,8 @@ celerik/
 │           ├── DoctrineDataSource.php
 │           └── DoctrineEventSource.php
 │
+├── theme/                        # Theme tokens: theme.schema.json, presets/{bootstrap,material,tailwind}.json
+│
 ├── resources/                    # Frontend sources (not shipped in the Composer dist)
 │   ├── js/
 │   │   ├── index.js              # Bundle entry, registers initializers, window.Celerik
@@ -96,8 +98,8 @@ celerik/
 │   │   ├── core.test.js  grid.test.js  chart.test.js  form.test.js  a11y.test.js
 │   │   ├── scheduler.test.js  scheduler-dialog.test.js  scheduler-integration.test.js
 │   │   ├── editor.test.js  upload.test.js  ui.test.js  notification.test.js
-│   │   ├── filemanager.test.js  themes.test.js
-│   │   └── helpers.js  setup.js  style-stub.js
+│   │   ├── filemanager.test.js  themes.test.js  presets.test.js
+│   │   └── helpers.js  setup.js  style-stub.js  css-helpers.js
 │   └── browser/                  # Playwright + axe-core in a real browser (npm run test:a11y)
 │       ├── server.php            # Test page with every component, served by PHP's built-in server
 │       ├── a11y.spec.mjs  keyboard.spec.mjs  scheduler.spec.mjs  forced-colors.spec.mjs

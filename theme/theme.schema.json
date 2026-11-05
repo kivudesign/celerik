@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kivudesign/celerik/theme/theme.schema.json",
+  "title": "Celerik UI theme",
+  "description": "Design tokens of a Celerik theme. Theme::toCss() (PHP), the ThemeBuilder and bin/celerik-theme turn it into a stylesheet loaded after the base theme.",
+  "type": "object",
+  "required": ["name", "base", "light", "dark"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "Display name, e.g. \"Acme\".",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "pattern": "^[\\p{L}\\p{N} ._-]+$"
+    },
+    "base": {
+      "description": "The look the theme starts from: celerik.css alone (bootstrap), or with celerik-material.css or celerik-tailwind.css.",
+      "enum": ["bootstrap", "material", "tailwind"]
+    },
+    "light": { "$ref": "#/$defs/palette" },
+    "dark": { "$ref": "#/$defs/palette" },
+    "radius": {
+      "description": "Corner radius of fields, cards, the grid and the calendar, in rem.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2
+    },
+    "fontFamily": {
+      "description": "A CSS font stack of family names and generic families. Omit it to keep the base theme's font.",
+      "type": "string",
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9 ,'\"-]+$"
+    },
+    "shadow": {
+      "description": "How containers (grid, chart, calendar, file manager) stand out from the page.",
+      "enum": ["none", "subtle", "elevated", "outlined"]
+    }
+  },
+  "$defs": {
+    "color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "palette": {
+      "description": "Colors of one mode (data-bs-theme=\"light\" or \"dark\"). Text pairs need 4.5:1, field borders 3:1 (WCAG 1.4.3, 1.4.11).",
+      "type": "object",
+      "required": ["primary", "primaryHover", "onPrimary", "bodyBg", "bodyColor", "muted", "surface", "border", "inputBorder", "danger"],
+      "additionalProperties": false,
+      "properties": {
+        "primary": { "$ref": "#/$defs/color", "description": "Buttons, links, active tabs, the current page, calendar events." },
+        "primaryHover": { "$ref": "#/$defs/color", "description": "Hovered and pressed buttons, hovered links." },
+        "onPrimary": { "$ref": "#/$defs/color", "description": "Text and icons on the primary color." },
+        "bodyBg": { "$ref": "#/$defs/color", "description": "Page background." },
+        "bodyColor": { "$ref": "#/$defs/color", "description": "Body text." },
+        "muted": { "$ref": "#/$defs/color", "description": "Secondary text: help texts, captions, placeholders." },
+        "surface": { "$ref": "#/$defs/color", "description": "Raised areas: grid header, upload area, toolbars." },
+        "border": { "$ref": "#/$defs/color", "description": "Dividers and decorative borders." },
+        "inputBorder": { "$ref": "#/$defs/color", "description": "Borders of form fields, which identify them (3:1)." },
+        "danger": { "$ref": "#/$defs/color", "description": "Error messages and invalid fields." }
+      }
+    }
+  }
+}

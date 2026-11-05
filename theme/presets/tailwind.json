@@ -1,0 +1,31 @@
+{
+  "name": "Tailwind",
+  "base": "tailwind",
+  "light": {
+    "primary": "#4f46e5",
+    "primaryHover": "#4338ca",
+    "onPrimary": "#ffffff",
+    "bodyBg": "#ffffff",
+    "bodyColor": "#0f172a",
+    "muted": "#475569",
+    "surface": "#f8fafc",
+    "border": "#e2e8f0",
+    "inputBorder": "#64748b",
+    "danger": "#dc3545"
+  },
+  "dark": {
+    "primary": "#818cf8",
+    "primaryHover": "#a5b4fc",
+    "onPrimary": "#0f172a",
+    "bodyBg": "#0f172a",
+    "bodyColor": "#f1f5f9",
+    "muted": "#94a3b8",
+    "surface": "#1e293b",
+    "border": "#334155",
+    "inputBorder": "#64748b",
+    "danger": "#ea868f"
+  },
+  "radius": 0.5,
+  "fontFamily": "ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'",
+  "shadow": "outlined"
+}
