@@ -57,3 +57,38 @@ export function toastFor(type, message) {
   }
   return { type, message: escapeHtml(message) };
 }
+
+// How long a toast of this type stays, in ms (0: until dismissed).
+export function durationFor(config, type) {
+  return config.types.find((entry) => entry.type === type)?.duration ?? config.duration ?? 0;
+}
+
+// A dismiss timer that can pause: toasts stay while the pointer or focus is on them,
+// so they can be read and dismissed in time (WCAG 2.2.1, Timing Adjustable).
+export function pausableTimer(duration, onExpire, clock = {
+  set: (callback, ms) => setTimeout(callback, ms),
+  clear: (id) => clearTimeout(id),
+  now: () => Date.now(),
+}) {
+  let remaining = duration;
+  let started = clock.now();
+  let id = clock.set(onExpire, remaining);
+  let running = true;
+
+  return {
+    pause() {
+      if (running) {
+        running = false;
+        clock.clear(id);
+        remaining -= clock.now() - started;
+      }
+    },
+    resume() {
+      if (!running) {
+        running = true;
+        started = clock.now();
+        id = clock.set(onExpire, Math.max(remaining, 0));
+      }
+    },
+  };
+}
