@@ -57,7 +57,15 @@ npm run test:a11y                   # PLAYWRIGHT_CHANNEL=msedge (or chrome) npm 
 
 On failure, `test-results/` holds a screenshot and a trace for each failed test (`npx playwright show-trace <trace.zip>`); in CI they are uploaded as the `playwright-results` artifact. Playwright starts its own browser with a temporary profile, so it never touches open browser windows.
 
-- Keyboard navigation and screen readers still have to be checked manually.
+`tests/browser/keyboard.spec.mjs` checks keyboard use once, in the default theme:
+
+- Modal: opens with Enter, keeps focus inside, closes with Escape, returns focus to the trigger.
+- Tabs: arrow keys, Home and End, with a single tab stop (roving `tabindex`).
+- Grid: sorting (`aria-sort`) and paging from the keyboard.
+- Form: a failed submit focuses the first invalid field; the rich text editor can be reached and typed in.
+- Scheduler: toolbar navigation. Notifications: dismiss with Enter.
+
+Screen readers and elFinder's own keyboard shortcuts are still checked manually.
 
 ## Theme Tests
 
