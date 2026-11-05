@@ -48,7 +48,7 @@ final class ComponentRegistryTest extends TestCase
     {
         self::assertSame(
             '<link rel="stylesheet" href="/vendor/celerik/celerik.css">' . "\n"
-            . '<script src="/vendor/celerik/celerik.js" defer nonce="abc"></script>',
+            . '<script type="module" src="/vendor/celerik/celerik.js" nonce="abc"></script>',
             Assets::tags('/vendor/celerik/', 'abc'),
         );
     }

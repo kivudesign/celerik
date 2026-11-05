@@ -9,7 +9,9 @@ use Celerik\Ui\Support\Html;
 /**
  * Renders the tags for the prebuilt bundle (public/celerik.css and public/celerik.js).
  *
- * jQuery and Bootstrap are peer dependencies: load them before these tags.
+ * celerik.js is an ES module that loads each component's library from public/chunks/
+ * only when that component is on the page. Module scripts are deferred, so jQuery and
+ * Bootstrap (peer dependencies) only need to be included before these tags.
  */
 final class Assets
 {
@@ -22,6 +24,6 @@ final class Assets
 
         return Html::tag('link', ['rel' => 'stylesheet', 'href' => $baseUrl . '/' . self::STYLESHEET])
             . "\n"
-            . Html::tag('script', ['src' => $baseUrl . '/' . self::SCRIPT, 'defer' => true, 'nonce' => $nonce]);
+            . Html::tag('script', ['type' => 'module', 'src' => $baseUrl . '/' . self::SCRIPT, 'nonce' => $nonce]);
     }
 }
