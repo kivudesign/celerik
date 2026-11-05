@@ -1,6 +1,6 @@
 # Symfony example
 
-Drop-in files for a Symfony 7 web application, showing a server-side Grid (Doctrine), a Chart, a validated Form and an editable Scheduler.
+Drop-in files for a Symfony 7 web application, showing a server-side Grid (Doctrine), a Chart, a validated Form, an editable Scheduler, and an article form with a rich text editor and uploads.
 
 ## Setup
 
@@ -26,7 +26,7 @@ Copy the example files into the app:
 
 | From `examples/symfony/` | To the app |
 |---|---|
-| `src/Controller/CelerikDemoController.php`, `CelerikCalendarController.php` | `src/Controller/` |
+| `src/Controller/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php` | `src/Controller/` |
 | `src/Entity/Product.php`, `Meeting.php` and their repositories | `src/Entity/`, `src/Repository/` |
 | `templates/celerik/*.html.twig` | `templates/celerik/` |
 
@@ -38,7 +38,9 @@ php bin/console dbal:run-sql "INSERT INTO product (name, category, price) VALUES
 symfony serve
 ```
 
-Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form` and `/celerik/scheduler`.
+The article form also needs the sanitizer: `composer require symfony/html-sanitizer`.
+
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler` and `/celerik/article`.
 
 ## What it shows
 
@@ -55,3 +57,7 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form` and `/celerik/sched
   - Changes are POSTed as JSON with the `X-CSRF-TOKEN` header, checked with `isCsrfTokenValid()`. `Event::fromArray()` validates them.
   - Dates are converted to the server time zone before saving, because Doctrine drops UTC offsets.
   - If the server refuses a change (validation, CSRF, 404), the calendar rolls it back.
+- **Article form (editor + uploads)**
+  - FilePond uploads each file to `/celerik/article/upload/{field}` with the token in the `X-CSRF-TOKEN` header, checked with `isCsrfTokenValid()`.
+  - On submit, the ids are claimed into `var/uploads`, outside `public/`. Without JavaScript the real files are stored instead.
+  - The editor HTML is cleaned with `EditorHtml::sanitize()` before it is stored or displayed.

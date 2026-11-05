@@ -1,6 +1,6 @@
 # Laravel example
 
-Drop-in files for a fresh Laravel 11+ application (verified on Laravel 13), showing a server-side Grid (Eloquent), a Chart, a validated Form and an editable Scheduler.
+Drop-in files for a fresh Laravel 11+ application (verified on Laravel 13), showing a server-side Grid (Eloquent), a Chart, a validated Form, an editable Scheduler, and an article form with a rich text editor and uploads.
 
 ## Setup
 
@@ -17,7 +17,7 @@ Copy the example files into the app:
 
 | From `examples/laravel/` | To the app |
 |---|---|
-| `app/Http/Controllers/CelerikDemoController.php`, `CelerikCalendarController.php` | `app/Http/Controllers/` |
+| `app/Http/Controllers/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php` | `app/Http/Controllers/` |
 | `app/Models/Meeting.php` | `app/Models/` |
 | `database/migrations/*_create_meetings_table.php` | `database/migrations/` (then run `php artisan migrate`) |
 | `routes/celerik.php` | `routes/` (then add `require __DIR__ . '/celerik.php';` to `routes/web.php`) |
@@ -30,7 +30,11 @@ php artisan tinker --execute="App\Models\User::factory(120)->create()"
 php artisan serve
 ```
 
-Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form` and `/celerik/scheduler`.
+The article form also needs the sanitizer: `composer require symfony/html-sanitizer`.
+
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler` and `/celerik/article`.
+
+> **Windows:** `php artisan serve` starts PHP without the `TEMP`/`TMP` environment variables, so every upload fails with "unable to create a temporary file". Use `cd public && php -S 127.0.0.1:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php` instead, or set `upload_tmp_dir` in `php.ini`.
 
 ## What it shows
 
@@ -47,3 +51,7 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form` and `/celerik/sched
   - Changes are POSTed as JSON with the `X-CSRF-TOKEN` header, which Laravel's CSRF middleware accepts natively. `Event::fromArray()` validates them.
   - Dates are converted to the app time zone before saving, because Eloquent drops UTC offsets.
   - If the server refuses a change (validation, CSRF, 404), the calendar rolls it back.
+- **Article form (editor + uploads)**
+  - FilePond uploads each file to `/celerik/article/upload/{field}` with the CSRF header; `UploadHandler` validates it and answers an id.
+  - On submit, the ids are claimed into `storage/app/private`, outside `public/`. Without JavaScript the real files are stored instead.
+  - The editor HTML is cleaned with `EditorHtml::sanitize()` before it is stored or displayed.
