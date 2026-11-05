@@ -4,6 +4,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\CelerikCalendarController;
 use App\Http\Controllers\CelerikDemoController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,3 +15,14 @@ Route::prefix('celerik')->name('celerik.')->controller(CelerikDemoController::cl
     Route::get('/form', 'form')->name('form');
     Route::post('/form', 'submit')->name('form.submit');
 });
+
+Route::prefix('celerik/scheduler')
+    ->name('celerik.scheduler')
+    ->controller(CelerikCalendarController::class)
+    ->group(static function (): void {
+        Route::get('/', 'show');
+        Route::get('/events', 'events')->name('.events');
+        Route::post('/events/create', 'create')->name('.create');
+        Route::post('/events/update', 'update')->name('.update');
+        Route::post('/events/delete', 'delete')->name('.delete');
+    });

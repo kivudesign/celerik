@@ -1,0 +1,11 @@
+{% extends 'celerik/base.html.twig' %}
+
+{% block title %}Scheduler{% endblock %}
+
+{% block content %}
+    <p class="text-body-secondary small">
+        Drag or resize a meeting to move it, select a time range to create one, click a meeting to delete it.
+    </p>
+
+    {{ celerik(scheduler) }}
+{% endblock %}
