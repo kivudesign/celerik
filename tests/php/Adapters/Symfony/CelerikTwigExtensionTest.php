@@ -25,4 +25,12 @@ final class CelerikTwigExtensionTest extends TestCase
         self::assertStringContainsString('<table id="users"', $html);
         self::assertStringContainsString('<td>&lt;i&gt;Ada&lt;/i&gt;</td>', $html);
     }
+
+    public function testAssetsFunctionAcceptsATheme(): void
+    {
+        $twig = new Environment(new ArrayLoader(['page' => "{{ celerik_assets(theme: 'tailwind') }}"]));
+        $twig->addExtension(new CelerikTwigExtension());
+
+        self::assertStringContainsString('<link rel="stylesheet" href="/bundles/celerikui/celerik-tailwind.css">', $twig->render('page'));
+    }
 }

@@ -9,16 +9,19 @@ use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 
 /**
- * <x-celerik-assets /> — load jQuery and Bootstrap before it.
+ * <x-celerik-assets /> or <x-celerik-assets theme="material" /> — load jQuery and Bootstrap before it.
  */
 final class AssetsComponent extends Component
 {
-    public function __construct(public ?string $baseUrl = null, public ?string $nonce = null)
-    {
+    public function __construct(
+        public ?string $baseUrl = null,
+        public ?string $nonce = null,
+        public string $theme = 'bootstrap',
+    ) {
     }
 
     public function render(): HtmlString
     {
-        return new HtmlString(Assets::tags($this->baseUrl ?? asset('vendor/celerik'), $this->nonce));
+        return new HtmlString(Assets::tags($this->baseUrl ?? asset('vendor/celerik'), $this->nonce, $this->theme));
     }
 }

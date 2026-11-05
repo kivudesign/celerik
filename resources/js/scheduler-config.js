@@ -16,6 +16,8 @@ export function buildSchedulerConfig(options) {
     initialView: options.view ?? 'dayGridMonth',
     headerToolbar: { start: 'prev,next today', center: 'title', end: views.join(',') },
     timeZone: options.timeZone ?? 'local',
+    // FullCalendar falls back to the first of the bundled locales (Afrikaans) when none is set.
+    locale: options.locale ?? 'en',
     height: 'auto',
     editable: Boolean(options.updateUrl),
     selectable: Boolean(options.createUrl),
@@ -28,7 +30,6 @@ export function buildSchedulerConfig(options) {
   const optional = {
     initialDate: options.date,
     firstDay: options.firstDay,
-    locale: options.locale,
     businessHours: options.businessHours,
     slotMinTime: options.slotMinTime,
     slotMaxTime: options.slotMaxTime,

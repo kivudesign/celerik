@@ -137,6 +137,27 @@ final class FormTest extends TestCase
         Field::text('name')->upload('/uploads');
     }
 
+    public function testFloatingLabelsPutTheControlFirstWithAPlaceholder(): void
+    {
+        $html = Form::make('f')->floatingLabels()->submit(null)->add(
+            Field::email('email')->required()->help('Never shared.'),
+            Field::select('country', ['fr' => 'France'])->placeholder('Choose...'),
+            Field::checkbox('terms', 'I agree'),
+            Field::file('cv'),
+        )->render();
+
+        self::assertStringContainsString(
+            '<div class="form-floating mb-3"><input id="f-email" name="email" required placeholder="Email" '
+            . 'aria-describedby="f-email-help" type="email" class="form-control">'
+            . '<label for="f-email">Email <span class="celerik-required" aria-hidden="true">*</span></label>'
+            . '<div id="f-email-help" class="form-text">Never shared.</div></div>',
+            $html,
+        );
+        self::assertStringContainsString('<div class="form-floating mb-3"><select id="f-country"', $html);
+        self::assertStringContainsString('<div class="mb-3 form-check"><input id="f-terms"', $html, 'Checkboxes keep their layout.');
+        self::assertStringContainsString('<div class="mb-3"><label for="f-cv" id="f-cv-label" class="form-label">', $html, 'File fields keep their layout.');
+    }
+
     public function testRejectsUnknownToolbar(): void
     {
         $this->expectException(InvalidArgumentException::class);

@@ -1,9 +1,27 @@
 @use 'variables' as *;
 
+// Runtime hooks: themes (themes/material.scss, themes/tailwind.scss) override these.
+:root {
+  --celerik-required-color: #{$celerik-required-color};
+  --celerik-chart-min-height: #{$celerik-chart-min-height};
+  --celerik-grid-header-bg: #{$celerik-grid-header-bg};
+  --celerik-grid-header-color: inherit;
+  --celerik-grid-header-font-weight: #{$celerik-grid-header-font-weight};
+  --celerik-grid-header-text-transform: none;
+  --celerik-focus-ring: #{$celerik-focus-ring};
+  --celerik-scheduler-today-bg: #{$celerik-scheduler-today-bg};
+  --celerik-scheduler-title-font-size: #{$celerik-scheduler-title-font-size};
+  --celerik-editor-min-height: #{$celerik-editor-min-height};
+  --celerik-radius: var(--bs-border-radius);
+  --celerik-surface-shadow: none;
+}
+
 .celerik-grid {
   thead th {
-    background-color: $celerik-grid-header-bg;
-    font-weight: $celerik-grid-header-font-weight;
+    background-color: var(--celerik-grid-header-bg);
+    color: var(--celerik-grid-header-color);
+    font-weight: var(--celerik-grid-header-font-weight);
+    text-transform: var(--celerik-grid-header-text-transform);
   }
 
   caption {
@@ -16,16 +34,18 @@
 .dt-container th.dt-orderable-desc {
   &:focus-visible {
     outline: 0;
-    box-shadow: $celerik-focus-ring;
+    box-shadow: var(--celerik-focus-ring);
   }
 }
 
 .celerik-chart {
   margin: 0 0 1rem;
+  border-radius: var(--celerik-radius);
+  box-shadow: var(--celerik-surface-shadow);
 
   &__canvas {
     position: relative;
-    min-height: $celerik-chart-min-height;
+    min-height: var(--celerik-chart-min-height);
   }
 }
 
@@ -35,47 +55,51 @@
   --fc-page-bg-color: var(--bs-body-bg);
   --fc-neutral-bg-color: var(--bs-tertiary-bg);
   --fc-list-event-hover-bg-color: var(--bs-tertiary-bg);
-  --fc-today-bg-color: #{$celerik-scheduler-today-bg};
+  --fc-today-bg-color: var(--celerik-scheduler-today-bg);
+  // FullCalendar's default is a fixed light grey, which shows as pale blocks in dark mode.
+  --fc-non-business-color: rgba(var(--bs-emphasis-color-rgb), 0.05);
+  --fc-highlight-color: rgba(var(--bs-primary-rgb), 0.15);
   --fc-event-bg-color: var(--bs-primary);
   --fc-event-border-color: var(--bs-primary);
   --fc-button-bg-color: var(--bs-primary);
   --fc-button-border-color: var(--bs-primary);
-  --fc-button-hover-bg-color: var(--bs-primary-text-emphasis);
-  --fc-button-hover-border-color: var(--bs-primary-text-emphasis);
-  --fc-button-active-bg-color: var(--bs-primary-text-emphasis);
-  --fc-button-active-border-color: var(--bs-primary-text-emphasis);
+  // A darker primary keeps white text readable in light and dark mode (the
+  // text-emphasis color is light in dark mode).
+  --fc-button-hover-bg-color: color-mix(in srgb, var(--bs-primary) 80%, #000);
+  --fc-button-hover-border-color: color-mix(in srgb, var(--bs-primary) 80%, #000);
+  --fc-button-active-bg-color: color-mix(in srgb, var(--bs-primary) 70%, #000);
+  --fc-button-active-border-color: color-mix(in srgb, var(--bs-primary) 70%, #000);
 
   .fc-button:focus-visible {
-    box-shadow: $celerik-focus-ring;
+    box-shadow: var(--celerik-focus-ring);
   }
 
   .fc-toolbar-title {
-    font-size: $celerik-scheduler-title-font-size;
+    font-size: var(--celerik-scheduler-title-font-size);
   }
 }
 
 .celerik-form {
   .celerik-required {
-    color: $celerik-required-color;
+    color: var(--celerik-required-color);
   }
 }
 
 // Rich text editor (Quill, snow theme) in Bootstrap form styling.
 .celerik-editor {
   background-color: var(--bs-body-bg);
-  border-bottom-left-radius: var(--bs-border-radius);
-  border-bottom-right-radius: var(--bs-border-radius);
+  border-bottom-left-radius: var(--celerik-radius);
+  border-bottom-right-radius: var(--celerik-radius);
 
   .ql-editor {
-    min-height: $celerik-editor-min-height;
+    min-height: var(--celerik-editor-min-height);
     font-size: 1rem;
   }
-
 }
 
 .ql-toolbar.ql-snow {
-  border-top-left-radius: var(--bs-border-radius);
-  border-top-right-radius: var(--bs-border-radius);
+  border-top-left-radius: var(--celerik-radius);
+  border-top-right-radius: var(--celerik-radius);
 }
 
 .ql-toolbar.ql-snow,
@@ -84,7 +108,33 @@
 }
 
 .ql-container.ql-snow:focus-within {
-  box-shadow: $celerik-focus-ring;
+  box-shadow: var(--celerik-focus-ring);
+}
+
+// Quill's icons and placeholder use fixed dark greys: follow the theme (dark mode).
+// Quill's stylesheet loads after celerik.css, so these are one class more specific.
+.ql-toolbar.ql-snow {
+  .ql-stroke,
+  .ql-stroke-miter {
+    stroke: var(--bs-body-color);
+  }
+
+  .ql-fill,
+  .ql-stroke.ql-fill {
+    fill: var(--bs-body-color);
+  }
+
+  .ql-picker {
+    color: var(--bs-body-color);
+  }
+
+  .ql-picker-options {
+    background-color: var(--bs-body-bg);
+  }
+}
+
+.celerik-editor.ql-snow .ql-editor.ql-blank::before {
+  color: var(--bs-secondary-color);
 }
 
 .ql-container.ql-snow.is-invalid {
@@ -114,7 +164,7 @@
 .notyf__toast.celerik-toast {
   color: #fff;
   font-family: inherit;
-  border-radius: var(--bs-border-radius);
+  border-radius: var(--celerik-radius);
 }
 
 .notyf__toast.celerik-toast-warning,
@@ -130,4 +180,27 @@
 .notyf__dismiss-btn:focus-visible {
   outline: 2px solid currentcolor;
   outline-offset: 2px;
+}
+
+// Containers themes can elevate (Material) or outline (Tailwind).
+.dt-container,
+.celerik-scheduler,
+.celerik-filemanager {
+  border-radius: var(--celerik-radius);
+  box-shadow: var(--celerik-surface-shadow);
+}
+
+// elFinder shows the selected folder grey on grey (3.2:1) while it does not have focus
+// (.elfinder-disabled). Its theme.css loads after celerik.css, so these selectors are
+// one class more specific than elFinder's. elFinder has no dark mode (its panels stay
+// light), so the selection stays light too: dark text on a light tint of the primary.
+.celerik-filemanager.elfinder {
+  .elfinder-navbar .elfinder-navbar-dir.ui-state-active,
+  .elfinder-navbar .elfinder-navbar-dir.ui-state-hover,
+  .elfinder-cwd .elfinder-cwd-filename.ui-state-hover,
+  .elfinder-cwd table td.ui-state-hover {
+    color: #212529;
+    background: color-mix(in srgb, var(--bs-primary) 18%, #fff);
+    border-color: transparent;
+  }
 }

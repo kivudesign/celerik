@@ -287,11 +287,13 @@ final class Field
     /**
      * @param string|null $error Server-side error message to display.
      * @param mixed $value Submitted value, takes precedence over the field default.
+     * @param bool $floating Bootstrap floating label (text-like inputs, selects and textareas only).
      */
-    public function render(string $formId, ?string $error = null, mixed $value = null): string
+    public function render(string $formId, ?string $error = null, mixed $value = null, bool $floating = false): string
     {
         $id = self::fieldId($formId, $this->name);
         $value ??= $this->value;
+        $floating = $floating && $this->canFloat();
 
         if ($this->type === 'hidden') {
             return Html::tag('input', [
@@ -312,7 +314,8 @@ final class Field
             'name' => $this->name,
             // FilePond enforces "required" itself (see upload.js); the native attribute would block it.
             'required' => $this->required && !$asyncUpload,
-            'placeholder' => $this->placeholder,
+            // Floating labels need a placeholder (Bootstrap shows the label in its place).
+            'placeholder' => $floating ? ($this->placeholder ?? $this->label) : $this->placeholder,
             'aria-describedby' => Html::classes([$helpId, $errorId]),
             'aria-invalid' => $error === null ? null : 'true',
             'data-parsley-equalto' => $this->equalTo === null ? null : '#' . self::fieldId($formId, $this->equalTo),
@@ -363,7 +366,11 @@ final class Field
                 'for' => $id,
                 // The editor's content area and FilePond's input are labelled by id (aria-labelledby).
                 'id' => in_array($this->type, ['editor', 'file'], true) ? $id . '-label' : null,
-                'class' => $this->type === 'checkbox' ? 'form-check-label' : 'form-label',
+                'class' => match (true) {
+                    $this->type === 'checkbox' => 'form-check-label',
+                    $floating => null,
+                    default => 'form-label',
+                },
             ],
             Html::escape($this->label) . ($this->required ? self::REQUIRED_MARKER : ''),
         );
@@ -377,11 +384,23 @@ final class Field
             Html::escape($error),
         );
 
-        $content = $this->type === 'checkbox'
+        // Checkboxes and floating labels put the control before its label.
+        $content = $this->type === 'checkbox' || $floating
             ? $control . $label . $feedback . $help
             : $label . $control . $feedback . $help;
 
-        return Html::tag('div', ['class' => $this->type === 'checkbox' ? 'mb-3 form-check' : 'mb-3'], $content);
+        $wrapper = match (true) {
+            $this->type === 'checkbox' => 'mb-3 form-check',
+            $floating => 'form-floating mb-3',
+            default => 'mb-3',
+        };
+
+        return Html::tag('div', ['class' => $wrapper], $content);
+    }
+
+    private function canFloat(): bool
+    {
+        return !in_array($this->type, ['checkbox', 'file', 'editor', 'hidden'], true);
     }
 
     public static function fieldId(string $formId, string $name): string

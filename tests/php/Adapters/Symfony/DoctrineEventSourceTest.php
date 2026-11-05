@@ -84,6 +84,7 @@ final class DoctrineEventSourceTest extends TestCase
             'end' => '2026-11-02T01:00:00+00:00',
             'allDay' => false,
             'color' => '#dc3545',
+            'textColor' => '#000',
         ]], $result->toArray()['data']);
     }
 

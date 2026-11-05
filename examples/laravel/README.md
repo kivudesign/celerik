@@ -50,7 +50,7 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/schedule
 
 ## What it shows
 
-- **`<x-celerik-assets />`** prints the `<link>` and `<script>` tags for the bundle. Load jQuery and Bootstrap before it.
+- **`<x-celerik-assets />`** prints the `<link>` and `<script>` tags for the bundle. Load jQuery and Bootstrap before it. Add `theme="material"` or `theme="tailwind"` for another look.
 - **`<x-celerik :component="$grid" />`** renders any Celerik component.
 - **`Grid::respond()` + `EloquentDataSource`**
   - Paging, sorting and search run in SQL.

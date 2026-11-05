@@ -1,18 +1,18 @@
 # Roadmap
 
-## Short term — Phase 1 (MVP)
+## Phase 1 (MVP) — done ✅
 
 - Grid, Chart and Form components.
 - Laravel and Symfony adapters.
 - Bootstrap theme.
 
-## Mid term — Phase 2
+## Phase 2 — done ✅
 
 - Scheduler, File Manager, Upload, rich text editor.
 - Modals, Tabs, Notifications.
-- Material and Tailwind themes.
+- Material and Tailwind-inspired themes, with light and dark mode.
 
-## Long term — Phase 3
+## Next — Phase 3
 
 - Accessibility polish.
 - ThemeBuilder UI.

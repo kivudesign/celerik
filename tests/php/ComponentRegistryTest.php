@@ -53,6 +53,21 @@ final class ComponentRegistryTest extends TestCase
         );
     }
 
+    public function testAssetTagsAddTheThemeStylesheetAfterCelerikCss(): void
+    {
+        self::assertSame(
+            '<link rel="stylesheet" href="/assets/celerik.css">' . "\n"
+            . '<link rel="stylesheet" href="/assets/celerik-material.css">' . "\n"
+            . '<script type="module" src="/assets/celerik.js"></script>',
+            Assets::tags('/assets', theme: 'material'),
+        );
+        self::assertStringContainsString('celerik-tailwind.css', Assets::tags('/assets', theme: 'tailwind'));
+        self::assertSame(Assets::tags('/assets'), Assets::tags('/assets', theme: 'bootstrap'));
+
+        $this->expectException(InvalidArgumentException::class);
+        Assets::tags('/assets', theme: '../../evil');
+    }
+
     public function testAssetTagsWithNonceIncludeCspNonceMetaForFullCalendar(): void
     {
         self::assertSame(
