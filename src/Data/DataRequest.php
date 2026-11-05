@@ -19,6 +19,12 @@ final class DataRequest
     public const MAX_SEARCH_LENGTH = 255;
 
     /**
+     * Escape character for SQL LIKE. Pass it explicitly (`LIKE ? ESCAPE '!'`): SQLite and
+     * SQL Server have no default escape character, and `!` needs no quoting in any dialect.
+     */
+    public const LIKE_ESCAPE = '!';
+
+    /**
      * @param list<array{field: string, direction: 'asc'|'desc'}> $sort
      * @param array<string, string> $filters Exact-match filters, field => value.
      * @param list<string> $searchFields Fields the search term applies to; empty lets the source decide.
@@ -93,6 +99,26 @@ final class DataRequest
     public function offset(): int
     {
         return ($this->page - 1) * $this->perPage;
+    }
+
+    /**
+     * The search term as a "contains" LIKE pattern, with `%` and `_` matched literally.
+     * Use it with an explicit escape clause: `LIKE ? ESCAPE '!'` (see LIKE_ESCAPE).
+     */
+    public function likePattern(): ?string
+    {
+        if ($this->search === null) {
+            return null;
+        }
+
+        $escape = self::LIKE_ESCAPE;
+        $escaped = str_replace(
+            [$escape, '%', '_'],
+            [$escape . $escape, $escape . '%', $escape . '_'],
+            $this->search,
+        );
+
+        return '%' . $escaped . '%';
     }
 
     public static function isValidField(string $field): bool

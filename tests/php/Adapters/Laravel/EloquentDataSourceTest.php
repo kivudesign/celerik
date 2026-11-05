@@ -59,9 +59,14 @@ final class EloquentDataSourceTest extends TestCase
 
     public function testSearchTreatsWildcardsLiterally(): void
     {
-        $result = (new EloquentDataSource(Person::query(), ['name']))->fetch(new DataRequest(search: '%'));
+        Person::query()->create(['name' => '100% Ada', 'role' => 'user', 'password' => 'hash']);
+        Person::query()->create(['name' => 'snake_case', 'role' => 'user', 'password' => 'hash']);
+        Person::query()->create(['name' => 'Bang! Bob', 'role' => 'user', 'password' => 'hash']);
+        $source = new EloquentDataSource(Person::query(), ['name']);
 
-        self::assertSame(0, $result->filtered);
+        self::assertSame(['100% Ada'], array_column($source->fetch(new DataRequest(search: '%'))->rows, 'name'));
+        self::assertSame(['snake_case'], array_column($source->fetch(new DataRequest(search: '_'))->rows, 'name'));
+        self::assertSame(['Bang! Bob'], array_column($source->fetch(new DataRequest(search: '!'))->rows, 'name'));
     }
 
     public function testWorksThroughGridRespond(): void

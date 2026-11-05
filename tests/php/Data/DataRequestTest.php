@@ -80,6 +80,12 @@ final class DataRequestTest extends TestCase
         self::assertSame(1, DataRequest::fromArray(['page' => '-4'])->page);
     }
 
+    public function testLikePatternEscapesWildcardsAndTheEscapeCharacter(): void
+    {
+        self::assertNull((new DataRequest())->likePattern());
+        self::assertSame('%100!%!_a!!b%', (new DataRequest(search: '100%_a!b'))->likePattern());
+    }
+
     public function testUsesDefaultPageSize(): void
     {
         self::assertSame(25, DataRequest::fromArray([], defaultPerPage: 25)->perPage);

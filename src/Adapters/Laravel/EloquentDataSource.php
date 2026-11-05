@@ -34,12 +34,17 @@ final class EloquentDataSource implements DataSourceInterface
 
         $fields = $request->searchFields !== [] ? $request->searchFields : $this->searchable;
 
-        if ($request->search !== null && $fields !== []) {
-            $term = '%' . addcslashes($request->search, '%_\\') . '%';
+        $pattern = $request->likePattern();
 
-            $query->where(static function (EloquentBuilder|QueryBuilder $where) use ($fields, $term): void {
+        if ($pattern !== null && $fields !== []) {
+            $grammar = ($query instanceof EloquentBuilder ? $query->getQuery() : $query)->getGrammar();
+
+            $query->where(static function (EloquentBuilder|QueryBuilder $where) use ($fields, $pattern, $grammar) {
                 foreach ($fields as $field) {
-                    $where->orWhere($field, 'like', $term);
+                    $where->orWhereRaw(
+                        sprintf("%s like ? escape '%s'", $grammar->wrap($field), DataRequest::LIKE_ESCAPE),
+                        [$pattern],
+                    );
                 }
             });
         }
