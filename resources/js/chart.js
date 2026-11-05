@@ -23,7 +23,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { buildChartConfig, renderDataTable } from './chart-config.js';
+import { buildChartConfig, renderDataTable, usesPatterns, withPatterns } from './chart-config.js';
 import { prefersReducedMotion } from './core.js';
 
 // Everything the PHP Chart types and common options need. Time scales are left out:
@@ -53,7 +53,7 @@ export function initChart(element, options) {
         return response.json();
       })
       .then((payload) => {
-        chart.data = payload.data;
+        chart.data = usesPatterns(options) ? withPatterns(payload.data, chart.config.type) : payload.data;
         chart.update();
         renderDataTable(element, canvas.getAttribute('aria-label') ?? '', payload.data);
       })

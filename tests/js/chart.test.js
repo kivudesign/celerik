@@ -1,4 +1,6 @@
-import { buildChartConfig, renderDataTable } from '../../resources/js/chart-config.js';
+import {
+  buildChartConfig, LINE_DASHES, POINT_STYLES, renderDataTable,
+} from '../../resources/js/chart-config.js';
 import { readOptions } from '../../resources/js/core.js';
 import { loadFixture } from './helpers.js';
 
@@ -28,6 +30,26 @@ describe('chart config', () => {
 
     const config = buildChartConfig({ options: { animation: { duration: 200 } } }, { reducedMotion: true });
     expect(config.options.animation).toEqual({ duration: 200 });
+  });
+
+  test('line charts tell series apart without color; dataset options from PHP win', () => {
+    const data = { labels: ['Jan'], datasets: [{ label: 'North', data: [1] }, { label: 'South', data: [2], pointStyle: 'cross' }] };
+    const config = buildChartConfig({ type: 'line', data });
+
+    expect(config.data.datasets[0]).toMatchObject({ pointStyle: POINT_STYLES[0], borderDash: LINE_DASHES[0], label: 'North' });
+    expect(config.data.datasets[1]).toMatchObject({ pointStyle: 'cross', borderDash: LINE_DASHES[1] });
+    expect(config.options.plugins.legend.labels.usePointStyle).toBe(true);
+    expect(new Set(POINT_STYLES).size).toBe(POINT_STYLES.length);
+    expect(data.datasets[0]).not.toHaveProperty('pointStyle'); // the PHP options are not mutated
+  });
+
+  test('patterns: on for line, radar and scatter (no dashes), opt-in for others, opt-out', () => {
+    const data = { labels: ['Jan'], datasets: [{ label: 'A', data: [1] }] };
+    expect(buildChartConfig({ type: 'radar', data }).data.datasets[0].pointStyle).toBe('circle');
+    expect(buildChartConfig({ type: 'scatter', data }).data.datasets[0]).not.toHaveProperty('borderDash');
+    expect(buildChartConfig({ type: 'bar', data }).data.datasets[0]).not.toHaveProperty('pointStyle');
+    expect(buildChartConfig({ type: 'bar', data, patterns: true }).data.datasets[0].pointStyle).toBe('circle');
+    expect(buildChartConfig({ type: 'line', data, patterns: false }).data.datasets[0]).not.toHaveProperty('pointStyle');
   });
 
   test('renders an accessible data table for remote data', () => {
