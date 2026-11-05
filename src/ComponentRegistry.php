@@ -7,6 +7,7 @@ namespace Celerik\Ui;
 use Celerik\Ui\Components\Chart;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Grid;
+use Celerik\Ui\Components\Scheduler;
 use InvalidArgumentException;
 
 /**
@@ -23,7 +24,8 @@ final class ComponentRegistry
         return (new self())
             ->register(Grid::class)
             ->register(Chart::class)
-            ->register(Form::class);
+            ->register(Form::class)
+            ->register(Scheduler::class);
     }
 
     /**
