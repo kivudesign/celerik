@@ -2,9 +2,9 @@
 
 An open-source, Bootstrap-based UI component suite for PHP, inspired by Telerik UI. It works with plain PHP and has optional adapters for **Laravel 11+** and **Symfony 7**.
 
-Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask, FullCalendar, Quill, FilePond and Notyf. Each library (and its stylesheet) is loaded only on pages that use it.
+Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask, FullCalendar, Quill, FilePond, Notyf and elFinder. Each library (and its stylesheet) is loaded only on pages that use it.
 
-> **Status: Phase 2 in progress.** Grid, Chart, Form (with uploads and a rich text editor), Scheduler, Modal, Tabs and Notification are available. See the [roadmap](ROADMAP.md).
+> **Status: Phase 2 in progress.** Grid, Chart, Form (with uploads and a rich text editor), Scheduler, Modal, Tabs, Notification and File Manager are available. See the [roadmap](ROADMAP.md).
 
 ## Quick look
 
@@ -54,6 +54,7 @@ Load Bootstrap 5.3 (CSS, and `bootstrap.bundle.js` for Modal and Tabs) and jQuer
 | Modal | `Components\Modal` | Bootstrap 5 | Labelled dialog, footer buttons that submit a form inside, opens on load after server errors |
 | Tabs | `Components\Tabs` | Bootstrap 5 | WAI-ARIA tabs with arrow keys, tabs/pills/underline styles, selected tab kept in the URL hash |
 | Notification | `Components\Notification` | Notyf 3 | Toasts from flash messages (`fromFlash()`) or `Celerik.notify()`; messages are always text; errors stay until dismissed |
+| File manager | `Components\FileManager` + `FileManager\FileManagerConnector` | elFinder 2.1 | Locked-down local volume, mandatory authorization, content-checked uploads, elFinder CSRF plus the framework's; see [SECURITY.md](SECURITY.md#file-manager) |
 
 Content passed to Modal and Tabs follows one rule: a string is escaped text, and a `Stringable` (another component, or `Html::raw()` for markup you trust) is inserted as HTML.
 | Scheduler | `Components\Scheduler` | FullCalendar 6 (MIT plugins) | Month, week, day and list views; create, move, resize and delete through your endpoints, rolled back if the server refuses |
@@ -63,8 +64,8 @@ The full Telerik → open-source mapping is in [Components.md](Components.md).
 ## Examples
 
 - [`examples/plain`](examples/plain): no framework. Run `php -S localhost:8000 examples/plain/index.php`.
-- [`examples/laravel`](examples/laravel): Eloquent grid, chart, validated form, scheduler, an article form with rich text and uploads, and a tabs/modal/notifications page.
-- [`examples/symfony`](examples/symfony): Doctrine grid, chart, validated form, scheduler, an article form with rich text and uploads, and a tabs/modal/notifications page.
+- [`examples/laravel`](examples/laravel): Eloquent grid, chart, validated form, scheduler, an article form with rich text and uploads, a tabs/modal/notifications page, and a file manager.
+- [`examples/symfony`](examples/symfony): Doctrine grid, chart, validated form, scheduler, an article form with rich text and uploads, a tabs/modal/notifications page, and a file manager.
 
 ## Development
 
@@ -91,6 +92,8 @@ img-src 'self' data:; font-src 'self' data:; connect-src 'self'
 ```
 
 `font-src data:` is needed for the Scheduler's toolbar icons. Add your CDN to `script-src` and `style-src` if Bootstrap and jQuery come from one.
+
+The File Manager also needs `style-src-attr 'unsafe-inline'`: elFinder builds its interface with inline `style` attributes. That directive allows style attributes only (they cannot run code); scripts and `<style>` elements still require the nonce.
 
 ## Documentation Pack
 

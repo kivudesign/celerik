@@ -16,6 +16,7 @@ Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The prebuilt bundle i
 | [Parchment](https://github.com/slab/parchment) (Quill dependency) | 3.x | BSD-3-Clause | `chunks/editor-*.js` |
 | [quill-delta](https://github.com/slab/delta), [eventemitter3](https://github.com/primus/eventemitter3), [lodash-es](https://lodash.com) (Quill dependencies) | – | MIT | `chunks/editor-*.js` |
 | [Notyf](https://carlosroso.com/notyf/) | 3.x | MIT | `chunks/notification-*.js`, `chunks/notification-*.css` |
+| [jQuery UI](https://jqueryui.com) (for elFinder) | 1.14 | MIT | `chunks/filemanager-*.js`, `chunks/filemanager-*.css`, `chunks/ui-icons_*.png` |
 
 ## Peer dependencies (not bundled, loaded by the application)
 
@@ -23,6 +24,7 @@ Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The prebuilt bundle i
 |---|---|---|
 | [Bootstrap](https://getbootstrap.com) (CSS; `bootstrap.bundle.js` for Modal and Tabs) | 5.3 | MIT |
 | [jQuery](https://jquery.com) | 3.7 | MIT |
+| [elFinder](https://github.com/Studio-42/elFinder) (`studio-42/elfinder`, for the File Manager: connector, JS, CSS, images) | 2.1 | BSD-3-Clause |
 
 Full license texts are in each package under `node_modules/<package>/LICENSE` after `npm install`. They must be kept with any redistribution of the files in `public/`.
 

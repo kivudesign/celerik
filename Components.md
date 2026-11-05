@@ -47,6 +47,8 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 | Calendar | FullCalendar (`Scheduler` month view) / Flatpickr inline | MIT | 2 ✅ |
 | Gantt | Frappe Gantt | MIT | – |
 
+> The npm package named `elfinder` is **not** elFinder (it is an unrelated "element finder" tool): elFinder is installed with Composer (`studio-42/elfinder`).
+
 > FullCalendar's resource and timeline views are **premium** (commercial). Only the MIT standard plugins are bundled.
 
 ### Navigation & Layout
@@ -92,7 +94,7 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 | Upload | FilePond (+ validate-type, validate-size, image-preview plugins) | MIT | 2 ✅ (`Field::file`) |
 | Rich Text Editor | Quill 2 | BSD-3 | 2 ✅ (`Field::editor`) |
 | Markdown Editor | EasyMDE | MIT | – |
-| File Manager | elFinder 🧩 | BSD-3 | 2 |
+| File Manager | elFinder 2.1 (`studio-42/elfinder` on Composer) 🧩, with jQuery UI | BSD-3 / MIT | 2 ✅ (`FileManager`) |
 
 ### Miscellaneous
 

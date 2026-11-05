@@ -21,7 +21,9 @@ celerik/
 │   │   ├── Chart.php
 │   │   ├── Form.php
 │   │   ├── Form/Field.php
-│   │   └── Scheduler.php
+│   │   ├── Scheduler.php
+│   │   ├── Modal.php  Tabs.php  Notification.php
+│   │   └── FileManager.php
 │   ├── Data/
 │   │   ├── DataSourceInterface.php
 │   │   ├── DataRequest.php       # Parses DataTables + simple query formats
@@ -36,6 +38,9 @@ celerik/
 │   │   ├── Dates.php             # Strict ISO 8601 parsing
 │   │   ├── EditorHtml.php        # Sanitizes rich text editor output
 │   │   └── RawHtml.php           # Trusted markup for Modal/Tabs content (Html::raw())
+│   ├── FileManager/
+│   │   ├── FileManagerConfig.php     # Locked-down elFinder volume
+│   │   └── FileManagerConnector.php  # run($config, authorized: ...)
 │   ├── Upload/
 │   │   ├── UploadRules.php       # Accepted types, size, count (field + server)
 │   │   ├── UploadHandler.php     # process / revert / claim / store / purge
@@ -66,6 +71,7 @@ celerik/
 │   │   ├── upload.js  upload-config.js      # FilePond, loaded only for forms with uploads
 │   │   ├── modal.js  tabs.js  bootstrap-global.js   # Bootstrap JS (peer dependency)
 │   │   ├── notification.js  notification-config.js  # Notyf, Celerik.notify()
+│   │   ├── filemanager.js  filemanager-config.js    # jQuery UI + the app's copy of elFinder
 │   │   └── jquery-global.js      # `jquery` → window.jQuery (peer dependency)
 │   └── scss/
 │       ├── _variables.scss
@@ -80,12 +86,13 @@ celerik/
 │
 ├── tests/
 │   ├── php/                      # PHPUnit (Celerik\Ui\Tests\)
-│   │   ├── Components/  Data/  Support/  Upload/
+│   │   ├── Components/  Data/  Support/  Upload/  FileManager/
 │   │   └── Adapters/Laravel/  Adapters/Symfony/
 │   └── js/                       # Jest + axe-core
 │       ├── fixtures/build.php    # Renders PHP components to HTML fixtures
 │       ├── core.test.js  grid.test.js  chart.test.js  form.test.js  a11y.test.js
 │       ├── scheduler.test.js  scheduler-integration.test.js  editor.test.js  upload.test.js
+│       ├── ui.test.js  notification.test.js  filemanager.test.js
 │       └── helpers.js  setup.js  style-stub.js
 │
 ├── examples/
