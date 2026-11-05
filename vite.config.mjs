@@ -1,26 +1,39 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
-// Builds the single bundle shipped with the Composer package:
-//   public/celerik.js  (IIFE, exposes window.Celerik)
+// Builds the bundle shipped with the Composer package:
+//   public/celerik.js     ES module entry (registry + lazy initializers)
+//   public/chunks/*.js    one chunk per component library, loaded only when used
 //   public/celerik.css
-// jQuery is a peer dependency: the page must load it before celerik.js.
+// jQuery is a peer dependency: `jquery` resolves to the page's window.jQuery.
+//
+// A regular build is used rather than library mode, which never minifies ES output.
 export default defineConfig({
   publicDir: false,
+  base: './',
+  resolve: {
+    alias: {
+      jquery: fileURLToPath(new URL('./resources/js/jquery-global.js', import.meta.url)),
+    },
+  },
   build: {
     outDir: 'public',
     emptyOutDir: true,
     sourcemap: true,
-    lib: {
-      entry: 'resources/js/index.js',
-      name: 'Celerik',
-      formats: ['iife'],
-      fileName: () => 'celerik.js',
-      cssFileName: 'celerik',
+    modulePreload: false,
+    cssCodeSplit: false,
+    // CommonJS libraries (Parsley, parts of DataTables) call require('jquery'): give them
+    // the shim's default export (window.jQuery), not its module namespace object.
+    commonjsOptions: {
+      requireReturnsDefault: 'auto',
     },
     rollupOptions: {
-      external: ['jquery'],
+      input: 'resources/js/index.js',
+      preserveEntrySignatures: 'exports-only',
       output: {
-        globals: { jquery: 'jQuery' },
+        entryFileNames: 'celerik.js',
+        chunkFileNames: 'chunks/[name]-[hash].js',
+        assetFileNames: (asset) => (asset.names?.some((name) => name.endsWith('.css')) ? 'celerik.css' : 'assets/[name]-[hash][extname]'),
       },
     },
   },
