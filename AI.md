@@ -70,6 +70,8 @@ Map database columns to grid columns like this:
   - On form submit, the field holds ids → `claim($id, $dir)`. If the browser sent real files instead (no JavaScript), use `store()`.
   - One `UploadRules` per field, shared by the field and its handler. Directories outside the web root.
 - **Editor**: always `EditorHtml::sanitize()` the submitted HTML before storing it.
+- **Modal with a form**: put the form in `body()`, submit it with a footer button (`['type' => 'submit', 'form' => '<form id>']`), and call `open($errors !== [])` so server errors reopen it.
+- **Notifications**: Post/Redirect/Get with flash messages, then `Notification::make()->fromFlash(...)` in the layout. From JavaScript: `Celerik.notify(type, message)`.
 
 ### Integration snippets
 

@@ -7,6 +7,7 @@ declare(strict_types=1);
 use App\Http\Controllers\CelerikArticleController;
 use App\Http\Controllers\CelerikCalendarController;
 use App\Http\Controllers\CelerikDemoController;
+use App\Http\Controllers\CelerikUiController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('celerik')->name('celerik.')->controller(CelerikDemoController::class)->group(static function (): void {
@@ -37,4 +38,12 @@ Route::prefix('celerik/article')
         Route::match(['POST', 'DELETE'], '/upload/{field}', 'upload')
             ->whereIn('field', ['cover', 'attachments'])
             ->name('.upload');
+    });
+
+Route::prefix('celerik/ui')
+    ->name('celerik.ui')
+    ->controller(CelerikUiController::class)
+    ->group(static function (): void {
+        Route::get('/', 'show');
+        Route::post('/subscribe', 'subscribe')->name('.subscribe');
     });

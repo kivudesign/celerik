@@ -122,5 +122,5 @@ $articleForm = Form::make('article')
         Field::file('attachments')->rules($uploadRules['attachments'])->upload('/upload/attachments'),
     )
     ->errors($articleErrors)
-    ->values($article === null ? $_POST : [])
+    ->values($path === '/article' && $article === null ? $_POST : [])
     ->submit('Publish');

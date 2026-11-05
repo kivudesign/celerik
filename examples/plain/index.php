@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Framework-free example: Grid (server-side), Chart, Scheduler and Form with plain PHP.
+ * Framework-free example: Grid, Chart, Scheduler, Forms, Tabs, Modal and Notifications with plain PHP.
  *
  *     composer install && npm install && npm run build
  *     php -S localhost:8000 examples/plain/index.php
@@ -95,8 +95,11 @@ $form = Form::make('contact')
         Field::textarea('message')->required()->minLength(10),
     )
     ->errors($errors)
-    ->values($message === null ? $_POST : [])
+    // Only re-fill this form when it is the one that was posted.
+    ->values($path === '/contact' && $message === null ? $_POST : [])
     ->submit('Send');
+
+require __DIR__ . '/ui.php';
 
 ?>
 <!doctype html>
@@ -134,10 +137,14 @@ $form = Form::make('contact')
 
     <section class="mb-5" aria-labelledby="form-title">
         <h2 id="form-title" class="h5">Form</h2>
-        <?php if ($message !== null) : ?>
-            <div class="alert alert-success" role="status"><?= htmlspecialchars($message) ?></div>
-        <?php endif ?>
         <?= $form ?>
+    </section>
+
+    <section class="mb-5" aria-labelledby="ui-title">
+        <h2 id="ui-title" class="h5">Tabs, modal and notifications</h2>
+        <?= $tabs ?>
+        <p class="mt-3"><?= $newsletterModal->trigger('Subscribe to the newsletter') ?></p>
+        <?= $newsletterModal ?>
     </section>
 
     <section class="mb-5" aria-labelledby="article-title">
@@ -160,5 +167,6 @@ $form = Form::make('contact')
         <?= $articleForm ?>
     </section>
 </main>
+<?= $notification ?>
 </body>
 </html>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Celerik\Ui\Support;
 
 use InvalidArgumentException;
+use Stringable;
 
 /**
  * Minimal, escaping-by-default HTML builder used by every component.
@@ -56,6 +57,23 @@ final class Html
         }
 
         return $open . ($content ?? '') . '</' . $name . '>';
+    }
+
+    /**
+     * Marks markup as trusted, so content-accepting components insert it unescaped.
+     */
+    public static function raw(string $html): RawHtml
+    {
+        return new RawHtml($html);
+    }
+
+    /**
+     * Content for Modal and Tabs: a string is escaped text, a Stringable (a component,
+     * Html::raw(), Laravel's HtmlString, Twig's Markup) is inserted as HTML.
+     */
+    public static function content(string|Stringable $content): string
+    {
+        return $content instanceof Stringable ? (string) $content : self::escape($content);
     }
 
     /**
