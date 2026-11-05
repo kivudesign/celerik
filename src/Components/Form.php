@@ -33,6 +33,8 @@ final class Form extends Component
 
     private ?string $submitLabel = 'Submit';
 
+    private bool $floatingLabels = false;
+
     /** @var array<string, string|list<string>> */
     private array $errors = [];
 
@@ -88,6 +90,16 @@ final class Form extends Component
     public function getFields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * Bootstrap floating labels for text inputs, selects and textareas (the Material look).
+     */
+    public function floatingLabels(bool $floating = true): self
+    {
+        $this->floatingLabels = $floating;
+
+        return $this;
     }
 
     /**
@@ -151,7 +163,12 @@ final class Form extends Component
         }
 
         foreach ($this->fields as $field) {
-            $content .= $field->render($this->id, $this->errorFor($field), $this->valueFor($field));
+            $content .= $field->render(
+                $this->id,
+                $this->errorFor($field),
+                $this->valueFor($field),
+                $this->floatingLabels,
+            );
         }
 
         if ($this->submitLabel !== null) {
