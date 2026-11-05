@@ -228,7 +228,8 @@ final class Form extends Component
             $error = $this->errorFor($field);
             if ($error !== null) {
                 $href = '#' . Field::fieldId($this->id, $field->getName());
-                $items .= Html::tag('li', [], Html::tag('a', ['href' => $href, 'class' => 'alert-link'], Html::escape($error)));
+                $link = Html::tag('a', ['href' => $href, 'class' => 'alert-link'], Html::escape($error));
+                $items .= Html::tag('li', [], $link);
             }
         }
 
