@@ -21,13 +21,16 @@
         "phpunit/phpunit": "^11.5",
         "squizlabs/php_codesniffer": "^3.11",
         "symfony/cache": "^7.2",
+        "symfony/html-sanitizer": "^7.2",
         "twig/twig": "^3.14"
     },
     "suggest": {
         "laravel/framework": "Laravel 11+ for the Blade components and Eloquent data source",
         "symfony/framework-bundle": "Symfony 7 for the bundle and Twig extension",
         "twig/twig": "Required by the Symfony Twig extension",
-        "doctrine/orm": "Required by the Doctrine data source"
+        "doctrine/orm": "Required by the Doctrine data and event sources",
+        "symfony/html-sanitizer": "Required by EditorHtml::sanitize() to clean rich text editor output",
+        "ext-fileinfo": "Required by UploadHandler to detect the real MIME type of uploads"
     },
     "autoload": {
         "psr-4": {
