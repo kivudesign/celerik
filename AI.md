@@ -19,7 +19,7 @@ Guidance for AI agents (and humans) scaffolding code in this repository.
 | Grid protocol | The endpoint accepts DataTables parameters (or the simple format) and returns `{data, meta}`; the JS wrapper converts |
 | Phase 1 Form scope | Validation (Parsley) + input masks (Inputmask); Upload and WYSIWYG in Phase 2 |
 | JS init | `data-celerik` + `data-celerik-options`, no inline scripts (CSP-safe) |
-| Assets | One prebuilt bundle in `public/`, published by the framework adapters |
+| Assets | Prebuilt ES module in `public/`: a small entry plus one lazy chunk per component library, published by the framework adapters |
 
 ## Scaffolding Templates
 
