@@ -61,9 +61,23 @@ Content passed to Modal and Tabs follows one rule: a string is escaped text, and
 
 The full Telerik → open-source mapping is in [Components.md](Components.md).
 
+## Themes
+
+Three looks, all on Bootstrap 5.3, each with light and dark mode (`<html data-bs-theme="dark">`):
+
+| Theme | Look | Use it |
+|---|---|---|
+| `bootstrap` (default) | Plain Bootstrap | `<x-celerik-assets />`, `{{ celerik_assets() }}`, `Assets::tags($url)` |
+| `material` | Material 3 palette, pill buttons, elevated surfaces, flat tables, rounded dialogs | `<x-celerik-assets theme="material" />`, `{{ celerik_assets(theme: 'material') }}`, `Assets::tags($url, theme: 'material')` |
+| `tailwind` | Tailwind-inspired: slate and indigo, ring focus, uppercase table headers (does **not** load Tailwind CSS) | `theme="tailwind"` |
+
+A theme is a small extra stylesheet (about 1 KB gzipped) loaded after `celerik.css`. Pair the Material theme with `Form::floatingLabels()` for floating labels. Every theme and mode is checked for WCAG 2.1 AA contrast, both automatically on its palette and in a browser with axe-core.
+
+To customise further, override the `--celerik-*` and `--bs-*` CSS custom properties, or the SCSS variables in `resources/scss/_variables.scss` and rebuild.
+
 ## Examples
 
-- [`examples/plain`](examples/plain): no framework. Run `php -S localhost:8000 examples/plain/index.php`.
+- [`examples/plain`](examples/plain): no framework, with a theme switcher (`?theme=material&mode=dark`). Run `php -S localhost:8000 examples/plain/index.php`.
 - [`examples/laravel`](examples/laravel): Eloquent grid, chart, validated form, scheduler, an article form with rich text and uploads, a tabs/modal/notifications page, and a file manager.
 - [`examples/symfony`](examples/symfony): Doctrine grid, chart, validated form, scheduler, an article form with rich text and uploads, a tabs/modal/notifications page, and a file manager.
 

@@ -77,11 +77,14 @@ celerik/
 │       ├── _variables.scss
 │       ├── _components.scss
 │       └── themes/
-│           └── bootstrap.scss    # material.scss, tailwind.scss in Phase 2
+│           ├── bootstrap.scss    # default look (part of celerik.css)
+│           ├── material.scss     # → public/celerik-material.css
+│           └── tailwind.scss     # → public/celerik-tailwind.css
 │
 ├── public/                       # Build output, shipped with the package
 │   ├── celerik.js                # ES module entry (~3 KB)
 │   ├── celerik.css
+│   ├── celerik-material.css  celerik-tailwind.css   # optional themes
 │   └── chunks/                   # grid, chart, form, scheduler, editor, upload (JS + CSS): loaded on demand
 │
 ├── tests/
@@ -92,7 +95,7 @@ celerik/
 │       ├── fixtures/build.php    # Renders PHP components to HTML fixtures
 │       ├── core.test.js  grid.test.js  chart.test.js  form.test.js  a11y.test.js
 │       ├── scheduler.test.js  scheduler-integration.test.js  editor.test.js  upload.test.js
-│       ├── ui.test.js  notification.test.js  filemanager.test.js
+│       ├── ui.test.js  notification.test.js  filemanager.test.js  themes.test.js
 │       └── helpers.js  setup.js  style-stub.js
 │
 ├── examples/

@@ -39,6 +39,11 @@
 - Color contrast can't be computed in jsdom. It's checked manually in a browser for now, with automated browser runs (Playwright + axe) planned for Phase 3.
 - Keyboard navigation has to be checked manually for each component until then.
 
+## Theme Tests
+
+- `tests/js/themes.test.js` compiles each theme and checks WCAG contrast for its light and dark palettes: body, muted and link text (4.5:1), text on surfaces, primary button labels including hover (4.5:1), and form field borders (3:1, WCAG 1.4.11).
+- In a browser, axe-core runs on the full example page with color-contrast enabled for every theme and mode. All six combinations report no WCAG 2.1 A/AA violations.
+
 ## Performance Tests
 
 - Benchmark grids with large datasets in server-side mode (`examples/plain` serves 250 rows; increase it in `people.php`).
