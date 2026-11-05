@@ -7,9 +7,10 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "lint": "eslint resources/js tests/js",
+    "lint": "eslint resources/js tests/js tests/browser playwright.config.mjs",
     "pretest": "php tests/js/fixtures/build.php",
-    "test": "jest"
+    "test": "jest",
+    "test:a11y": "playwright test"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.22",
@@ -34,9 +35,11 @@
     "jquery": "^3.7.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
     "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.64.1",
     "axe-core": "^4.10.2",
     "babel-jest": "^29.7.0",
     "bootstrap": "^5.3.8",

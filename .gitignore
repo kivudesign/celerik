@@ -4,6 +4,8 @@
 /package-lock.json
 /.phpunit.cache/
 /coverage/
+/test-results/
+/playwright-report/
 /tests/js/fixtures/*.html
 .DS_Store
 Thumbs.db
