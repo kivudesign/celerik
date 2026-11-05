@@ -115,6 +115,8 @@ final class Event implements JsonSerializable
             'end' => $this->end?->format($format),
             'allDay' => $this->allDay,
             'color' => $this->color,
+            // Readable text on a custom color, whatever the theme's default event text color.
+            'textColor' => self::textColorFor($this->color),
             'url' => $this->url,
             'extendedProps' => $this->extra === [] ? null : $this->extra,
         ], static fn (mixed $value): bool => $value !== null);
@@ -126,6 +128,27 @@ final class Event implements JsonSerializable
     public function jsonSerialize(): array
     {
         return $this->toArray();
+    }
+
+    /**
+     * Black or white, whichever contrasts more with a hex color (WCAG relative luminance).
+     */
+    public static function textColorFor(?string $color): ?string
+    {
+        if ($color === null || preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})([0-9a-f]{2})?$/i', $color, $match) !== 1) {
+            return null;
+        }
+
+        $hex = strlen($match[1]) === 3 ? preg_replace('/(.)/', '$1$1', $match[1]) : $match[1];
+        $channels = array_map(static function (string $pair): float {
+            $value = hexdec($pair) / 255;
+
+            return $value <= 0.03928 ? $value / 12.92 : (($value + 0.055) / 1.055) ** 2.4;
+        }, str_split((string) $hex, 2));
+        $luminance = 0.2126 * $channels[0] + 0.7152 * $channels[1] + 0.0722 * $channels[2];
+
+        // Contrast with black is (L + 0.05) / 0.05, with white 1.05 / (L + 0.05): equal at L ≈ 0.179.
+        return $luminance > 0.179 ? '#000' : '#fff';
     }
 
     private static function optionalString(mixed $value): ?string

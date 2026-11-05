@@ -34,9 +34,21 @@ final class EventTest extends TestCase
             'end' => '2026-11-05T10:30:00+01:00',
             'allDay' => false,
             'color' => '#0d6efd',
+            'textColor' => '#000',
             'url' => '/meetings/7',
             'extendedProps' => ['room' => 'B12'],
         ], $event->toArray());
+    }
+
+    public function testTextColorIsTheHigherContrastOfBlackAndWhite(): void
+    {
+        self::assertSame('#fff', Event::textColorFor('#0f172a'));
+        self::assertSame('#000', Event::textColorFor('#ffc107'));
+        self::assertSame('#000', Event::textColorFor('#767676'), 'Black 4.63:1 beats white 4.54:1.');
+        self::assertSame('#fff', Event::textColorFor('#757575'));
+        self::assertSame('#fff', Event::textColorFor('#123'));
+        self::assertNull(Event::textColorFor('green'), 'Named colors are left to the theme.');
+        self::assertNull(Event::textColorFor(null));
     }
 
     public function testPlainDatesAreAllDayByDefault(): void
