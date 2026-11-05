@@ -11,7 +11,11 @@ use Celerik\Ui\Components\Chart;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
 use Celerik\Ui\Components\Grid;
+use Celerik\Ui\Components\Modal;
+use Celerik\Ui\Components\Notification;
 use Celerik\Ui\Components\Scheduler;
+use Celerik\Ui\Components\Tabs;
+use Celerik\Ui\Support\Html;
 use Celerik\Ui\Upload\UploadRules;
 
 require dirname(__DIR__, 3) . '/vendor/autoload.php';
@@ -50,6 +54,25 @@ $fixtures = [
         ->title('Monthly revenue')
         ->labels(['Jan', 'Feb', 'Mar'])
         ->dataset('Revenue', [1200, 1900, 1500]),
+
+    'modal' => Modal::make('contact-modal')
+        ->title('Contact us')
+        ->body(Form::make('modal-form')->add(Field::text('name')->required(), Field::email('email')->required())->submit(null))
+        ->cancelButton()
+        ->button('Send', 'primary', attributes: ['type' => 'submit', 'form' => 'modal-form'])
+        ->staticBackdrop(),
+
+    'tabs' => Tabs::make('account')
+        ->label('Account settings')
+        ->tab('profile', 'Profile', 'Your name and e-mail.')
+        ->tab('security', 'Security', Html::raw('<p>Change your password.</p>'))
+        ->tab('billing', 'Billing', 'Invoices and payment methods.')
+        ->rememberInHash(),
+
+    'notification' => Notification::make('flash')
+        ->success('Profile saved.')
+        ->error('Tom & Jerry <img src=x onerror="window.pwned=1">')
+        ->warning('Disk almost full.'),
 
     'form-rich' => Form::make('article')
         ->action('/articles')

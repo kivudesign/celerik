@@ -109,3 +109,25 @@
 .filepond--label-action {
   text-decoration-color: var(--bs-primary);
 }
+
+// Toasts (Notyf) on Bootstrap colors, with text colors that keep a 4.5:1 contrast.
+.notyf__toast.celerik-toast {
+  color: #fff;
+  font-family: inherit;
+  border-radius: var(--bs-border-radius);
+}
+
+.notyf__toast.celerik-toast-warning,
+.notyf__toast.celerik-toast-info {
+  color: #000;
+
+  .notyf__dismiss-btn::before,
+  .notyf__dismiss-btn::after {
+    background: #000;
+  }
+}
+
+.notyf__dismiss-btn:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
