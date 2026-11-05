@@ -19,4 +19,4 @@ Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The prebuilt bundle i
 
 Full license texts are in each package under `node_modules/<package>/LICENSE` after `npm install`. They must be kept with any redistribution of the files in `public/`.
 
-Update this file whenever a library is added to the bundle (see [doc/Rules.md](doc/Rules.md#licensing)).
+Update this file whenever a library is added to the bundle. Only MIT, Apache 2.0, BSD or ISC libraries may be bundled (see [Components.md](Components.md#licensing-notes)).

@@ -11,13 +11,6 @@ celerik/
 ├── LICENSE.md                    # MIT
 ├── THIRD_PARTY_NOTICES.md        # Licenses of bundled libraries
 │
-├── doc/                          # Specifications and guides
-│   ├── PRD.md  Architecture.md  Rules.md  Phases.md  Design.md  Memory.md
-│   └── guides/
-│       ├── usage-guide.md
-│       ├── api-reference.md
-│       └── theming.md
-│
 ├── src/                          # PHP, namespace Celerik\Ui\
 │   ├── Component.php             # Base class (make, options, render, toArray)
 │   ├── ComponentRegistry.php     # Plugin registry

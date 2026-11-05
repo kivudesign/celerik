@@ -4,10 +4,11 @@ Guidance for AI agents (and humans) scaffolding code in this repository.
 
 ## Read First
 
-1. [doc/Architecture.md](doc/Architecture.md): component and data-source contracts, request/response format.
-2. [doc/Rules.md](doc/Rules.md): standards, accessibility, licensing, security.
+1. [README.md](README.md): what the suite does and how components are used.
+2. [CONTRIBUTING.md](CONTRIBUTING.md): coding, accessibility, licensing and security rules.
 3. [Components.md](Components.md): which library to use for which component.
-4. [doc/Phases.md](doc/Phases.md): what is in scope now.
+4. [ROADMAP.md](ROADMAP.md): what is in scope now.
+5. `src/Component.php` and `src/Data/`: the component and data-source contracts.
 
 ## Decisions Already Made
 
@@ -73,6 +74,6 @@ For every new component, generate:
 - A PHPUnit test covering rendering, escaping, ARIA attributes and `toArray()`.
 - A fixture in `tests/js/fixtures/build.php` (axe-core checks it automatically).
 - A Jest test for its `*-config.js` module and one integration test with the real library.
-- An entry in `doc/guides/api-reference.md` and an example in each `examples/` folder.
+- PHPDoc on every public method, and an example in each `examples/` folder.
 
 Always run `composer lint && composer test && npm run lint && npm test` before proposing a change.

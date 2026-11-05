@@ -75,15 +75,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [TESTING.md](TESTING.md).
 
 | Document | Purpose |
 |---|---|
-| [doc/PRD.md](doc/PRD.md) | Product requirements: scope, goals, constraints |
-| [doc/Architecture.md](doc/Architecture.md) | Layers, component and data contracts, data flow, assets, plugins |
-| [doc/Rules.md](doc/Rules.md) | Coding, accessibility, performance, licensing and security rules |
-| [doc/Phases.md](doc/Phases.md) | Phased delivery plan |
-| [doc/Design.md](doc/Design.md) | UI principles and theming |
-| [doc/Memory.md](doc/Memory.md) | Product memory: presets and theme cache |
+| [ROADMAP.md](ROADMAP.md) | Phased delivery plan |
+| [Components.md](Components.md) | Telerik → open-source component mapping, licenses, phases |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, project rules, adding a component |
+| [TESTING.md](TESTING.md) | Test suites and how to run them |
+| [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
+| [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Licenses of bundled libraries |
 | [AI.md](AI.md) | Notes for AI-assisted development |
-| [Components.md](Components.md) | Telerik → open-source component mapping |
-| [doc/guides/](doc/guides) | Usage guide, API reference, theming guide |
 | [structure.md](structure.md) | Repository layout |
 
 ## License

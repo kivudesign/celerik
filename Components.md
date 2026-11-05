@@ -5,9 +5,9 @@ Telerik UI → open-source alternatives.
 This document maps the major Telerik UI web components to open-source libraries.
 - ✅ The **core** only includes MIT, Apache 2.0 or BSD libraries, or native Bootstrap 5.3 / HTML features.
 - ⚠️ GPL, commercial or proprietary libraries are listed separately as **optional extras**.
-- 🧩 marks libraries that need jQuery (a peer dependency, see [doc/PRD.md](doc/PRD.md)).
+- 🧩 marks libraries that need jQuery (a peer dependency the application loads itself).
 
-The **Phase** column refers to [doc/Phases.md](doc/Phases.md); "–" means not yet scheduled.
+The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet scheduled.
 
 ---
 

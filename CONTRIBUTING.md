@@ -6,7 +6,7 @@ We welcome contributions from developers, designers and AI agents.
 
 1. Fork the repo.
 2. Create a feature branch (`feature/grid-component`).
-3. Implement changes following [doc/Rules.md](doc/Rules.md) (PSR-12, ESLint, WCAG 2.1 AA).
+3. Implement changes following the [project rules](#project-rules).
 4. Add or update documentation in the relevant `.md` file.
 5. Write tests (PHPUnit, Jest, axe-core). See [TESTING.md](TESTING.md).
 6. Run `composer lint && composer test && npm run lint && npm test`.
@@ -27,8 +27,25 @@ We welcome contributions from developers, designers and AI agents.
   - Add PHPUnit and Jest tests.
 - **Docs**
   - Add usage examples in `examples/`.
-  - Add an entry in `doc/guides/api-reference.md`.
+  - Document every public method with PHPDoc.
   - List the library in `THIRD_PARTY_NOTICES.md`.
+
+## Project Rules
+
+- **Code style**
+  - PHP: PSR-12 (`composer lint`), `declare(strict_types=1)`, classes `final` unless designed for extension.
+  - JavaScript: ESLint recommended rules (`npm run lint`), ES modules.
+- **Framework neutrality**: code outside `src/Adapters/` must not depend on Laravel, Symfony, Doctrine or Twig. Those packages are only `require-dev` or `suggest`.
+- **Accessibility**: target WCAG 2.1 AA.
+  - Tables have captions, form fields have labels, charts have a text alternative.
+  - Every component has an axe-core fixture.
+- **Performance**: large grids use server-side mode. Page size is capped at 1000 rows.
+- **Licensing**: only MIT, Apache 2.0, BSD or ISC libraries in the bundle. List each one in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- **Security**
+  - Escape all output and emit no inline scripts.
+  - Only declared fields may be sorted, searched or returned.
+  - Forms carry CSRF tokens.
+  - Data endpoints are protected by the application's authorization.
 
 ## Code Review
 
@@ -38,6 +55,6 @@ We welcome contributions from developers, designers and AI agents.
 
 ## Community Standards
 
-- Respect the rules in [doc/Rules.md](doc/Rules.md).
+- Respect the [project rules](#project-rules).
 - Keep documentation up to date.
 - Be kind and collaborative (see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)).
