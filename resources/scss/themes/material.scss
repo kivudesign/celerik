@@ -1,0 +1,164 @@
+// Material theme: an add-on stylesheet (celerik-material.css), loaded after celerik.css.
+// It restyles Bootstrap and the Celerik components with Material 3's baseline palette,
+// elevation and shapes. It does not load Material libraries or fonts.
+
+$primary: #6750a4;
+$primary-hover: #57438f;
+$on-primary: #fff;
+$primary-dark: #d0bcff;
+$primary-dark-hover: #e1d3ff;
+$on-primary-dark: #381e72;
+
+@mixin palette($primary, $primary-hover, $on-primary, $body-bg, $body-color, $muted, $surface, $border, $outline, $rgb) {
+  --bs-primary: #{$primary};
+  --bs-primary-rgb: #{$rgb};
+  --bs-link-color: #{$primary};
+  --bs-link-color-rgb: #{$rgb};
+  --bs-link-hover-color: #{$primary-hover};
+  --bs-link-hover-color-rgb: #{$rgb};
+  --bs-primary-text-emphasis: #{$primary-hover};
+  --bs-body-bg: #{$body-bg};
+  --bs-body-color: #{$body-color};
+  --bs-secondary-color: #{$muted};
+  --bs-tertiary-bg: #{$surface};
+  --bs-border-color: #{$border};
+  --bs-focus-ring-color: rgba(#{$rgb}, 0.35);
+  --celerik-primary: #{$primary};
+  --celerik-on-primary: #{$on-primary};
+  --celerik-primary-hover: #{$primary-hover};
+  // Material's "outline" color: form field borders need 3:1 (WCAG 1.4.11).
+  --celerik-input-border: #{$outline};
+}
+
+:root,
+[data-bs-theme='light'] {
+  @include palette($primary, $primary-hover, $on-primary, #fffbfe, #1d1b20, #49454f, #f3edf7, #cac4d0, #79747e, '103, 80, 164');
+}
+
+[data-bs-theme='dark'] {
+  @include palette($primary-dark, $primary-dark-hover, $on-primary-dark, #141218, #e6e0e9, #cac4d0, #211f26, #49454f, #938f99, '208, 188, 255');
+}
+
+:root {
+  --bs-border-radius: 0.75rem;
+  --celerik-radius: 0.75rem;
+  --celerik-surface-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --celerik-grid-header-bg: transparent;
+  --celerik-grid-header-font-weight: 500;
+  --celerik-focus-ring: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.35);
+  --celerik-scheduler-today-bg: rgba(var(--bs-primary-rgb), 0.12);
+}
+
+// Buttons: pill shape, primary color.
+.btn {
+  --bs-btn-border-radius: 1.25rem;
+  --bs-btn-font-weight: 500;
+  --bs-btn-padding-x: 1.5rem;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary {
+  --bs-btn-color: var(--celerik-on-primary);
+  --bs-btn-bg: var(--celerik-primary);
+  --bs-btn-border-color: var(--celerik-primary);
+  --bs-btn-hover-color: var(--celerik-on-primary);
+  --bs-btn-hover-bg: var(--celerik-primary-hover);
+  --bs-btn-hover-border-color: var(--celerik-primary-hover);
+  --bs-btn-active-color: var(--celerik-on-primary);
+  --bs-btn-active-bg: var(--celerik-primary-hover);
+  --bs-btn-active-border-color: var(--celerik-primary-hover);
+  --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+  box-shadow: var(--celerik-surface-shadow);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--celerik-primary);
+  --bs-btn-border-color: var(--bs-border-color);
+  --bs-btn-hover-color: var(--celerik-on-primary);
+  --bs-btn-hover-bg: var(--celerik-primary);
+  --bs-btn-hover-border-color: var(--celerik-primary);
+}
+
+// Form fields: outlined, with the primary color on focus. Use Form::floatingLabels() for floating labels.
+.form-control,
+.form-select {
+  border-color: var(--celerik-input-border);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--celerik-primary);
+  box-shadow: inset 0 0 0 1px var(--celerik-primary);
+}
+
+.form-check-input:checked {
+  background-color: var(--celerik-primary);
+  border-color: var(--celerik-primary);
+}
+
+// Navigation: tabs and pills use the primary color.
+.nav {
+  --bs-nav-link-color: var(--bs-body-color);
+  --bs-nav-link-hover-color: var(--celerik-primary);
+}
+
+.nav-tabs {
+  --bs-nav-tabs-link-active-color: var(--celerik-primary);
+  --bs-nav-tabs-link-active-border-color: transparent transparent var(--celerik-primary);
+  --bs-nav-tabs-border-color: var(--bs-border-color);
+}
+
+.nav-pills {
+  --bs-nav-pills-border-radius: 1.25rem;
+  --bs-nav-pills-link-active-bg: var(--celerik-primary);
+  --bs-nav-pills-link-active-color: var(--celerik-on-primary);
+}
+
+.nav-underline {
+  --bs-nav-underline-link-active-color: var(--celerik-primary);
+}
+
+// Grid: flat table on an elevated surface, with row dividers instead of stripes.
+// DataTables draws stripes with an inset box-shadow on table.table.dataTable.table-striped.
+.celerik-grid.table.dataTable.table-striped > tbody > tr > * {
+  box-shadow: none;
+}
+
+.celerik-grid.table {
+  --bs-table-striped-bg: transparent;
+  --bs-table-hover-bg: rgba(var(--bs-primary-rgb), 0.08);
+  --bs-table-bg: transparent;
+}
+
+.dt-container {
+  padding: 1rem;
+  background: var(--bs-body-bg);
+}
+
+.pagination {
+  --bs-pagination-active-bg: var(--celerik-primary);
+  --bs-pagination-active-border-color: var(--celerik-primary);
+  --bs-pagination-active-color: var(--celerik-on-primary);
+  --bs-pagination-color: var(--celerik-primary);
+}
+
+// Dialogs: Material's large corner radius.
+.modal {
+  --bs-modal-border-radius: 1.75rem;
+  --bs-modal-inner-border-radius: 1.75rem;
+  --bs-modal-border-width: 0;
+}
+
+// Calendar buttons on the primary color.
+.celerik-scheduler {
+  --fc-button-bg-color: var(--celerik-primary);
+  --fc-button-border-color: var(--celerik-primary);
+  --fc-button-text-color: var(--celerik-on-primary);
+  --fc-button-hover-bg-color: var(--celerik-primary-hover);
+  --fc-button-hover-border-color: var(--celerik-primary-hover);
+  --fc-button-active-bg-color: var(--celerik-primary-hover);
+  --fc-button-active-border-color: var(--celerik-primary-hover);
+  --fc-event-bg-color: var(--celerik-primary);
+  --fc-event-border-color: var(--celerik-primary);
+  --fc-event-text-color: var(--celerik-on-primary);
+}
