@@ -1,4 +1,4 @@
-import { buildEditorConfig, editorHtml, TOOLBARS } from '../../resources/js/editor-config.js';
+import { buildEditorConfig, editorHtml, KEYBOARD_BINDINGS, TOOLBARS } from '../../resources/js/editor-config.js';
 import { initForm } from '../../resources/js/form.js';
 import { readOptions } from '../../resources/js/core.js';
 import { loadFixture } from './helpers.js';
@@ -8,7 +8,7 @@ describe('editor config', () => {
     expect(buildEditorConfig({ toolbar: 'basic', placeholder: 'Write…' })).toEqual({
       theme: 'snow',
       placeholder: 'Write…',
-      modules: { toolbar: TOOLBARS.basic.toolbar },
+      modules: { toolbar: TOOLBARS.basic.toolbar, keyboard: { bindings: KEYBOARD_BINDINGS } },
       formats: ['bold', 'italic', 'underline', 'list', 'link'],
     });
     expect(buildEditorConfig({ toolbar: 'unknown' }).formats).toEqual(TOOLBARS.standard.formats);
@@ -54,6 +54,13 @@ describe('editor integration (Quill)', () => {
     expect(editable().getAttribute('aria-labelledby')).toBe('article-body-label');
     expect(editable().getAttribute('aria-describedby')).toBe('article-body-help');
     expect(editable().getAttribute('aria-required')).toBe('true');
+  });
+
+  test('Tab is left to the browser (no keyboard trap)', () => {
+    const quill = textarea().celerikEditor;
+    // Only Quill's table binding is left, and no toolbar allows tables.
+    // Leaving the editor with Tab is checked in a real browser (tests/browser/keyboard.spec.mjs).
+    expect((quill.keyboard.bindings.Tab ?? []).map((binding) => binding.format)).toEqual([['table']]);
   });
 
   test('typing updates the submitted value, with normal spaces', () => {

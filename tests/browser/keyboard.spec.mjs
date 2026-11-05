@@ -98,6 +98,13 @@ test.describe('form', () => {
     await expect(editor).toBeFocused();
     await page.keyboard.type(' typed');
     await expect(editor).toContainText('typed');
+
+    // Tab leaves the editor instead of inserting a tab (WCAG 2.1.2, No Keyboard Trap).
+    await page.keyboard.press('Tab');
+    await expect(editor).not.toBeFocused();
+    expect(await editor.textContent()).not.toContain('	');
+    await page.keyboard.press('Shift+Tab');
+    await expect(editor).toBeFocused();
   });
 });
 

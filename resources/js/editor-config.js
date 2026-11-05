@@ -27,14 +27,27 @@ export const TOOLBARS = {
   },
 };
 
+// Quill's Tab key inserts a tab or indents, so keyboard users could not Tab out of the
+// editor (WCAG 2.1.2, No Keyboard Trap). Without these bindings Tab and Shift+Tab move
+// focus, as in a textarea. Indentation is not in any toolbar's formats anyway.
+export const KEYBOARD_BINDINGS = {
+  tab: null,
+  indent: null,
+  outdent: null,
+  'remove tab': null,
+  'indent code-block': null,
+  'outdent code-block': null,
+};
+
 export function buildEditorConfig(options = {}) {
   const config = { theme: 'snow', placeholder: options.placeholder ?? '' };
+  const keyboard = { bindings: KEYBOARD_BINDINGS };
 
   if (Array.isArray(options.toolbar)) {
-    config.modules = { toolbar: options.toolbar };
+    config.modules = { toolbar: options.toolbar, keyboard };
   } else {
     const preset = TOOLBARS[options.toolbar] ?? TOOLBARS.standard;
-    config.modules = { toolbar: preset.toolbar };
+    config.modules = { toolbar: preset.toolbar, keyboard };
     config.formats = preset.formats;
   }
 
