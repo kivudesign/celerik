@@ -11,6 +11,9 @@
     "pretest": "php tests/js/fixtures/build.php",
     "test": "jest",
     "test:a11y": "playwright test",
+    "docs:demos": "php site/demos/build.php",
+    "predocs:dev": "npm run docs:demos",
+    "predocs:build": "npm run docs:demos",
     "docs:dev": "vitepress dev site",
     "docs:build": "vitepress build site",
     "docs:preview": "vitepress preview site"

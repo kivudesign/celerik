@@ -9,6 +9,8 @@
 /site/.vitepress/dist/
 /site/.vitepress/cache/
 /site/.generated/
+/site/public/demos/
+/site/public/assets/
 /tests/js/fixtures/*.html
 /tests/js/fixtures/*.css
 .DS_Store

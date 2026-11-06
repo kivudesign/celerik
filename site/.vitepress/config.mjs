@@ -10,15 +10,28 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   srcExclude: ['**/README.md'],
-  head: [['meta', { name: 'theme-color', content: '#0d6efd' }]],
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${process.env.DOCS_BASE ?? '/celerik/'}logo.svg` }],
+    ['meta', { name: 'theme-color', content: '#0d6efd' }],
+  ],
 
   themeConfig: {
+    logo: '/logo.svg',
     nav: [
       { text: 'Guide', link: '/guide/getting-started', activeMatch: '/guide/' },
+      { text: 'Components', link: '/components/', activeMatch: '/components/' },
       { text: 'GitHub', link: 'https://github.com/kivudesign/celerik' },
     ],
 
     sidebar: {
+      '/components/': [
+        {
+          text: 'Components',
+          items: [
+            { text: 'Overview', link: '/components/' },
+          ],
+        },
+      ],
       '/guide/': [
         {
           text: 'Introduction',

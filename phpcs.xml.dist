@@ -4,6 +4,7 @@
     <file>src</file>
     <file>tests/php</file>
     <file>examples</file>
+    <file>site/demos</file>
     <exclude-pattern>*.blade.php</exclude-pattern>
     <exclude-pattern>*.twig</exclude-pattern>
     <arg name="extensions" value="php"/>
