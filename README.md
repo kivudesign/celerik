@@ -1,10 +1,15 @@
 # Celerik UI
 
+[![CI](https://github.com/kivudesign/celerik/actions/workflows/ci.yml/badge.svg)](https://github.com/kivudesign/celerik/actions/workflows/ci.yml)
+[![Documentation](https://img.shields.io/badge/docs-kivudesign.github.io%2Fcelerik-0a58ca)](https://kivudesign.github.io/celerik/)
+
 An open-source, Bootstrap-based UI component suite for PHP, inspired by Telerik UI. It works with plain PHP and has optional adapters for **Laravel 11+** and **Symfony 7**.
 
 Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask, FullCalendar, Quill, FilePond, Notyf and elFinder. Each library (and its stylesheet) is loaded only on pages that use it.
 
-> **Status: Phase 2 in progress.** Grid, Chart, Form (with uploads and a rich text editor), Scheduler, Modal, Tabs, Notification and File Manager are available. See the [roadmap](ROADMAP.md).
+> **Status: Phase 3 complete.** Grid, Chart, Form (with uploads and a rich text editor), Scheduler, Modal, Tabs, Notification, File Manager and ThemeBuilder are available, accessible to WCAG 2.2 AA and documented. See the [roadmap](ROADMAP.md).
+
+**Documentation: <https://kivudesign.github.io/celerik/>**, with getting started guides for plain PHP, Laravel and Symfony, every component with a live demo, the theming and security guides, and the API reference.
 
 ## Quick look
 
@@ -100,6 +105,8 @@ composer lint        # PSR-12
 npm run lint         # ESLint
 ```
 
+The documentation site is built from `site/` (`npm run docs:dev`, `npm run docs:build`); its demos are rendered by PHP and its API reference is generated from the code.
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [TESTING.md](TESTING.md).
 
 ## Content Security Policy
@@ -125,6 +132,7 @@ Components target WCAG 2.2 AA in every theme, light and dark, and respect reduce
 
 | Document | Purpose |
 |---|---|
+| [Documentation site](https://kivudesign.github.io/celerik/) | Guides, components with live demos, API reference (source in `site/`) |
 | [ROADMAP.md](ROADMAP.md) | Phased delivery plan |
 | [Components.md](Components.md) | Telerik → open-source component mapping, licenses, phases |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, project rules, adding a component |

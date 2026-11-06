@@ -109,13 +109,21 @@ celerik/
 │   │   ├── filemanager.test.js  themes.test.js  presets.test.js
 │   │   ├── theme-css.test.js  theme-export.test.js  themebuilder.test.js
 │   │   └── helpers.js  setup.js  style-stub.js  css-helpers.js
-│   └── browser/                  # Playwright + axe-core in a real browser (npm run test:a11y)
-│       ├── server.php            # Test page with every component, served by PHP's built-in server
-│       ├── theme-builder-page.php  custom-theme.json   # /theme-builder and the teal test theme
-│       ├── a11y.spec.mjs  keyboard.spec.mjs  scheduler.spec.mjs  forced-colors.spec.mjs
-│       ├── motion.spec.mjs  wcag22.spec.mjs  chart.spec.mjs  custom-theme.spec.mjs
-│       ├── theme-builder.spec.mjs  theme-builder-a11y.spec.mjs
-│       └── helpers.mjs
+│   ├── browser/                  # Playwright + axe-core in a real browser (npm run test:a11y)
+│   │   ├── server.php            # Test page with every component, served by PHP's built-in server
+│   │   ├── theme-builder-page.php  custom-theme.json   # /theme-builder and the teal test theme
+│   │   ├── a11y.spec.mjs  keyboard.spec.mjs  scheduler.spec.mjs  forced-colors.spec.mjs
+│   │   ├── motion.spec.mjs  wcag22.spec.mjs  chart.spec.mjs  custom-theme.spec.mjs
+│   │   ├── theme-builder.spec.mjs  theme-builder-a11y.spec.mjs
+│   │   └── helpers.mjs
+│   └── site/                     # Playwright checks of the built documentation site (npm run test:site)
+│
+├── site/                         # Documentation site (VitePress): npm run docs:dev, docs:build
+│   ├── .vitepress/               # config.mjs; theme/ (Demo.vue, custom.css)
+│   ├── guide/  components/  guides/   # Pages (guides include THEMING.md, ACCESSIBILITY.md…)
+│   ├── demos/                    # <name>.php components; build.php renders them to public/demos/
+│   ├── tools/reference.php       # Generates the API reference (reference/, ignored)
+│   └── public/logo.svg
 │
 ├── examples/
 │   ├── plain/                    # php -S localhost:8000 examples/plain/index.php
@@ -125,8 +133,9 @@ celerik/
 ├── .github/
 │   ├── ISSUE_TEMPLATE.md
 │   ├── PULL_REQUEST_TEMPLATE.md
-│   └── workflows/ci.yml
+│   └── workflows/ci.yml  docs.yml   # CI; documentation build and GitHub Pages deployment
 │
 ├── composer.json  phpunit.xml.dist  phpcs.xml.dist
-└── package.json  vite.config.mjs  jest.config.cjs  playwright.config.mjs  babel.config.cjs  eslint.config.mjs
+└── package.json  vite.config.mjs  jest.config.cjs  playwright.config.mjs  playwright.site.config.mjs
+    babel.config.cjs  eslint.config.mjs
 ```

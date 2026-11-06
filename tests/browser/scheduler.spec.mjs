@@ -89,6 +89,26 @@ for (const theme of THEMES) {
       await page.keyboard.press('Enter');
       await expect(page.getByRole('dialog')).toBeVisible();
       expect(await axeViolations(page, { include: '.celerik-scheduler-dialog' })).toEqual([]);
+
+      // axe can leave the dialog's contrast "incomplete" (it sits in the top layer, over a
+      // backdrop), so the buttons are also measured directly: text on the button, or on
+      // the dialog for transparent (outline) buttons.
+      const ratios = await page.locator('.celerik-scheduler-dialog').evaluate((dialog) => {
+        const rgb = (color) => color.match(/[\d.]+/g).slice(0, 4).map(Number);
+        const luminance = ([r, g, b]) => [r, g, b].map((c) => c / 255)
+          .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+          .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0);
+        const dialogBg = rgb(getComputedStyle(dialog).backgroundColor);
+        return [...dialog.querySelectorAll('button')].map((button) => {
+          const style = getComputedStyle(button);
+          const own = rgb(style.backgroundColor);
+          const bg = own[3] === 0 ? dialogBg : own;
+          const [light, dark] = [luminance(rgb(style.color)), luminance(bg)].sort((a, b) => b - a);
+          return `${button.textContent} ${((light + 0.05) / (dark + 0.05)).toFixed(2)}`;
+        });
+      });
+      expect(ratios.filter((entry) => Number(entry.split(' ').pop()) < 4.5)).toEqual([]);
+      expect(ratios.map((entry) => entry.split(' ')[0])).toEqual(['Delete', 'Cancel', 'Save']);
     });
   }
 }

@@ -60,7 +60,7 @@ Celerik makes its own components accessible; the page around them is yours:
 - name components (`title()`, `caption()`, `label()`) in the page's language, and translate built-in labels (`Scheduler::labels()`, the notification dismiss label, Quill and FilePond texts);
 - keep your own content and colors at 4.5:1 contrast, also when you customize a theme;
 - write error messages that say how to fix the problem;
-- test your pages with the same tools: `documentation/` (the [celerik-doc](https://github.com/bim-g/celerik-doc) repository) has a page checker and an integration checklist.
+- test your pages with the same tools: `documentation/` (the [celerik-doc](https://github.com/kivudesign/celerik-doc) repository) has a page checker and an integration checklist.
 
 ## Manual test plan
 

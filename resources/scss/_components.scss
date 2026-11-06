@@ -108,6 +108,13 @@
   &::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
   }
+
+  // Bootstrap's outline-danger text is always #dc3545: below 4.5:1 on every dark
+  // background (3.9:1 on Tailwind's). The danger text-emphasis color follows the mode.
+  .btn-outline-danger {
+    --bs-btn-color: var(--bs-danger-text-emphasis);
+    --bs-btn-border-color: var(--bs-danger-text-emphasis);
+  }
 }
 
 .celerik-form {

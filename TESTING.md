@@ -6,6 +6,7 @@
 | JS unit + integration tests | Jest 29 (jsdom) | `npm test` | `tests/js/` |
 | Accessibility (markup) | axe-core in jsdom (WCAG 2.1 A/AA tags) | `npm test` | `tests/js/a11y.test.js` |
 | Accessibility (browser) | Playwright + axe-core, with color contrast | `npm run test:a11y` | `tests/browser/` |
+| Documentation site | Playwright + axe-core on the built site | `npm run test:site` | `tests/site/` |
 | Code style | PHP_CodeSniffer (PSR-12), ESLint | `composer lint`, `npm run lint` | – |
 
 ## PHP Tests
@@ -68,6 +69,10 @@ On failure, `test-results/` holds a screenshot and a trace for each failed test 
 Theme checks: `custom-theme.spec.mjs` (a generated theme on every base and mode), `theme-builder.spec.mjs` and `theme-builder-a11y.spec.mjs` (live preview, export, import, save, the no-JavaScript form, keyboard only, forced colors, exported themes on every component). In Jest, `presets.test.js` compares the presets with the compiled themes and `theme-css.test.js` checks that the ThemeBuilder's JavaScript writes the same stylesheet as `Theme::toCss()`.
 
 Other browser checks: `forced-colors.spec.mjs` (focus visible on every tab stop in Windows High Contrast), `motion.spec.mjs` (reduced motion), `wcag22.spec.mjs` (target size, focus not obscured), `scheduler.spec.mjs` (event dialog) and `chart.spec.mjs` (series without color).
+
+### Documentation site (`npm run test:site`)
+
+After `npm run docs:build`, `tests/site/site.spec.mjs` serves the built site and checks every page in light and dark mode with axe-core (WCAG 2.2 AA, color contrast included), every demo in every look and mode (all components start, no console errors, no violations), every internal link and anchor, the skip link, the search, and the demo controls.
 
 Screen readers and elFinder's own keyboard shortcuts are still checked manually: see the test plan in [ACCESSIBILITY.md](ACCESSIBILITY.md#manual-test-plan).
 

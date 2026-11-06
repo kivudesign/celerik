@@ -1,0 +1,89 @@
+/* Live demos (components/Demo.vue). */
+.celerik-demo {
+  margin: 1.5rem 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.celerik-demo__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background: var(--vp-c-bg-soft);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.celerik-demo__bar select {
+  min-height: 24px;
+  padding: 0.125rem 1.5rem 0.125rem 0.5rem;
+  color: var(--vp-c-text-1);
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 4px;
+}
+
+.celerik-demo__bar a {
+  margin-left: auto;
+}
+
+.celerik-demo iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: var(--vp-c-bg);
+}
+
+.celerik-demo figcaption {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--vp-c-text-2);
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Accessible brand colors (WCAG 1.4.3): Celerik's blue, with white text on buttons. */
+:root {
+  --vp-c-brand-1: #0a58ca;
+  --vp-c-brand-2: #084298;
+  --vp-c-brand-3: #0a58ca;
+  --vp-c-brand-soft: rgba(10, 88, 202, 0.14);
+  --vp-button-brand-bg: #0a58ca;
+  --vp-button-brand-hover-bg: #084298;
+  --vp-button-brand-active-bg: #052c65;
+  --vp-button-brand-text: #fff;
+  --vp-button-brand-hover-text: #fff;
+  --vp-button-brand-active-text: #fff;
+}
+
+.dark {
+  --vp-c-brand-1: #6ea8fe;
+  --vp-c-brand-2: #9ec5fe;
+  --vp-c-brand-3: #0a58ca;
+  --vp-c-brand-soft: rgba(110, 168, 254, 0.16);
+}
+
+/* The language label of code blocks, at 4.5:1 on the code background. */
+.vp-doc [class*='language-'] > span.lang {
+  color: var(--vp-c-text-2);
+}
+
+/* The search button is named "Search": hide the shortcut hint so its visible text matches
+   its accessible name (WCAG 2.5.3). Ctrl+K and / still open the search. */
+.DocSearch-Button-Keys {
+  display: none !important;
+}

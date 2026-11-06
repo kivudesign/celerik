@@ -3,14 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "description": "JS wrappers and theming for the Celerik UI PHP component suite.",
+  "homepage": "https://kivudesign.github.io/celerik/",
   "license": "MIT",
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "lint": "eslint resources/js tests/js tests/browser playwright.config.mjs",
+    "lint": "eslint resources/js tests/js tests/browser site playwright.config.mjs playwright.site.config.mjs tests/site",
     "pretest": "php tests/js/fixtures/build.php",
     "test": "jest",
-    "test:a11y": "playwright test"
+    "test:a11y": "playwright test",
+    "test:site": "playwright test -c playwright.site.config.mjs",
+    "docs:demos": "php site/demos/build.php",
+    "docs:reference": "php site/tools/reference.php",
+    "docs:generate": "npm run docs:demos && npm run docs:reference",
+    "predocs:dev": "npm run docs:generate",
+    "predocs:build": "npm run docs:generate",
+    "docs:dev": "vitepress dev site",
+    "docs:build": "vitepress build site",
+    "docs:preview": "vitepress preview site"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.22",
@@ -51,6 +61,7 @@
     "jquery": "^3.7.1",
     "lodash": "^4.18.1",
     "sass": "^1.83.0",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "vitepress": "^1.6.4"
   }
 }
