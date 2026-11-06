@@ -7,6 +7,9 @@ name: Release
 # installs tags, so `composer require celerik/ui` gets the bundle, and main stays
 # source-only. Source maps are not in the package: they are attached to the GitHub
 # release as a zip.
+#
+# With an NPM_TOKEN secret (an npm automation token for the @celerik scope), the same
+# bundle is published to npm as @celerik/ui, which jsDelivr serves: Assets::cdnUrl().
 
 on:
   workflow_dispatch:
@@ -17,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write # npm provenance
 
 concurrency:
   group: release
@@ -27,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ inputs.version }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -93,3 +98,11 @@ jobs:
           gh release create "v$VERSION" "dist/celerik-ui-$VERSION-sourcemaps.zip" \
             --title "v$VERSION" --generate-notes --verify-tag \
             $([[ "$VERSION" == *-* ]] && echo --prerelease)
+
+      - name: Publish to npm
+        if: env.NPM_TOKEN != ''
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Pre-releases go to the "next" tag, so they never become "latest".
+          npm publish --provenance --access public $([[ "$VERSION" == *-* ]] && echo --tag next)
