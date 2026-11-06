@@ -2,16 +2,16 @@
 
 Celerik's own test suites prove that the components work. They cannot prove that **your** application wires them correctly: routes, CSRF, authorization, asset paths, time zones, themes and your Content Security Policy live in your code.
 
-Test in this order. Each layer catches problems the previous one cannot see. Step-by-step guides and ready-made scripts are in the [celerik-doc](https://github.com/bim-g/celerik-doc) repository.
+Test in this order. Each layer catches problems the previous one cannot see. Step-by-step guides and ready-made scripts are in the [celerik-doc](https://github.com/kivudesign/celerik-doc) repository.
 
 | # | Layer | Catches | Guide |
 |---|---|---|---|
-| 1 | Unit and component tests | Logic and rendering bugs | [Test suites](https://github.com/bim-g/celerik-doc/blob/main/testing/test-suites.md) |
-| 2 | HTTP checks | Endpoint contracts, CSRF, validation, authorization, stored data | [HTTP checks](https://github.com/bim-g/celerik-doc/blob/main/testing/http-checks.md) |
-| 3 | Browser checks | Missing assets, wrong chunk paths, JavaScript errors, components that never start | [Browser checks](https://github.com/bim-g/celerik-doc/blob/main/testing/browser-checks.md) |
-| 4 | Accessibility in a browser | Contrast and markup issues that only appear once libraries have rendered, in your theme | [Accessibility](https://github.com/bim-g/celerik-doc/blob/main/testing/accessibility.md) |
-| 5 | Content Security Policy | Inline scripts or styles your policy blocks | [CSP](https://github.com/bim-g/celerik-doc/blob/main/testing/csp.md) |
-| 6 | Security | Upload, rich text and File Manager attacks | [Security](https://github.com/bim-g/celerik-doc/blob/main/testing/security.md) |
+| 1 | Unit and component tests | Logic and rendering bugs | [Test suites](https://github.com/kivudesign/celerik-doc/blob/main/testing/test-suites.md) |
+| 2 | HTTP checks | Endpoint contracts, CSRF, validation, authorization, stored data | [HTTP checks](https://github.com/kivudesign/celerik-doc/blob/main/testing/http-checks.md) |
+| 3 | Browser checks | Missing assets, wrong chunk paths, JavaScript errors, components that never start | [Browser checks](https://github.com/kivudesign/celerik-doc/blob/main/testing/browser-checks.md) |
+| 4 | Accessibility in a browser | Contrast and markup issues that only appear once libraries have rendered, in your theme | [Accessibility](https://github.com/kivudesign/celerik-doc/blob/main/testing/accessibility.md) |
+| 5 | Content Security Policy | Inline scripts or styles your policy blocks | [CSP](https://github.com/kivudesign/celerik-doc/blob/main/testing/csp.md) |
+| 6 | Security | Upload, rich text and File Manager attacks | [Security](https://github.com/kivudesign/celerik-doc/blob/main/testing/security.md) |
 
 ## The scripts
 
