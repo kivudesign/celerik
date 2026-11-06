@@ -52,13 +52,13 @@ Instead of publishing the assets, load the bundle of the installed version from 
 Allow `https://cdn.jsdelivr.net` in `script-src` and `style-src` if you use a [Content Security Policy](./csp). With a JavaScript bundler (Vite, webpack), install it from npm instead:
 
 ```bash
-npm install @celerik/ui
+npm install @celerikui/ui
 ```
 
 ```js
-import '@celerik/ui';                       // registers the components and starts them
-import '@celerik/ui/celerik.css';
-import '@celerik/ui/celerik-material.css';  // optional base look
+import '@celerikui/ui';                       // registers the components and starts them
+import '@celerikui/ui/celerik.css';
+import '@celerikui/ui/celerik-material.css';  // optional base look
 ```
 
 The PHP version and the npm version must match: the components and the bundle change together.

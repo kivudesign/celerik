@@ -24,8 +24,8 @@ final class Assets
     /** "bootstrap" is the default look; the others add a stylesheet after celerik.css. */
     public const THEMES = ['bootstrap', 'material', 'tailwind'];
 
-    /** The bundle of every release on jsDelivr, from the @celerik/ui npm package. */
-    public const CDN = 'https://cdn.jsdelivr.net/npm/@celerik/ui@%s/public';
+    /** The bundle of every release on jsDelivr, from the @celerikui/ui npm package. */
+    public const CDN = 'https://cdn.jsdelivr.net/npm/@celerikui/ui@%s/public';
 
     /**
      * The bundle's URL on the jsDelivr CDN, for Assets::tags() when you do not serve the
