@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The built bundle in `public/` (included in every release, and in the `@celerik/ui` npm package) includes the following libraries, each under its own license:
+Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The built bundle in `public/` (included in every release, and in the `@celerikui/ui` npm package) includes the following libraries, each under its own license:
 
 | Library | Version | License | Bundled in |
 |---|---|---|---|

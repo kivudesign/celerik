@@ -47,7 +47,7 @@ Load Bootstrap 5.3 (CSS, and `bootstrap.bundle.js` for Modal and Tabs) and jQuer
 | Symfony | add `CelerikUiBundle` to `config/bundles.php`, then `php bin/console assets:install` | `{{ celerik_assets() }}` | `{{ celerik(grid) }}` |
 | Plain PHP | serve the package's `public/` folder | `<?= Assets::tags('/assets') ?>` | `<?= $grid ?>` |
 
-Releases include the built bundle (`public/`), so no Node.js is needed to install. To skip publishing the assets, load them from the jsDelivr CDN instead: `Assets::tags(Assets::cdnUrl())` (or `<x-celerik-assets :base-url="Celerik\Ui\Assets::cdnUrl()" />`). Projects with a JavaScript bundler can also install the bundle from npm: `npm install @celerik/ui`, then `import '@celerik/ui'` and `import '@celerik/ui/celerik.css'`.
+Releases include the built bundle (`public/`), so no Node.js is needed to install. To skip publishing the assets, load them from the jsDelivr CDN instead: `Assets::tags(Assets::cdnUrl())` (or `<x-celerik-assets :base-url="Celerik\Ui\Assets::cdnUrl()" />`). Projects with a JavaScript bundler can also install the bundle from npm: `npm install @celerikui/ui`, then `import '@celerikui/ui'` and `import '@celerikui/ui/celerik.css'`.
 
 ## Components
 

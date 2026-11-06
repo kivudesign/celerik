@@ -82,10 +82,10 @@ final class ComponentRegistryTest extends TestCase
 
     public function testCdnUrlPointsToAReleaseOnJsDelivr(): void
     {
-        self::assertSame('https://cdn.jsdelivr.net/npm/@celerik/ui@0.2.0/public', Assets::cdnUrl('0.2.0'));
-        self::assertSame('https://cdn.jsdelivr.net/npm/@celerik/ui@1.0.0-beta.1/public', Assets::cdnUrl('v1.0.0-beta.1'));
+        self::assertSame('https://cdn.jsdelivr.net/npm/@celerikui/ui@0.2.0/public', Assets::cdnUrl('0.2.0'));
+        self::assertSame('https://cdn.jsdelivr.net/npm/@celerikui/ui@1.0.0-beta.1/public', Assets::cdnUrl('v1.0.0-beta.1'));
         self::assertStringContainsString(
-            '<script type="module" src="https://cdn.jsdelivr.net/npm/@celerik/ui@0.2.0/public/celerik.js"></script>',
+            '<script type="module" src="https://cdn.jsdelivr.net/npm/@celerikui/ui@0.2.0/public/celerik.js"></script>',
             Assets::tags(Assets::cdnUrl('0.2.0')),
         );
     }
