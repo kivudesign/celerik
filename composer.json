@@ -1,6 +1,12 @@
 {
     "name": "celerik/ui",
     "description": "Open-source, Bootstrap-based UI component suite for PHP, with optional Laravel and Symfony adapters.",
+    "homepage": "https://kivudesign.github.io/celerik/",
+    "support": {
+        "docs": "https://kivudesign.github.io/celerik/",
+        "issues": "https://github.com/kivudesign/celerik/issues",
+        "source": "https://github.com/kivudesign/celerik"
+    },
     "type": "library",
     "license": "MIT",
     "keywords": ["ui", "components", "bootstrap", "datatables", "chartjs", "laravel", "symfony", "grid", "chart", "form"],

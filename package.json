@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "JS wrappers and theming for the Celerik UI PHP component suite.",
+  "homepage": "https://kivudesign.github.io/celerik/",
   "license": "MIT",
   "scripts": {
     "build": "vite build",

@@ -26,8 +26,9 @@ We welcome contributions from developers, designers and AI agents.
   - Add the component to `tests/js/fixtures/build.php` so axe-core checks its markup.
   - Add PHPUnit and Jest tests.
 - **Docs**
+  - Add a page in `site/components/`, with a demo in `site/demos/<name>.php` (`<Demo name="…" />` and `<<< @/demos/<name>.php`), and add it to the sidebar in `site/.vitepress/config.mjs`.
   - Add usage examples in `examples/`.
-  - Document every public method with PHPDoc.
+  - Document every public method with PHPDoc: the API reference is generated from it (`npm run docs:reference`).
   - List the library in `THIRD_PARTY_NOTICES.md`.
 
 ## Project Rules
