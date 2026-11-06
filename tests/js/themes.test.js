@@ -3,7 +3,7 @@
  */
 import { compile } from 'sass';
 import { join } from 'node:path';
-import { contrast, properties } from './css-helpers.js';
+import { contrast, normalizeHex, properties } from './css-helpers.js';
 
 const themes = ['material', 'tailwind'];
 
@@ -36,6 +36,15 @@ describe.each(themes)('%s theme', (theme) => {
     }
 
     expect(failures).toEqual([]);
+  });
+
+  test.each(['light', 'dark'])('%s mode: every *-rgb property matches its color', (mode) => {
+    const palette = properties(css, `[data-bs-theme=${mode}]`);
+    const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ');
+    for (const name of ['--bs-primary', '--bs-link-color', '--bs-link-hover-color']) {
+      // Bootstrap colors links (and hovered links) from the -rgb variant.
+      expect([name, palette[`${name}-rgb`]]).toEqual([name, rgb(normalizeHex(palette[name]))]);
+    }
   });
 
   test('light mode is also the default (:root)', () => {
