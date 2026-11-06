@@ -11,6 +11,7 @@
 /site/.generated/
 /site/public/demos/
 /site/public/assets/
+/site/reference/
 /tests/js/fixtures/*.html
 /tests/js/fixtures/*.css
 .DS_Store

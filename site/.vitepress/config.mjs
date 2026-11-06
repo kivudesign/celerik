@@ -1,4 +1,9 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'vitepress';
+
+// The API reference sidebar, written by site/tools/reference.php (npm run docs:reference).
+const referenceFile = new URL('../.generated/reference.json', import.meta.url);
+const reference = existsSync(referenceFile) ? JSON.parse(readFileSync(referenceFile, 'utf8')) : [];
 
 // Documentation site: npm run docs:dev, npm run docs:build (output: site/.vitepress/dist).
 // DOCS_BASE is the path the site is served from: /celerik/ on GitHub Pages.
@@ -20,10 +25,12 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started', activeMatch: '/guide/' },
       { text: 'Components', link: '/components/', activeMatch: '/components/' },
+      { text: 'Reference', link: '/reference/', activeMatch: '/reference/' },
       { text: 'GitHub', link: 'https://github.com/kivudesign/celerik' },
     ],
 
     sidebar: {
+      '/reference/': [{ text: 'API reference', link: '/reference/' }, ...reference],
       '/components/': [
         {
           text: 'Components',
