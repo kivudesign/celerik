@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Celerik\Ui;
 
 use Celerik\Ui\Support\Html;
+use Composer\InstalledVersions;
 use InvalidArgumentException;
+use LogicException;
 
 /**
  * Renders the tags for the prebuilt bundle (public/celerik.css and public/celerik.js).
@@ -21,6 +23,47 @@ final class Assets
 
     /** "bootstrap" is the default look; the others add a stylesheet after celerik.css. */
     public const THEMES = ['bootstrap', 'material', 'tailwind'];
+
+    /** The bundle of every release on jsDelivr, from the @celerik/ui npm package. */
+    public const CDN = 'https://cdn.jsdelivr.net/npm/@celerik/ui@%s/public';
+
+    /**
+     * The bundle's URL on the jsDelivr CDN, for Assets::tags() when you do not serve the
+     * package's public/ folder yourself:
+     *
+     *     Assets::tags(Assets::cdnUrl());          // the installed version
+     *     Assets::tags(Assets::cdnUrl('0.2.0'));
+     *
+     * Allow https://cdn.jsdelivr.net in script-src and style-src if you use a CSP.
+     *
+     * @param string|null $version A released version; by default the installed one.
+     * @throws InvalidArgumentException When the version is not a release version.
+     * @throws LogicException When no version is given and the installed one is a
+     *                         development version (a branch or a path repository).
+     */
+    public static function cdnUrl(?string $version = null): string
+    {
+        if ($version === null) {
+            $installed = class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('celerik/ui')
+                ? InstalledVersions::getPrettyVersion('celerik/ui')
+                : null;
+            if ($installed === null || str_starts_with($installed, 'dev-') || str_ends_with($installed, '-dev')) {
+                throw new LogicException(sprintf(
+                    'celerik/ui is installed as "%s", which is not on the CDN: pass a released version, '
+                    . 'or serve the package\'s public/ folder (npm run build in a development checkout).',
+                    $installed ?? 'unknown',
+                ));
+            }
+            $version = $installed;
+        }
+
+        $version = ltrim($version, 'v');
+        if (preg_match('/^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/', $version) !== 1) {
+            throw new InvalidArgumentException(sprintf('Invalid version "%s": use a release such as 0.2.0.', $version));
+        }
+
+        return sprintf(self::CDN, $version);
+    }
 
     /**
      * @param string|null $nonce CSP nonce. Also printed as <meta name="csp-nonce">, which
