@@ -39,6 +39,7 @@ All of these run in CI on every pull request. See [TESTING.md](TESTING.md).
 | Tabs | Supported | Arrow keys, Home and End; one tab stop | WAI-ARIA tabs pattern (`tablist`, `tab`, `tabpanel`), optional `label()` |
 | Notification | Supported | Dismiss buttons are named and reachable | Polite live-region announcements of the plain text; errors stay until dismissed; other toasts pause while hovered or focused (2.2.1) |
 | File manager | Partial | elFinder's own shortcuts (arrows, Enter, Delete, Ctrl+C/V…); toolbar buttons reachable | Region named by `title()`; selection contrast fixed; 24 px tree arrows. elFinder is not designed around screen readers: see the known limits below |
+| Theme builder | Supported | Every token has a labelled hex field (the color pickers are skipped in the tab order); preview mode is a radio group; Undo moves focus on when it becomes disabled | The contrast report says Pass/Fail in text, and only its summary is announced; invalid values are reported on their field. Without JavaScript it is a form with a report computed in PHP |
 
 ### Known limits
 

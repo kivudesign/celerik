@@ -1,0 +1,30 @@
+{
+  "name": "Bootstrap",
+  "base": "bootstrap",
+  "light": {
+    "primary": "#0d6efd",
+    "primaryHover": "#0a58ca",
+    "onPrimary": "#ffffff",
+    "bodyBg": "#ffffff",
+    "bodyColor": "#212529",
+    "muted": "#595c5f",
+    "surface": "#f8f9fa",
+    "border": "#dee2e6",
+    "inputBorder": "#6c757d",
+    "danger": "#dc3545"
+  },
+  "dark": {
+    "primary": "#6ea8fe",
+    "primaryHover": "#9ec5fe",
+    "onPrimary": "#000000",
+    "bodyBg": "#212529",
+    "bodyColor": "#dee2e6",
+    "muted": "#adb5bd",
+    "surface": "#2b3035",
+    "border": "#495057",
+    "inputBorder": "#8c959f",
+    "danger": "#ea868f"
+  },
+  "radius": 0.375,
+  "shadow": "none"
+}

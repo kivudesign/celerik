@@ -17,7 +17,7 @@ final class ComponentRegistryTest extends TestCase
     {
         $registry = ComponentRegistry::withDefaults();
 
-        self::assertSame(['grid', 'chart', 'form', 'scheduler', 'modal', 'tabs', 'notification', 'filemanager'], array_keys($registry->all()));
+        self::assertSame(['grid', 'chart', 'form', 'scheduler', 'modal', 'tabs', 'notification', 'filemanager', 'themebuilder'], array_keys($registry->all()));
         self::assertInstanceOf(Grid::class, $registry->create('grid', 'orders'));
         self::assertSame('orders', $registry->create('grid', 'orders')->getId());
     }
@@ -66,6 +66,17 @@ final class ComponentRegistryTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         Assets::tags('/assets', theme: '../../evil');
+    }
+
+    public function testAssetTagsLoadACustomThemeLastAndEscapeItsUrl(): void
+    {
+        self::assertSame(
+            '<link rel="stylesheet" href="/assets/celerik.css">' . "\n"
+            . '<link rel="stylesheet" href="/assets/celerik-tailwind.css">' . "\n"
+            . '<link rel="stylesheet" href="/css/acme.css?v=2&amp;x=&quot;">' . "\n"
+            . '<script type="module" src="/assets/celerik.js"></script>',
+            Assets::tags('/assets', theme: 'tailwind', customTheme: '/css/acme.css?v=2&x="'),
+        );
     }
 
     public function testAssetTagsWithNonceIncludeCspNonceMetaForFullCalendar(): void

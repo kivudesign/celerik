@@ -16,7 +16,9 @@ use Celerik\Ui\Components\Modal;
 use Celerik\Ui\Components\Notification;
 use Celerik\Ui\Components\Scheduler;
 use Celerik\Ui\Components\Tabs;
+use Celerik\Ui\Components\ThemeBuilder;
 use Celerik\Ui\Support\Html;
+use Celerik\Ui\Theme\Theme;
 use Celerik\Ui\Upload\UploadRules;
 
 require dirname(__DIR__, 3) . '/vendor/autoload.php';
@@ -103,6 +105,12 @@ $fixtures = [
         )
         ->submit('Order'),
 
+    'themebuilder' => ThemeBuilder::make('builder')
+        ->theme(Theme::preset('material')->color('light', 'danger', '#dd3545'))
+        ->saveUrl('/theme')
+        ->csrf('test-token')
+        ->preview(Form::make('preview-form')->add(Field::text('name'))->submit('Send')),
+
     'form' => Form::make('signup')
         ->action('/signup')
         ->csrf('test-token')
@@ -123,4 +131,18 @@ foreach ($fixtures as $name => $component) {
     file_put_contents(__DIR__ . '/' . $name . '.html', $component->render() . "\n");
 }
 
-echo 'Wrote ' . count($fixtures) . " fixtures to tests/js/fixtures\n";
+// Stylesheets generated from the presets: compared with the compiled themes (presets.test.js).
+foreach (Theme::BASES as $base) {
+    file_put_contents(__DIR__ . '/theme-' . $base . '.css', Theme::preset($base)->toCss());
+}
+
+// The teal browser-test theme on each base, with a font and a whole-number radius:
+// resources/js/theme-css.js must write the same text (theme-css.test.js).
+$custom = Theme::fromJson((string) file_get_contents(dirname(__DIR__, 2) . '/browser/custom-theme.json'))
+    ->fontFamily('"Inter", system-ui, sans-serif')
+    ->radius(1.0);
+foreach (Theme::BASES as $base) {
+    file_put_contents(__DIR__ . '/theme-custom-' . $base . '.css', $custom->base($base)->toCss());
+}
+
+echo 'Wrote ' . count($fixtures) . ' fixtures and ' . count(Theme::BASES) . " theme stylesheets to tests/js/fixtures\n";

@@ -1,0 +1,30 @@
+{
+  "name": "Teal test",
+  "base": "bootstrap",
+  "light": {
+    "primary": "#0f766e",
+    "primaryHover": "#115e59",
+    "onPrimary": "#ffffff",
+    "bodyBg": "#ffffff",
+    "bodyColor": "#1f2937",
+    "muted": "#4b5563",
+    "surface": "#f0fdfa",
+    "border": "#ccfbf1",
+    "inputBorder": "#6b7280",
+    "danger": "#b91c1c"
+  },
+  "dark": {
+    "primary": "#5eead4",
+    "primaryHover": "#99f6e4",
+    "onPrimary": "#042f2e",
+    "bodyBg": "#0b1a1a",
+    "bodyColor": "#e6fffb",
+    "muted": "#9fb8b5",
+    "surface": "#12302e",
+    "border": "#1f4d4a",
+    "inputBorder": "#5f8f8b",
+    "danger": "#fca5a5"
+  },
+  "radius": 0.25,
+  "shadow": "subtle"
+}

@@ -33,4 +33,17 @@ final class CelerikTwigExtensionTest extends TestCase
 
         self::assertStringContainsString('<link rel="stylesheet" href="/bundles/celerikui/celerik-tailwind.css">', $twig->render('page'));
     }
+
+    public function testAssetsFunctionAcceptsACustomTheme(): void
+    {
+        $twig = new Environment(new ArrayLoader([
+            'page' => "{{ celerik_assets(theme: 'material', customTheme: '/css/acme.css') }}",
+        ]));
+        $twig->addExtension(new CelerikTwigExtension());
+
+        self::assertStringContainsString(
+            'celerik-material.css">' . "\n" . '<link rel="stylesheet" href="/css/acme.css">',
+            $twig->render('page'),
+        );
+    }
 }

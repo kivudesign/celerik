@@ -12,6 +12,7 @@ use Celerik\Ui\Components\Modal;
 use Celerik\Ui\Components\Notification;
 use Celerik\Ui\Components\Scheduler;
 use Celerik\Ui\Components\Tabs;
+use Celerik\Ui\Components\ThemeBuilder;
 use InvalidArgumentException;
 
 /**
@@ -33,7 +34,8 @@ final class ComponentRegistry
             ->register(Modal::class)
             ->register(Tabs::class)
             ->register(Notification::class)
-            ->register(FileManager::class);
+            ->register(FileManager::class)
+            ->register(ThemeBuilder::class);
     }
 
     /**

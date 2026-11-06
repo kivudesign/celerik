@@ -26,9 +26,15 @@ final class Assets
      * @param string|null $nonce CSP nonce. Also printed as <meta name="csp-nonce">, which
      *                           FullCalendar reads to allow the styles it injects at runtime.
      * @param string $theme "bootstrap" (default), "material" or "tailwind".
+     * @param string|null $customTheme URL of a stylesheet made with Theme::toCss() (or the
+     *                                 ThemeBuilder), loaded last. Its base must be $theme.
      */
-    public static function tags(string $baseUrl, ?string $nonce = null, string $theme = 'bootstrap'): string
-    {
+    public static function tags(
+        string $baseUrl,
+        ?string $nonce = null,
+        string $theme = 'bootstrap',
+        ?string $customTheme = null,
+    ): string {
         if (!in_array($theme, self::THEMES, true)) {
             throw new InvalidArgumentException(sprintf(
                 'Unknown theme "%s". Available: %s.',
@@ -44,9 +50,15 @@ final class Assets
             'href' => $baseUrl . '/celerik-' . $theme . '.css',
         ]);
 
+        $customLink = $customTheme === null ? '' : "\n" . Html::tag('link', [
+            'rel' => 'stylesheet',
+            'href' => $customTheme,
+        ]);
+
         return $meta
             . Html::tag('link', ['rel' => 'stylesheet', 'href' => $baseUrl . '/' . self::STYLESHEET])
             . $themeLink
+            . $customLink
             . "\n"
             . Html::tag('script', ['type' => 'module', 'src' => $baseUrl . '/' . self::SCRIPT, 'nonce' => $nonce]);
     }

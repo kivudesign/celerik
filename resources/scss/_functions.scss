@@ -1,0 +1,7 @@
+@use 'sass:color';
+
+// "r, g, b" of a color, for Bootstrap's *-rgb custom properties.
+@function rgb-channels($color) {
+  @return color.channel($color, 'red', $space: rgb), color.channel($color, 'green', $space: rgb),
+    color.channel($color, 'blue', $space: rgb);
+}

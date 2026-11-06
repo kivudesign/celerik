@@ -246,6 +246,33 @@
   content: '';
 }
 
+// Theme builder: controls beside the preview on wide screens, stacked on small ones.
+.celerik-theme-builder {
+  display: grid;
+  gap: 1.5rem;
+
+  @media (min-width: 992px) {
+    grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  &__canvas {
+    padding: 1rem;
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--celerik-radius);
+  }
+
+  &__color .form-control-color {
+    flex: 0 0 3rem;
+  }
+
+  &__pair.is-fail {
+    font-weight: 600;
+  }
+}
+
 // Less motion when the user asks for it (WCAG 2.3.3). Bootstrap already removes its own
 // transitions (fades, modal slide). Notyf removes toasts on animationend, so its
 // animations are shortened rather than removed. Chart.js animation is turned off in JS.
@@ -273,6 +300,7 @@
 @media (forced-colors: active) {
   // !important: FullCalendar and elFinder remove outlines with more specific selectors.
   :is(.dt-container, .celerik-form, .celerik-scheduler, .celerik-scheduler-dialog, .celerik-tabs, .celerik-filemanager,
+    .celerik-theme-builder,
     .celerik-modal, .notyf)
     :focus-visible,
   [aria-haspopup='dialog'][data-bs-toggle='modal']:focus-visible {

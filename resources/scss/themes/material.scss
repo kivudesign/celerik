@@ -2,6 +2,8 @@
 // It restyles Bootstrap and the Celerik components with Material 3's baseline palette,
 // elevation and shapes. It does not load Material libraries or fonts.
 
+@use '../functions' as *;
+
 $primary: #6750a4;
 $primary-hover: #57438f;
 $on-primary: #fff;
@@ -15,7 +17,8 @@ $on-primary-dark: #381e72;
   --bs-link-color: #{$primary};
   --bs-link-color-rgb: #{$rgb};
   --bs-link-hover-color: #{$primary-hover};
-  --bs-link-hover-color-rgb: #{$rgb};
+  // Bootstrap colors hovered links from this one: the hover color, not the primary.
+  --bs-link-hover-color-rgb: #{rgb-channels($primary-hover)};
   --bs-primary-text-emphasis: #{$primary-hover};
   --bs-body-bg: #{$body-bg};
   --bs-body-color: #{$body-color};

@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Builds and checks Celerik themes: see Celerik\Ui\Theme\Console, or run with --help.
+
+foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $autoload) {
+    if (is_file($autoload)) {
+        require $autoload;
+        break;
+    }
+}
+
+if (!class_exists(Celerik\Ui\Theme\Console::class)) {
+    fwrite(STDERR, "Run \"composer install\" first.\n");
+    exit(2);
+}
+
+exit((new Celerik\Ui\Theme\Console(STDOUT, STDERR))->run(array_slice($argv, 1)));

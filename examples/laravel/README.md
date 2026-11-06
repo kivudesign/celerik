@@ -17,7 +17,7 @@ Copy the example files into the app:
 
 | From `examples/laravel/` | To the app |
 |---|---|
-| `app/Http/Controllers/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php`, `CelerikUiController.php` | `app/Http/Controllers/` |
+| `app/Http/Controllers/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php`, `CelerikUiController.php`, `CelerikFilesController.php`, `CelerikThemeController.php` | `app/Http/Controllers/` |
 | `app/Models/Meeting.php` | `app/Models/` |
 | `database/migrations/*_create_meetings_table.php` | `database/migrations/` (then run `php artisan migrate`) |
 | `routes/celerik.php` | `routes/` (then add `require __DIR__ . '/celerik.php';` to `routes/web.php`) |
@@ -44,7 +44,7 @@ php artisan vendor:publish --tag=celerik-elfinder   # copies elFinder's css, img
 Gate::define('manage-files', fn (?User $user) => app()->isLocal());
 ```
 
-Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article`, `/celerik/ui` and `/celerik/files`.
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article`, `/celerik/ui`, `/celerik/files` and, with `APP_ENV=local`, `/celerik/theme`.
 
 > **Windows:** `php artisan serve` starts PHP without the `TEMP`/`TMP` environment variables, so every upload fails with "unable to create a temporary file". Use `cd public && php -S 127.0.0.1:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php` instead, or set `upload_tmp_dir` in `php.ini`.
 
@@ -73,3 +73,7 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/schedule
 - **File manager** (`/celerik/files`)
   - Both the page and the connector check the `manage-files` gate. Files live in `storage/app/private/files`, outside `public/`.
   - Requests carry Laravel's CSRF token (`FileManager::csrf()`) and elFinder's own token; uploads are checked by content like `UploadHandler`.
+- **Theme builder** (`/celerik/theme`, only when `APP_ENV=local`)
+  - `CelerikThemeController` shows the ThemeBuilder with a preview of a form, a grid, tabs and a chart. Save posts the theme as JSON; Laravel's CSRF middleware checks the `X-CSRF-TOKEN` header.
+  - Saving writes `storage/app/celerik-theme.json` (keep it in git) and `public/css/celerik-theme.css`. The layout loads the saved theme on every page (`<x-celerik-assets :theme="..." :custom-theme="..." />`).
+  - In CI, rebuild the stylesheet from the JSON: `vendor/bin/celerik-theme build storage/app/celerik-theme.json public/css/celerik-theme.css`.
