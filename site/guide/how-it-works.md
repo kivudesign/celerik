@@ -51,7 +51,7 @@ document.addEventListener('celerik:ready', (event) => {
 });
 ```
 
-Components that change data fire their own events, for example `celerik:scheduler:select`, `celerik:scheduler:edit`, `celerik:scheduler:delete` and `celerik:scheduler:error` (see the [Scheduler](../components/)).
+Components that change data fire their own events, for example `celerik:scheduler:select`, `celerik:scheduler:edit`, `celerik:scheduler:delete` and `celerik:scheduler:error` (see the [Scheduler](../components/scheduler#editing)).
 
 ## The JavaScript API
 
