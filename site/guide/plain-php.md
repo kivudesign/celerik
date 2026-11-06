@@ -10,6 +10,8 @@ Copy the bundle to your web root, and again after each update, for example in a 
 cp -r vendor/celerik/ui/public public/vendor/celerik
 ```
 
+Or skip the copy and load it from the CDN: `Assets::tags(Assets::cdnUrl())` (see [Getting started](./getting-started#or-use-the-cdn-or-npm)).
+
 ```php
 <?= Celerik\Ui\Assets::tags('/vendor/celerik') ?>
 <?= Celerik\Ui\Assets::tags('/vendor/celerik', theme: 'material') ?>

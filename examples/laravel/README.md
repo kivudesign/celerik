@@ -7,6 +7,7 @@ Drop-in files for a fresh Laravel 11+ application (verified on Laravel 13), show
 ```bash
 laravel new celerik-demo && cd celerik-demo      # SQLite by default
 composer config repositories.celerik path ../celerik
+(cd ../celerik && npm install && npm run build)   # a checkout has no built bundle; releases do
 composer require celerik/ui:@dev
 php artisan vendor:publish --tag=celerik-assets   # copies public/ to public/vendor/celerik
 ```

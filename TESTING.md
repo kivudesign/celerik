@@ -51,7 +51,7 @@ For each theme (bootstrap, material, tailwind) in light and dark mode, the tests
 - the same with the modal open.
 
 ```bash
-npm run build                       # the tests use the bundle in public/
+npm run build                       # the tests use the bundle in public/ (built, not committed)
 npx playwright install chromium     # once; or use an installed browser:
 npm run test:a11y                   # PLAYWRIGHT_CHANNEL=msedge (or chrome) npm run test:a11y
 ```

@@ -7,6 +7,7 @@ Drop-in files for a Symfony 7 web application, showing a server-side Grid (Doctr
 ```bash
 symfony new celerik-demo --webapp && cd celerik-demo
 composer config repositories.celerik path ../celerik
+(cd ../celerik && npm install && npm run build)   # a checkout has no built bundle; releases do
 composer require celerik/ui:@dev
 ```
 
