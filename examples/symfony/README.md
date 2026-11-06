@@ -26,7 +26,8 @@ Copy the example files into the app:
 
 | From `examples/symfony/` | To the app |
 |---|---|
-| `src/Controller/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php`, `CelerikUiController.php` | `src/Controller/` |
+| `src/Controller/CelerikDemoController.php`, `CelerikCalendarController.php`, `CelerikArticleController.php`, `CelerikUiController.php`, `CelerikFilesController.php`, `CelerikThemeController.php` | `src/Controller/` |
+| `src/Twig/CelerikThemeExtension.php` | `src/Twig/` |
 | `src/Entity/Product.php`, `Meeting.php` and their repositories | `src/Entity/`, `src/Repository/` |
 | `templates/celerik/*.html.twig` | `templates/celerik/` |
 
@@ -47,7 +48,7 @@ composer require studio-42/elfinder
 mkdir -p public/elfinder && cp -r vendor/studio-42/elfinder/{css,img,js,sounds} public/elfinder/
 ```
 
-Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article`, `/celerik/ui` and `/celerik/files`.
+Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/scheduler`, `/celerik/article`, `/celerik/ui`, `/celerik/files` and, in the dev environment, `/celerik/theme`.
 
 ## What it shows
 
@@ -74,3 +75,7 @@ Then open `/celerik/grid`, `/celerik/chart`, `/celerik/form`, `/celerik/schedule
 - **File manager** (`/celerik/files`)
   - `CelerikFilesController::isAllowed()` only allows the dev environment: **replace it** with your security rules (e.g. `isGranted('ROLE_FILE_MANAGER')`).
   - Files live in `var/files`, outside `public/`. elFinder's CSRF token protects every command that changes files; uploads are checked by content like `UploadHandler`.
+- **Theme builder** (`/celerik/theme`, dev environment only)
+  - `CelerikThemeController` shows the ThemeBuilder with a preview of a form, a grid, tabs and a chart. Save posts the theme as JSON with a CSRF token checked by `isCsrfTokenValid()`.
+  - Saving writes `config/celerik-theme.json` (keep it in git) and `public/css/celerik-theme.css`. `base.html.twig` loads the saved theme on every page through `celerik_saved_theme()` (`src/Twig/CelerikThemeExtension.php`).
+  - In CI, rebuild the stylesheet from the JSON: `vendor/bin/celerik-theme build config/celerik-theme.json public/css/celerik-theme.css`.

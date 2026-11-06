@@ -89,6 +89,13 @@ if ($path === '/contact' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 $theme = in_array($_GET['theme'] ?? '', Assets::THEMES, true) ? $_GET['theme'] : 'bootstrap';
 $mode = ($_GET['mode'] ?? '') === 'dark' ? 'dark' : 'light';
 
+// ?custom=1: the theme saved with the theme builder (theme-builder.php), on its base look.
+$customTheme = null;
+if (isset($_GET['custom'], $_SESSION['theme']['base'])) {
+    $theme = $_SESSION['theme']['base'];
+    $customTheme = '/custom-theme.css';
+}
+
 $form = Form::make('contact')
     ->action('/contact')
     ->csrf($_SESSION['csrf'])
@@ -106,6 +113,7 @@ $form = Form::make('contact')
 
 require __DIR__ . '/ui.php';
 require __DIR__ . '/files.php';
+require __DIR__ . '/theme-builder.php';
 
 ?>
 <!doctype html>
@@ -117,7 +125,7 @@ require __DIR__ . '/files.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <?= Assets::tags('/assets', theme: $theme) ?>
+    <?= Assets::tags('/assets', theme: $theme, customTheme: $customTheme) ?>
 </head>
 <body>
 <main class="container py-4">
@@ -130,6 +138,11 @@ require __DIR__ . '/files.php';
                 <a href="?theme=<?= $name ?>&amp;mode=<?= $m ?>"<?= $current ?>><?= ucfirst($name) ?> <?= $m ?></a>
             <?php endforeach ?>
         <?php endforeach ?>
+        <?php if (isset($_SESSION['theme'])) : ?>
+            <?php $current = $customTheme === null ? '' : ' aria-current="page"' ?>
+            · <a href="?custom=1&amp;mode=<?= $mode ?>"<?= $current ?>>Saved theme</a>
+        <?php endif ?>
+        · <a href="/theme-builder?theme=<?= $theme ?>">Theme builder</a>
     </nav>
 
     <section class="mb-5" aria-labelledby="grid-title">

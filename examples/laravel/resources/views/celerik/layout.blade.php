@@ -7,7 +7,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <x-celerik-assets />
+    {{-- The theme saved with the theme builder (CelerikThemeController), if any. --}}
+    @php($savedTheme = \App\Http\Controllers\CelerikThemeController::saved())
+    <x-celerik-assets
+        :theme="$savedTheme?->getBase() ?? 'bootstrap'"
+        :custom-theme="$savedTheme ? asset('css/celerik-theme.css') : null"
+    />
 </head>
 <body>
 <nav class="navbar navbar-expand bg-body-tertiary mb-4" aria-label="Examples">
@@ -21,6 +26,9 @@
             <li class="nav-item"><a class="nav-link" href="{{ route('celerik.article') }}">Article</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ route('celerik.ui') }}">Tabs &amp; modal</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ route('celerik.files') }}">Files</a></li>
+            @if (app()->isLocal())
+                <li class="nav-item"><a class="nav-link" href="{{ route('celerik.theme') }}">Theme builder</a></li>
+            @endif
         </ul>
     </div>
 </nav>

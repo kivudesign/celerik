@@ -8,6 +8,7 @@ use App\Http\Controllers\CelerikArticleController;
 use App\Http\Controllers\CelerikCalendarController;
 use App\Http\Controllers\CelerikDemoController;
 use App\Http\Controllers\CelerikFilesController;
+use App\Http\Controllers\CelerikThemeController;
 use App\Http\Controllers\CelerikUiController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,4 +56,13 @@ Route::prefix('celerik/files')
     ->group(static function (): void {
         Route::get('/', 'show');
         Route::match(['GET', 'POST'], '/connector', 'connector')->name('.connector');
+    });
+
+// Development only: the controller answers 404 unless APP_ENV is "local".
+Route::prefix('celerik/theme')
+    ->name('celerik.theme')
+    ->controller(CelerikThemeController::class)
+    ->group(static function (): void {
+        Route::get('/', 'show');
+        Route::post('/', 'save')->name('.save');
     });
