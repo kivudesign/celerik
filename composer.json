@@ -44,6 +44,7 @@
             "Celerik\\Ui\\Tests\\": "tests/php/"
         }
     },
+    "bin": ["bin/celerik-theme"],
     "extra": {
         "laravel": {
             "providers": [
