@@ -37,6 +37,17 @@ export default defineConfig({
           text: 'Introduction',
           items: [
             { text: 'Getting started', link: '/guide/getting-started' },
+            { text: 'How it works', link: '/guide/how-it-works' },
+            { text: 'Data endpoints', link: '/guide/data' },
+          ],
+        },
+        {
+          text: 'Setup',
+          items: [
+            { text: 'Plain PHP', link: '/guide/plain-php' },
+            { text: 'Laravel', link: '/guide/laravel' },
+            { text: 'Symfony', link: '/guide/symfony' },
+            { text: 'Content Security Policy', link: '/guide/csp' },
           ],
         },
       ],
