@@ -36,7 +36,7 @@ final class ContrastResult
             $this->mode,
             $this->label,
             $this->backgroundColor,
-            $this->ratio,
+            floor($this->ratio * 100) / 100, // truncated: 4.497 shows as 4.49, not a failing "4.50"
             rtrim(rtrim(number_format($this->minimum, 1), '0'), '.'),
             $this->wcag,
         );

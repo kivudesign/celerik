@@ -16,6 +16,7 @@ use Celerik\Ui\Components\Modal;
 use Celerik\Ui\Components\Notification;
 use Celerik\Ui\Components\Scheduler;
 use Celerik\Ui\Components\Tabs;
+use Celerik\Ui\Components\ThemeBuilder;
 use Celerik\Ui\Support\Html;
 use Celerik\Ui\Theme\Theme;
 use Celerik\Ui\Upload\UploadRules;
@@ -103,6 +104,12 @@ $fixtures = [
             Field::editor('notes')->required(),
         )
         ->submit('Order'),
+
+    'themebuilder' => ThemeBuilder::make('builder')
+        ->theme(Theme::preset('material')->color('light', 'danger', '#dd3545'))
+        ->saveUrl('/theme')
+        ->csrf('test-token')
+        ->preview(Form::make('preview-form')->add(Field::text('name'))->submit('Send')),
 
     'form' => Form::make('signup')
         ->action('/signup')

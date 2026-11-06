@@ -33,13 +33,13 @@ final class ContrastTest extends TestCase
 
     public function testThresholdsAreNotRounded(): void
     {
-        // #dd3545 on white is 4.497:1: it prints as 4.50:1 but is below 4.5:1.
+        // #dd3545 on white is 4.497:1: below 4.5:1, and printed truncated (4.49), not rounded.
         $theme = Theme::preset('bootstrap')->color('light', 'danger', '#dd3545');
         $failures = Contrast::failures($theme);
 
         self::assertCount(1, $failures);
         self::assertSame('danger', $failures[0]->foreground);
-        self::assertSame('FAIL light: Error messages on #ffffff = 4.50:1 (needs 4.5:1, WCAG 1.4.3)', (string) $failures[0]);
+        self::assertSame('FAIL light: Error messages on #ffffff = 4.49:1 (needs 4.5:1, WCAG 1.4.3)', (string) $failures[0]);
 
         $theme->color('light', 'danger', '#dc3545'); // 4.53:1
         self::assertSame([], Contrast::failures($theme));

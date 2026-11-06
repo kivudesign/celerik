@@ -74,7 +74,7 @@ final class ConsoleTest extends TestCase
 
         self::assertSame(Console::CONTRAST_FAILED, $code);
         self::assertSame(
-            "FAIL light: Error messages on #ffffff = 4.50:1 (needs 4.5:1, WCAG 1.4.3)\n"
+            "FAIL light: Error messages on #ffffff = 4.49:1 (needs 4.5:1, WCAG 1.4.3)\n"
             . "Bootstrap: 1 pair below the minimum.\n",
             $out,
         );

@@ -52,6 +52,12 @@ describe('accessibility (axe-core, WCAG 2.1 AA)', () => {
     expect(await violations()).toEqual([]);
   });
 
+  test('theme builder markup from PHP, with a failing contrast pair', async () => {
+    const element = loadFixture('themebuilder');
+    expect(element.querySelectorAll('.celerik-theme-builder__pair.is-fail')).toHaveLength(1);
+    expect(await violations()).toEqual([]);
+  });
+
   test('chart markup from PHP', async () => {
     loadFixture('chart');
     expect(await violations()).toEqual([]);
