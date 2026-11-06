@@ -3,6 +3,7 @@ import {
   durationFor,
   escapeHtml,
   pausableTimer,
+  uncoverScroll,
   toastFor,
   unescapeHtml,
 } from '../../resources/js/notification-config.js';
@@ -28,6 +29,29 @@ describe('notification config', () => {
     expect(types.success).toMatchObject({ duration: 3000, dismissible: false, background: 'var(--bs-success)' });
     expect(types.error).toMatchObject({ duration: 0, dismissible: true, background: 'var(--bs-danger)' });
     expect(types.warning.className).toBe('celerik-toast celerik-toast-warning');
+  });
+});
+
+describe('uncoverScroll', () => {
+  const rect = (left, top, width, height) => ({
+    left, top, width, height, right: left + width, bottom: top + height,
+  });
+  const toasts = [rect(900, 20, 360, 60), rect(900, 90, 360, 60)]; // top-right stack, down to 150
+
+  test('scrolls up so a covered element lands below the toasts', () => {
+    expect(uncoverScroll(rect(1000, 40, 40, 30), toasts)).toBe(-(150 - 40 + 8));
+  });
+
+  test('leaves elements alone when less than half is covered, or nothing is', () => {
+    expect(uncoverScroll(rect(840, 40, 100, 30), toasts)).toBe(0); // 40% under the toast
+    expect(uncoverScroll(rect(100, 40, 100, 30), toasts)).toBe(0);
+    expect(uncoverScroll(rect(1000, 400, 40, 30), toasts)).toBe(0);
+    expect(uncoverScroll(rect(1000, 40, 40, 30), [])).toBe(0);
+  });
+
+  test('scrolls down for toasts at the bottom', () => {
+    const bottom = [rect(900, 600, 360, 80)];
+    expect(uncoverScroll(rect(1000, 620, 40, 30), bottom, { y: 'bottom' })).toBe(650 - 600 + 8);
   });
 });
 
