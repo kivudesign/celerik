@@ -13,6 +13,7 @@ register('modal', async (element, options) => (await import('./modal.js')).initM
 register('tabs', async (element, options) => (await import('./tabs.js')).initTabs(element, options));
 register('notification', async (element, options) => (await import('./notification.js')).initNotification(element, options));
 register('filemanager', async (element, options) => (await import('./filemanager.js')).initFileManager(element, options));
+register('themebuilder', async (element, options) => (await import('./themebuilder.js')).initThemeBuilder(element, options));
 
 // Shows a toast from JavaScript, e.g. after an AJAX request: Celerik.notify('success', 'Saved.').
 // The message is always treated as text.

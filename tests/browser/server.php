@@ -98,6 +98,12 @@ if ($path === '/custom-theme.css') {
 }
 $customTheme = isset($_GET['custom']) ? '/custom-theme.css?theme=' . $theme : null;
 
+// The ThemeBuilder, previewing real components: GET /theme-builder?theme=material
+if ($path === '/theme-builder') {
+    require __DIR__ . '/theme-builder-page.php';
+    exit;
+}
+
 if ($path !== '/') {
     http_response_code(404);
     exit('Not found.');

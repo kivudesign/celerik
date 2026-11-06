@@ -101,7 +101,7 @@ final class ThemeBuilderTest extends TestCase
     {
         $xpath = $this->dom(ThemeBuilder::make('b')->render());
 
-        foreach (['__preset', '__export', '__modes'] as $part) {
+        foreach (['__preset', '__history', '__export', '__modes'] as $part) {
             $element = $xpath->query(sprintf('//*[contains(@class, "celerik-theme-builder%s")]', $part))->item(0);
             self::assertInstanceOf(DOMElement::class, $element, $part);
             self::assertTrue($element->hasAttribute('hidden'), $part);

@@ -271,7 +271,7 @@ final class ThemeBuilder extends Component
                 'class' => 'form-select',
             ], $presetOptions) . Html::tag('button', [
                 'type' => 'button',
-                'class' => 'btn btn-outline-secondary',
+                'class' => 'btn btn-secondary',
                 'data-celerik-action' => 'preset',
             ], $this->text('loadPreset'))));
     }
@@ -438,19 +438,23 @@ final class ThemeBuilder extends Component
     {
         $button = fn (string $action, string $label): string => Html::tag('button', [
             'type' => 'button',
-            'class' => 'btn btn-outline-secondary',
+            'class' => 'btn btn-secondary',
             'data-celerik-action' => $action,
         ], $this->text($label));
         $importLabel = Html::tag(
             'label',
-            ['class' => 'btn btn-outline-secondary mb-0', 'for' => $this->id . '-import'],
+            ['class' => 'btn btn-secondary mb-0', 'for' => $this->id . '-import'],
             $this->text('import'),
         );
 
+        $history = Html::tag(
+            'div',
+            ['class' => 'd-flex flex-wrap gap-2 mb-2 celerik-theme-builder__history', 'hidden' => true],
+            $button('undo', 'undo') . $button('reset', 'reset'),
+        );
+
         $exportClass = 'd-flex flex-wrap gap-2 mb-2 celerik-theme-builder__export';
-        $exports = Html::tag('div', ['class' => $exportClass, 'hidden' => true], $button('undo', 'undo')
-            . $button('reset', 'reset')
-            . $button('download-css', 'downloadCss')
+        $exports = Html::tag('div', ['class' => $exportClass, 'hidden' => true], $button('download-css', 'downloadCss')
             . $button('download-json', 'downloadJson')
             . $button('copy-php', 'copyPhp')
             . $importLabel
@@ -466,7 +470,8 @@ final class ThemeBuilder extends Component
             ? ''
             : Html::tag('button', ['type' => 'submit', 'class' => 'btn btn-primary'], $this->text('save'));
 
-        return $exports
+        return $history
+            . $exports
             . Html::tag('p', ['class' => 'celerik-theme-builder__message small mb-2', 'role' => 'status'], '')
             . $save;
     }
@@ -483,7 +488,7 @@ final class ThemeBuilder extends Component
                 'id' => $id,
                 'value' => $mode,
                 'checked' => $mode === 'light',
-            ]) . Html::tag('label', ['class' => 'btn btn-outline-secondary btn-sm', 'for' => $id], $this->text($label));
+            ]) . Html::tag('label', ['class' => 'btn btn-secondary btn-sm', 'for' => $id], $this->text($label));
         }
 
         $items = '';

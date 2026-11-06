@@ -136,4 +136,13 @@ foreach (Theme::BASES as $base) {
     file_put_contents(__DIR__ . '/theme-' . $base . '.css', Theme::preset($base)->toCss());
 }
 
+// The teal browser-test theme on each base, with a font and a whole-number radius:
+// resources/js/theme-css.js must write the same text (theme-css.test.js).
+$custom = Theme::fromJson((string) file_get_contents(dirname(__DIR__, 2) . '/browser/custom-theme.json'))
+    ->fontFamily('"Inter", system-ui, sans-serif')
+    ->radius(1.0);
+foreach (Theme::BASES as $base) {
+    file_put_contents(__DIR__ . '/theme-custom-' . $base . '.css', $custom->base($base)->toCss());
+}
+
 echo 'Wrote ' . count($fixtures) . ' fixtures and ' . count(Theme::BASES) . " theme stylesheets to tests/js/fixtures\n";
