@@ -34,7 +34,7 @@ export default [
     },
   },
   {
-    files: ['tests/browser/**/*.mjs'],
+    files: ['tests/browser/**/*.mjs', 'tests/site/**/*.mjs'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',

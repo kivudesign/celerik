@@ -44,7 +44,11 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   srcExclude: ['**/README.md'],
-  markdown: { config: repositoryLinks },
+  markdown: {
+    config: repositoryLinks,
+    // High-contrast highlighting: every token at 4.5:1 or more on the code background.
+    theme: { light: 'github-light-high-contrast', dark: 'github-dark-high-contrast' },
+  },
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${process.env.DOCS_BASE ?? '/celerik/'}logo.svg` }],
     ['meta', { name: 'theme-color', content: '#0d6efd' }],

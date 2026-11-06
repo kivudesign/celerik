@@ -56,6 +56,14 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run build
       - run: npm run docs:build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:site
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: site-test-results
+          path: test-results/
+          retention-days: 7
 
   a11y:
     runs-on: ubuntu-latest
