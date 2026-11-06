@@ -27,6 +27,7 @@ use Celerik\Ui\Components\Modal;
 use Celerik\Ui\Components\Notification;
 use Celerik\Ui\Components\Scheduler;
 use Celerik\Ui\Components\Tabs;
+use Celerik\Ui\Components\ThemeBuilder;
 use Celerik\Ui\FileManager\FileManagerConfig;
 use Celerik\Ui\FileManager\FileManagerConnector;
 use Celerik\Ui\Support\Html;
@@ -97,6 +98,43 @@ if ($path === '/custom-theme.css') {
     exit;
 }
 $customTheme = isset($_GET['custom']) ? '/custom-theme.css?theme=' . $theme : null;
+
+// ThemeBuilder endpoints. Each saved theme goes to a temporary file named after it, which
+// the tests read back with /theme-saved?name=… (tests run in parallel).
+$savedTheme = static fn (string $name): string => sys_get_temp_dir() . '/celerik-browser-tests/saved-' . md5($name) . '.json';
+if ($path === '/theme-save' && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    $json = str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json');
+    $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? $_POST['_token'] ?? '';
+    if (!hash_equals('test-token', (string) $token)) {
+        http_response_code(419);
+        exit('Invalid CSRF token.');
+    }
+    try {
+        $saved = ThemeBuilder::fromRequest($_POST, (string) file_get_contents('php://input'));
+    } catch (InvalidArgumentException $exception) {
+        http_response_code(422);
+        exit($exception->getMessage());
+    }
+    file_put_contents($savedTheme($saved->getName()), $saved->toJson());
+    if ($json) {
+        header('Content-Type: application/json');
+        echo json_encode(['data' => $saved->toArray(), 'meta' => []]);
+    } else {
+        header('Location: /theme-builder?theme=' . $saved->getBase(), true, 303);
+    }
+    exit;
+}
+if ($path === '/theme-saved') {
+    header('Content-Type: application/json');
+    readfile($savedTheme((string) ($_GET['name'] ?? '')));
+    exit;
+}
+// Theme::toCss() for a posted theme JSON: the tests compare it with the builder's download.
+if ($path === '/theme-css' && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    header('Content-Type: text/css');
+    echo Theme::fromJson((string) file_get_contents('php://input'))->toCss();
+    exit;
+}
 
 // The ThemeBuilder, previewing real components: GET /theme-builder?theme=material
 if ($path === '/theme-builder') {

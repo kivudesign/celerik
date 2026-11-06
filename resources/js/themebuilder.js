@@ -338,7 +338,7 @@ export function initThemeBuilder(element, options) {
   sync();
   render();
 
-  return {
+  const api = {
     getTheme: () => clone(theme),
     setTheme,
     toCss: () => themeToCss(theme),
@@ -347,4 +347,110 @@ export function initThemeBuilder(element, options) {
       return () => listeners.delete(listener);
     },
   };
+  initExport(element, options, api);
+
+  return api;
+}
+
+// A file name from the theme name: "Acme Café 2" -> "acme-cafe-2".
+export function fileName(name, extension) {
+  const slug = name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return `${slug || 'theme'}.${extension}`;
+}
+
+export function themeJson(theme) {
+  return `${JSON.stringify(theme, null, 4)}\n`;
+}
+
+// PHP that rebuilds the theme: paste it into a config file or a seeder.
+export function phpSnippet(theme) {
+  return `use Celerik\\Ui\\Theme\\Theme;\n\n$theme = Theme::fromJson(<<<'JSON'\n${themeJson(theme)}JSON);\n`;
+}
+
+function download(name, type, text) {
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// Download, copy, import and save.
+function initExport(element, options, api) {
+  const labels = options.labels ?? {};
+  const message = element.querySelector('.celerik-theme-builder__message');
+  const say = (text, isError = false) => {
+    message.textContent = text;
+    message.classList.toggle('text-danger-emphasis', isError);
+  };
+  const action = (name) => element.querySelector(`[data-celerik-action="${name}"]`);
+
+  element.querySelector('.celerik-theme-builder__export').hidden = false;
+
+  action('download-css').addEventListener('click', () => {
+    download(fileName(api.getTheme().name, 'css'), 'text/css', api.toCss());
+  });
+  action('download-json').addEventListener('click', () => {
+    download(fileName(api.getTheme().name, 'json'), 'application/json', themeJson(api.getTheme()));
+  });
+  action('copy-php').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(phpSnippet(api.getTheme()));
+      say(labels.copied);
+    } catch {
+      say(labels.copyFailed, true);
+    }
+  });
+
+  const importInput = action('import');
+  importInput.addEventListener('change', async () => {
+    const [file] = importInput.files;
+    importInput.value = ''; // importing the same file again fires "change"
+    if (!file) {
+      return;
+    }
+    let data;
+    try {
+      data = JSON.parse(await file.text());
+    } catch (error) {
+      say(labels.importError.replace('{error}', error.message), true);
+      return;
+    }
+    const { theme, error } = validateTheme(data);
+    if (!theme) {
+      say(labels.importError.replace('{error}', error), true);
+      return;
+    }
+    api.setTheme(theme);
+    say(labels.imported);
+  });
+
+  // Save sends JSON; without JavaScript the form posts its fields (ThemeBuilder::fromRequest()).
+  const form = element.querySelector('form');
+  if (options.saveUrl) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+      const token = options.csrf ? form.querySelector(`input[name="${options.csrf.field}"]`)?.value : null;
+      if (token) {
+        headers['X-CSRF-TOKEN'] = token;
+      }
+      try {
+        const response = await fetch(options.saveUrl, {
+          method: 'POST',
+          headers,
+          credentials: 'same-origin',
+          body: JSON.stringify({ theme: api.getTheme() }),
+        });
+        say(response.ok ? labels.saved : labels.saveFailed, !response.ok);
+      } catch {
+        say(labels.saveFailed, true);
+      }
+    });
+  }
 }

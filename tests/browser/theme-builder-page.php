@@ -21,6 +21,8 @@ use Celerik\Ui\Theme\Theme;
 $builder = ThemeBuilder::make('builder')
     ->theme(Theme::preset($theme))
     ->assetsUrl('/assets')
+    ->saveUrl('/theme-save')
+    ->csrf('test-token')
     ->preview(
         Form::make('preview-form')
             ->add(

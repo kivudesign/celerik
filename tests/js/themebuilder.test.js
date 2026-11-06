@@ -38,10 +38,9 @@ describe('theme builder (fixture: material preset, light error color at 4.49:1)'
   const failures = () => [...element.querySelectorAll('.celerik-theme-builder__pair.is-fail')].map((li) => li.dataset.celerikPair);
 
   test('reveals the JavaScript controls and previews the theme in the preview area only', () => {
-    for (const part of ['__preset', '__history', '__modes']) {
+    for (const part of ['__preset', '__history', '__export', '__modes']) {
       expect($(`.celerik-theme-builder${part}`).hidden).toBe(false);
     }
-    expect($('.celerik-theme-builder__export').hidden).toBe(true); // export comes with its own step
     expect(previewCss()).toContain('#builder .celerik-theme-builder__canvas,\n#builder .celerik-theme-builder__canvas[data-bs-theme=light] {');
     expect(previewCss()).toContain('  --bs-primary: #6750a4;');
     expect(previewCss()).not.toMatch(/(^|\n):root/);

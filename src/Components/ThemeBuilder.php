@@ -62,6 +62,10 @@ final class ThemeBuilder extends Component
         'copied' => 'Copied.',
         'import' => 'Import JSON',
         'importError' => 'This file is not a valid theme: {error}',
+        'imported' => 'Theme imported.',
+        'copyFailed' => 'Copying is not allowed here: select the snippet and copy it.',
+        'saved' => 'Theme saved.',
+        'saveFailed' => 'The theme could not be saved.',
         'undo' => 'Undo',
         'reset' => 'Reset',
         'invalidColor' => 'Use a color like #0d6efd.',
@@ -182,6 +186,48 @@ final class ThemeBuilder extends Component
         }
 
         return $this;
+    }
+
+    /**
+     * The theme posted to saveUrl(): a JSON body (the Save button, {"theme": {...}}) or the
+     * form fields (without JavaScript, theme[light][primary]…). Check the CSRF token first.
+     *
+     *     $theme = ThemeBuilder::fromRequest($_POST, file_get_contents('php://input'));
+     *     file_put_contents('theme.json', $theme->toJson());
+     *
+     * @param array<mixed> $form The parsed form fields ($_POST, $request->request->all()).
+     * @param string $body The raw request body, for JSON requests.
+     * @throws InvalidArgumentException When the theme is missing or invalid: answer with HTTP 422.
+     */
+    public static function fromRequest(array $form, string $body = ''): Theme
+    {
+        if (trim($body) !== '' && in_array(trim($body)[0], ['{', '['], true)) {
+            $data = json_decode($body, true, 8);
+            if (!is_array($data)) {
+                throw new InvalidArgumentException('The request body is not valid JSON.');
+            }
+            $theme = $data['theme'] ?? $data;
+        } else {
+            $theme = $form['theme'] ?? null;
+        }
+        if (!is_array($theme)) {
+            throw new InvalidArgumentException('The request has no theme.');
+        }
+
+        // Form fields are strings: an empty optional field keeps the base look's value.
+        foreach (['radius', 'fontFamily', 'shadow'] as $key) {
+            if (($theme[$key] ?? null) === '') {
+                unset($theme[$key]);
+            }
+        }
+        if (isset($theme['radius']) && is_string($theme['radius'])) {
+            if (!is_numeric($theme['radius'])) {
+                throw new InvalidArgumentException('The radius must be a number (rem).');
+            }
+            $theme['radius'] = (float) $theme['radius'];
+        }
+
+        return Theme::fromArray($theme);
     }
 
     public function getTheme(): Theme
@@ -447,14 +493,15 @@ final class ThemeBuilder extends Component
             $this->text('import'),
         );
 
-        $history = Html::tag(
+        // Bootstrap's d-flex (display: flex !important) would override [hidden]: the flex
+        // layout goes on an inner element.
+        $group = static fn (string $part, string $content): string => Html::tag(
             'div',
-            ['class' => 'd-flex flex-wrap gap-2 mb-2 celerik-theme-builder__history', 'hidden' => true],
-            $button('undo', 'undo') . $button('reset', 'reset'),
+            ['class' => 'celerik-theme-builder__' . $part, 'hidden' => true],
+            Html::tag('div', ['class' => 'd-flex flex-wrap gap-2 mb-2'], $content),
         );
-
-        $exportClass = 'd-flex flex-wrap gap-2 mb-2 celerik-theme-builder__export';
-        $exports = Html::tag('div', ['class' => $exportClass, 'hidden' => true], $button('download-css', 'downloadCss')
+        $history = $group('history', $button('undo', 'undo') . $button('reset', 'reset'));
+        $exports = $group('export', $button('download-css', 'downloadCss')
             . $button('download-json', 'downloadJson')
             . $button('copy-php', 'copyPhp')
             . $importLabel

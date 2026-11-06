@@ -137,6 +137,51 @@ final class ThemeBuilderTest extends TestCase
         self::assertStringContainsString('>Principale</label>', ThemeBuilder::make('b')->labels(['primary' => 'Principale'])->render());
     }
 
+    public function testFromRequestReadsAJsonBody(): void
+    {
+        $theme = Theme::preset('tailwind')->name('Acme');
+
+        self::assertEquals($theme, ThemeBuilder::fromRequest([], json_encode(['theme' => $theme->toArray()], JSON_THROW_ON_ERROR)));
+        self::assertEquals($theme, ThemeBuilder::fromRequest([], $theme->toJson()), 'A bare theme object works too.');
+    }
+
+    public function testFromRequestReadsTheFormFieldsPostedWithoutJavaScript(): void
+    {
+        $fields = Theme::preset('material')->toArray();
+        $fields['radius'] = '1.25';
+        $fields['fontFamily'] = '';
+        $fields['shadow'] = '';
+
+        $theme = ThemeBuilder::fromRequest(['_token' => 'x', 'theme' => $fields]);
+
+        self::assertSame(1.25, $theme->getRadius());
+        self::assertNull($theme->getFontFamily(), 'An empty optional field keeps the base look.');
+        self::assertNull($theme->getShadow());
+        self::assertSame('#6750a4', $theme->palette('light')['primary']);
+    }
+
+    /** @param array<mixed> $form */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidRequests')]
+    public function testFromRequestRejectsInvalidRequests(array $form, string $body): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        ThemeBuilder::fromRequest($form, $body);
+    }
+
+    /** @return iterable<string, array{array<mixed>, string}> */
+    public static function invalidRequests(): iterable
+    {
+        $valid = Theme::preset('bootstrap')->toArray();
+
+        yield 'nothing' => [[], ''];
+        yield 'broken json' => [[], '{"theme": '];
+        yield 'json without a theme' => [[], '{"theme": "material"}'];
+        yield 'theme as a string' => [['theme' => 'material'], ''];
+        yield 'radius as text' => [['theme' => ['radius' => 'large'] + $valid], ''];
+        yield 'css in a color' => [['theme' => ['light' => ['primary' => '#fff;}'] + $valid['light']] + $valid], ''];
+    }
+
     public function testRejectsUnknownLabelsAndCsrfFields(): void
     {
         $this->expectException(InvalidArgumentException::class);
