@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import globals from 'globals';
 
 export default [
-  { ignores: ['public/**', 'vendor/**', 'node_modules/**', 'coverage/**', 'test-results/**', 'playwright-report/**'] },
+  { ignores: ['public/**', 'vendor/**', 'node_modules/**', 'coverage/**', 'test-results/**', 'playwright-report/**', 'site/.vitepress/dist/**', 'site/.vitepress/cache/**'] },
   js.configs.recommended,
   {
     files: ['resources/js/**/*.js'],
@@ -18,6 +18,14 @@ export default [
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: { ...globals.browser, ...globals.node, ...globals.jest },
+    },
+  },
+  {
+    files: ['site/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: { ...globals.browser, ...globals.node },
     },
   },
   {

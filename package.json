@@ -7,10 +7,13 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "lint": "eslint resources/js tests/js tests/browser playwright.config.mjs",
+    "lint": "eslint resources/js tests/js tests/browser site playwright.config.mjs",
     "pretest": "php tests/js/fixtures/build.php",
     "test": "jest",
-    "test:a11y": "playwright test"
+    "test:a11y": "playwright test",
+    "docs:dev": "vitepress dev site",
+    "docs:build": "vitepress build site",
+    "docs:preview": "vitepress preview site"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.22",
@@ -51,6 +54,7 @@
     "jquery": "^3.7.1",
     "lodash": "^4.18.1",
     "sass": "^1.83.0",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "vitepress": "^1.6.4"
   }
 }
