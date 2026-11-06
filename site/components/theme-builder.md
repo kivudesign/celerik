@@ -27,7 +27,7 @@ file_put_contents('public/css/theme.css', $theme->toCss());
 
 `fromRequest()` reads the JSON sent by the Save button, or the form fields posted without JavaScript, and throws `InvalidArgumentException` for an invalid theme (answer 422).
 
-The builder is a development tool: put it behind authorization or a local-only route. Tokens, `Theme` in PHP and the `celerik-theme` command are described in [THEMING.md](https://github.com/kivudesign/celerik/blob/main/THEMING.md).
+The builder is a development tool: put it behind authorization or a local-only route. Tokens, `Theme` in PHP and the `celerik-theme` command are described in [Theming](../guides/theming).
 
 ## Accessibility
 

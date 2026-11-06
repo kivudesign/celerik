@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import globals from 'globals';
 
 export default [
-  { ignores: ['public/**', 'vendor/**', 'node_modules/**', 'coverage/**', 'test-results/**', 'playwright-report/**', 'site/.vitepress/dist/**', 'site/.vitepress/cache/**', 'site/public/assets/**', 'site/public/demos/**'] },
+  { ignores: ['public/**', 'vendor/**', 'node_modules/**', 'coverage/**', 'test-results/**', 'playwright-report/**', 'site/.vitepress/dist/**', 'site/.vitepress/cache/**', 'site/public/demo-assets/**', 'site/public/demos/**'] },
   js.configs.recommended,
   {
     files: ['resources/js/**/*.js'],

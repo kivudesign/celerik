@@ -6,7 +6,7 @@
  *
  *   site/demos/<name>.php            returns a component, or a list of components
  *   site/public/demos/<name>.html    a standalone page with that component (generated)
- *   site/public/assets/              the Celerik bundle, Bootstrap and jQuery (copied)
+ *   site/public/demo-assets/              the Celerik bundle, Bootstrap and jQuery (copied)
  *
  * Pages embed a demo with <Demo name="grid" /> and show its code with <<< @/demos/grid.php.
  * Demos run without a server: data is embedded and nothing is saved.
@@ -38,10 +38,10 @@ $copyDirectory = static function (string $from, string $to): void {
     }
 };
 
-$copyDirectory($root . '/public', $public . '/assets/celerik');
-$copyDirectory($root . '/node_modules/bootstrap/dist', $public . '/assets/bootstrap');
-$copyDirectory($root . '/node_modules/jquery/dist', $public . '/assets/jquery');
-copy(__DIR__ . '/runtime.js', $public . '/assets/demo-runtime.js');
+$copyDirectory($root . '/public', $public . '/demo-assets/celerik');
+$copyDirectory($root . '/node_modules/bootstrap/dist', $public . '/demo-assets/bootstrap');
+$copyDirectory($root . '/node_modules/jquery/dist', $public . '/demo-assets/jquery');
+copy(__DIR__ . '/runtime.js', $public . '/demo-assets/demo-runtime.js');
 
 if (!is_dir($public . '/demos')) {
     mkdir($public . '/demos', 0755, true);
@@ -69,12 +69,12 @@ foreach (glob(__DIR__ . '/*.php') ?: [] as $file) {
         . '<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n"
         . '<title>' . Html::escape($title) . ' — Celerik UI demo</title>' . "\n"
         . '<link rel="icon" href="data:,">' . "\n"
-        . '<link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">' . "\n"
-        . '<script src="../assets/jquery/jquery.min.js" defer></script>' . "\n"
-        . '<script src="../assets/bootstrap/js/bootstrap.bundle.min.js" defer></script>' . "\n"
-        . Assets::tags('../assets/celerik') . "\n"
+        . '<link rel="stylesheet" href="../demo-assets/bootstrap/css/bootstrap.min.css">' . "\n"
+        . '<script src="../demo-assets/jquery/jquery.min.js" defer></script>' . "\n"
+        . '<script src="../demo-assets/bootstrap/js/bootstrap.bundle.min.js" defer></script>' . "\n"
+        . Assets::tags('../demo-assets/celerik') . "\n"
         // After celerik.css: sets data-bs-theme and adds the base look from ?mode= and ?theme=.
-        . '<script src="../assets/demo-runtime.js"></script>' . "\n"
+        . '<script src="../demo-assets/demo-runtime.js"></script>' . "\n"
         . '</head>' . "\n"
         . '<body>' . "\n"
         . '<main class="container-fluid p-3">' . "\n"

@@ -5,6 +5,35 @@ import { defineConfig } from 'vitepress';
 const referenceFile = new URL('../.generated/reference.json', import.meta.url);
 const reference = existsSync(referenceFile) ? JSON.parse(readFileSync(referenceFile, 'utf8')) : [];
 
+// Guides include the repository's Markdown files (THEMING.md, ACCESSIBILITY.md…), whose
+// links are relative to the repository root. Root documents are linked to their page on
+// this site, other paths (theme/presets/, tests/…) to GitHub.
+const REPOSITORY = 'https://github.com/kivudesign/celerik';
+const ROOT_PAGES = {
+  'THEMING.md': '/guides/theming',
+  'ACCESSIBILITY.md': '/guides/accessibility',
+  'SECURITY.md': '/guides/security',
+  'TESTING.md': '/guides/testing',
+  'ROADMAP.md': '/guides/roadmap',
+};
+
+function repositoryLinks(md) {
+  md.core.ruler.push('celerik-repository-links', (state) => {
+    for (const block of state.tokens) {
+      for (const token of block.children ?? []) {
+        const href = token.type === 'link_open' ? token.attrGet('href') : null;
+        // Absolute URLs, anchors, site paths and ./ or ../ links are the site's own.
+        if (!href || /^([a-z]+:|#|\/|\.)/i.test(href)) {
+          continue;
+        }
+        const [path, hash] = href.split('#');
+        const page = ROOT_PAGES[path];
+        token.attrSet('href', page ? `${page}${hash ? `#${hash}` : ''}` : `${REPOSITORY}/blob/main/${href}`);
+      }
+    }
+  });
+}
+
 // Documentation site: npm run docs:dev, npm run docs:build (output: site/.vitepress/dist).
 // DOCS_BASE is the path the site is served from: /celerik/ on GitHub Pages.
 export default defineConfig({
@@ -15,6 +44,7 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   srcExclude: ['**/README.md'],
+  markdown: { config: repositoryLinks },
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${process.env.DOCS_BASE ?? '/celerik/'}logo.svg` }],
     ['meta', { name: 'theme-color', content: '#0d6efd' }],
@@ -25,12 +55,26 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started', activeMatch: '/guide/' },
       { text: 'Components', link: '/components/', activeMatch: '/components/' },
+      { text: 'Guides', link: '/guides/theming', activeMatch: '/guides/' },
       { text: 'Reference', link: '/reference/', activeMatch: '/reference/' },
       { text: 'GitHub', link: 'https://github.com/kivudesign/celerik' },
     ],
 
     sidebar: {
       '/reference/': [{ text: 'API reference', link: '/reference/' }, ...reference],
+      '/guides/': [
+        {
+          text: 'Guides',
+          items: [
+            { text: 'Theming', link: '/guides/theming' },
+            { text: 'Security', link: '/guides/security' },
+            { text: 'Accessibility', link: '/guides/accessibility' },
+            { text: 'Testing', link: '/guides/testing' },
+            { text: 'Testing an integration', link: '/guides/integration-testing' },
+            { text: 'Roadmap', link: '/guides/roadmap' },
+          ],
+        },
+      ],
       '/components/': [
         {
           text: 'Components',
@@ -74,7 +118,18 @@ export default defineConfig({
     search: { provider: 'local' },
     outline: { level: [2, 3] },
     editLink: {
-      pattern: 'https://github.com/kivudesign/celerik/edit/main/site/:path',
+      // Guides that include a repository file are edited there (THEMING.md…). The function
+      // runs in the browser, so it cannot use this module's constants.
+      pattern: ({ filePath }) => {
+        const included = {
+          'guides/theming.md': 'THEMING.md',
+          'guides/accessibility.md': 'ACCESSIBILITY.md',
+          'guides/security.md': 'SECURITY.md',
+          'guides/testing.md': 'TESTING.md',
+          'guides/roadmap.md': 'ROADMAP.md',
+        }[filePath];
+        return `https://github.com/kivudesign/celerik/edit/main/${included ?? `site/${filePath}`}`;
+      },
       text: 'Edit this page on GitHub',
     },
     socialLinks: [{ icon: 'github', link: 'https://github.com/kivudesign/celerik' }],
