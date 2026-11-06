@@ -23,7 +23,8 @@ celerik/
 │   │   ├── Form/Field.php
 │   │   ├── Scheduler.php
 │   │   ├── Modal.php  Tabs.php  Notification.php
-│   │   └── FileManager.php
+│   │   ├── FileManager.php
+│   │   └── ThemeBuilder.php      # Theme editor: live preview, contrast report, export
 │   ├── Data/
 │   │   ├── DataSourceInterface.php
 │   │   ├── DataRequest.php       # Parses DataTables + simple query formats
@@ -38,6 +39,11 @@ celerik/
 │   │   ├── Dates.php             # Strict ISO 8601 parsing
 │   │   ├── EditorHtml.php        # Sanitizes rich text editor output
 │   │   └── RawHtml.php           # Trusted markup for Modal/Tabs content (Html::raw())
+│   ├── Theme/
+│   │   ├── Theme.php             # Validated theme tokens (presets, fromJson, toCss)
+│   │   ├── Stylesheet.php        # Writes the theme stylesheet
+│   │   ├── Contrast.php  ContrastResult.php   # WCAG checks of theme/contrast.json
+│   │   └── Console.php           # bin/celerik-theme
 │   ├── FileManager/
 │   │   ├── FileManagerConfig.php     # Locked-down elFinder volume
 │   │   └── FileManagerConnector.php  # run($config, authorized: ...)
@@ -59,7 +65,8 @@ celerik/
 │           ├── DoctrineDataSource.php
 │           └── DoctrineEventSource.php
 │
-├── theme/                        # Theme tokens: theme.schema.json, presets/{bootstrap,material,tailwind}.json
+├── bin/celerik-theme             # preset / check / build a theme (vendor/bin/celerik-theme)
+├── theme/                        # theme.schema.json, contrast.json, presets/{bootstrap,material,tailwind}.json
 │
 ├── resources/                    # Frontend sources (not shipped in the Composer dist)
 │   ├── js/
@@ -74,6 +81,7 @@ celerik/
 │   │   ├── modal.js  tabs.js  bootstrap-global.js   # Bootstrap JS (peer dependency)
 │   │   ├── notification.js  notification-config.js  # Notyf, Celerik.notify()
 │   │   ├── filemanager.js  filemanager-config.js    # jQuery UI + the app's copy of elFinder
+│   │   ├── themebuilder.js  theme-css.js            # ThemeBuilder; theme stylesheet + contrast in JS
 │   │   └── jquery-global.js      # `jquery` → window.jQuery (peer dependency)
 │   └── scss/
 │       ├── _variables.scss
@@ -91,19 +99,22 @@ celerik/
 │
 ├── tests/
 │   ├── php/                      # PHPUnit (Celerik\Ui\Tests\)
-│   │   ├── Components/  Data/  Support/  Upload/  FileManager/
+│   │   ├── Components/  Data/  Support/  Upload/  FileManager/  Theme/
 │   │   └── Adapters/Laravel/  Adapters/Symfony/
 │   ├── js/                       # Jest + axe-core
-│   │   ├── fixtures/build.php    # Renders PHP components to HTML fixtures
+│   │   ├── fixtures/build.php    # Renders PHP components and preset stylesheets to fixtures
 │   │   ├── core.test.js  grid.test.js  chart.test.js  form.test.js  a11y.test.js
 │   │   ├── scheduler.test.js  scheduler-dialog.test.js  scheduler-integration.test.js
 │   │   ├── editor.test.js  upload.test.js  ui.test.js  notification.test.js
 │   │   ├── filemanager.test.js  themes.test.js  presets.test.js
+│   │   ├── theme-css.test.js  theme-export.test.js  themebuilder.test.js
 │   │   └── helpers.js  setup.js  style-stub.js  css-helpers.js
 │   └── browser/                  # Playwright + axe-core in a real browser (npm run test:a11y)
 │       ├── server.php            # Test page with every component, served by PHP's built-in server
+│       ├── theme-builder-page.php  custom-theme.json   # /theme-builder and the teal test theme
 │       ├── a11y.spec.mjs  keyboard.spec.mjs  scheduler.spec.mjs  forced-colors.spec.mjs
-│       ├── motion.spec.mjs  wcag22.spec.mjs  chart.spec.mjs
+│       ├── motion.spec.mjs  wcag22.spec.mjs  chart.spec.mjs  custom-theme.spec.mjs
+│       ├── theme-builder.spec.mjs  theme-builder-a11y.spec.mjs
 │       └── helpers.mjs
 │
 ├── examples/

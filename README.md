@@ -55,6 +55,7 @@ Load Bootstrap 5.3 (CSS, and `bootstrap.bundle.js` for Modal and Tabs) and jQuer
 | Tabs | `Components\Tabs` | Bootstrap 5 | WAI-ARIA tabs with arrow keys, tabs/pills/underline styles, selected tab kept in the URL hash |
 | Notification | `Components\Notification` | Notyf 3 | Toasts from flash messages (`fromFlash()`) or `Celerik.notify()`; messages are always text; errors stay until dismissed |
 | Scheduler | `Components\Scheduler` | FullCalendar 6 (MIT plugins) | Month, week, day and list views; create, move, resize and delete through your endpoints (also from the keyboard), rolled back if the server refuses |
+| Theme builder | `Components\ThemeBuilder` + `Theme\Theme` | – | Edit theme tokens with a live preview of your components and a contrast report; export CSS or JSON; see [THEMING.md](THEMING.md) |
 | File manager | `Components\FileManager` + `FileManager\FileManagerConnector` | elFinder 2.1 | Locked-down local volume, mandatory authorization, content-checked uploads, elFinder CSRF plus the framework's; see [SECURITY.md](SECURITY.md#file-manager) |
 
 Content passed to Modal and Tabs follows one rule: a string is escaped text, and a `Stringable` (another component, or `Html::raw()` for markup you trust) is inserted as HTML.
@@ -73,7 +74,13 @@ Three looks, all on Bootstrap 5.3, each with light and dark mode (`<html data-bs
 
 A theme is a small extra stylesheet (about 1 KB gzipped) loaded after `celerik.css`. Pair the Material theme with `Form::floatingLabels()` for floating labels. Every theme and mode is checked for WCAG 2.1 AA contrast, both automatically on its palette and in a browser with axe-core.
 
-To customise further, override the `--celerik-*` and `--bs-*` CSS custom properties, or the SCSS variables in `resources/scss/_variables.scss` and rebuild.
+To make your own, start from a look and change its design tokens (ten colors per mode, radius, font, shadow):
+
+- the **ThemeBuilder** component edits them with a live preview of your components and a WCAG contrast report, and exports the stylesheet or the theme JSON;
+- `Theme::preset('tailwind')->color('light', 'primary', '#0b5394')->toCss()` does the same in PHP;
+- `vendor/bin/celerik-theme build theme.json public/css/acme.css` builds it in CI, and refuses a theme that fails a contrast check.
+
+Load the result with `customTheme` (`<x-celerik-assets theme="tailwind" custom-theme="/css/acme.css" />`). See [THEMING.md](THEMING.md); for changes tokens cannot make, override the CSS custom properties or the SCSS variables.
 
 ## Examples
 
@@ -123,6 +130,7 @@ Components target WCAG 2.2 AA in every theme, light and dark, and respect reduce
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, project rules, adding a component |
 | [TESTING.md](TESTING.md) | Test suites and how to run them |
 | [ACCESSIBILITY.md](ACCESSIBILITY.md) | Conformance target, per-component status, manual test plan |
+| [THEMING.md](THEMING.md) | Theme tokens, ThemeBuilder, `Theme` in PHP, the `celerik-theme` command |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
 | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Licenses of bundled libraries |
 | [AI.md](AI.md) | Notes for AI-assisted development |

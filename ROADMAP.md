@@ -15,7 +15,7 @@
 ## Next — Phase 3
 
 - Accessibility polish ✅: browser accessibility tests in every theme, reduced motion, Windows High Contrast, keyboard editing in the Scheduler, form error summary, charts readable without color, WCAG 2.2 AA (see [ACCESSIBILITY.md](ACCESSIBILITY.md)).
-- ThemeBuilder UI.
+- ThemeBuilder UI ✅: theme tokens and presets, `Theme` in PHP with WCAG contrast checks, the ThemeBuilder component (live preview, contrast report, import and export) and the `celerik-theme` command (see [THEMING.md](THEMING.md)).
 - Documentation portal.
 
 ## Future — Phase 4
