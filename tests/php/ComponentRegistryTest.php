@@ -68,6 +68,17 @@ final class ComponentRegistryTest extends TestCase
         Assets::tags('/assets', theme: '../../evil');
     }
 
+    public function testAssetTagsLoadACustomThemeLastAndEscapeItsUrl(): void
+    {
+        self::assertSame(
+            '<link rel="stylesheet" href="/assets/celerik.css">' . "\n"
+            . '<link rel="stylesheet" href="/assets/celerik-tailwind.css">' . "\n"
+            . '<link rel="stylesheet" href="/css/acme.css?v=2&amp;x=&quot;">' . "\n"
+            . '<script type="module" src="/assets/celerik.js"></script>',
+            Assets::tags('/assets', theme: 'tailwind', customTheme: '/css/acme.css?v=2&x="'),
+        );
+    }
+
     public function testAssetTagsWithNonceIncludeCspNonceMetaForFullCalendar(): void
     {
         self::assertSame(

@@ -6,7 +6,7 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'
 
 // Opens the test page and waits until every [data-celerik] component has fired
 // celerik:ready. Console errors are collected and returned.
-export async function openComponents(page, { theme = 'bootstrap', mode = 'light' } = {}) {
+export async function openComponents(page, { theme = 'bootstrap', mode = 'light', custom = false } = {}) {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
@@ -19,7 +19,7 @@ export async function openComponents(page, { theme = 'bootstrap', mode = 'light'
     window.celerikReady = new Set();
     document.addEventListener('celerik:ready', (event) => window.celerikReady.add(event.target));
   });
-  await page.goto(`/?theme=${theme}&mode=${mode}`);
+  await page.goto(`/?theme=${theme}&mode=${mode}${custom ? '&custom=1' : ''}`);
   await page.waitForFunction(
     () => window.celerikReady.size === document.querySelectorAll('[data-celerik]').length,
     null,

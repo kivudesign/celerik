@@ -274,6 +274,15 @@ final class Theme
         return $this->shadow;
     }
 
+    /**
+     * The theme's stylesheet, to load after celerik.css and the base theme's stylesheet
+     * (Assets::tags(theme: $theme->getBase(), customTheme: '/css/acme.css')).
+     */
+    public function toCss(): string
+    {
+        return Stylesheet::render($this);
+    }
+
     /** @return list<ContrastResult> */
     public function contrast(): array
     {

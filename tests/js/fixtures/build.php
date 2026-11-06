@@ -17,6 +17,7 @@ use Celerik\Ui\Components\Notification;
 use Celerik\Ui\Components\Scheduler;
 use Celerik\Ui\Components\Tabs;
 use Celerik\Ui\Support\Html;
+use Celerik\Ui\Theme\Theme;
 use Celerik\Ui\Upload\UploadRules;
 
 require dirname(__DIR__, 3) . '/vendor/autoload.php';
@@ -123,4 +124,9 @@ foreach ($fixtures as $name => $component) {
     file_put_contents(__DIR__ . '/' . $name . '.html', $component->render() . "\n");
 }
 
-echo 'Wrote ' . count($fixtures) . " fixtures to tests/js/fixtures\n";
+// Stylesheets generated from the presets: compared with the compiled themes (presets.test.js).
+foreach (Theme::BASES as $base) {
+    file_put_contents(__DIR__ . '/theme-' . $base . '.css', Theme::preset($base)->toCss());
+}
+
+echo 'Wrote ' . count($fixtures) . ' fixtures and ' . count(Theme::BASES) . " theme stylesheets to tests/js/fixtures\n";

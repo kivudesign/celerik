@@ -84,6 +84,43 @@ describe('theme presets', () => {
     });
   });
 
+  // tests/js/fixtures/theme-*.css are written by Theme::toCss() (fixtures/build.php).
+  describe.each(['material', 'tailwind'])('the stylesheet generated from the %s preset', (name) => {
+    const compiled = compile(join(root, 'resources/scss/themes', `${name}.scss`)).css;
+    const generated = readFileSync(join(__dirname, 'fixtures', `theme-${name}.css`), 'utf8');
+    const colors = (value) => value.replace(/#[0-9a-f]{3}\b/gi, (hex) => normalizeHex(hex));
+
+    test.each(['light', 'dark'])('sets every %s palette property of the compiled theme, to the same value', (mode) => {
+      const expected = properties(compiled, `[data-bs-theme=${mode}]`);
+      const actual = properties(generated, `[data-bs-theme=${mode}]`);
+      for (const [property, value] of Object.entries(expected)) {
+        expect([property, actual[property]]).toEqual([property, colors(value)]);
+      }
+    });
+
+    test('sets the same shape tokens', () => {
+      const expected = properties(compiled, ':root');
+      const actual = properties(generated, ':root');
+      for (const property of ['--celerik-radius', '--celerik-surface-shadow', '--bs-body-font-family']) {
+        expect([property, actual[property]]).toEqual([property, expected[property]]);
+      }
+    });
+  });
+
+  test('the stylesheet generated from the bootstrap preset keeps Bootstrap 5.3 light colors', () => {
+    const bootstrap = properties(readFileSync(join(root, 'node_modules/bootstrap/dist/css/bootstrap.css'), 'utf8'), ':root');
+    const generated = properties(readFileSync(join(__dirname, 'fixtures', 'theme-bootstrap.css'), 'utf8'), '[data-bs-theme=light]');
+    const same = [
+      '--bs-primary', '--bs-primary-rgb', '--bs-link-color', '--bs-link-color-rgb', '--bs-link-hover-color',
+      '--bs-link-hover-color-rgb', '--bs-body-bg', '--bs-body-bg-rgb', '--bs-body-color', '--bs-body-color-rgb',
+      '--bs-tertiary-bg', '--bs-tertiary-bg-rgb', '--bs-border-color', '--bs-focus-ring-color',
+      '--bs-form-invalid-color', '--bs-form-invalid-border-color',
+    ];
+    for (const property of same) {
+      expect([property, generated[property]]).toEqual([property, normalizeHex(bootstrap[property])]);
+    }
+  });
+
   test('the bootstrap preset is Bootstrap 5.3, with field borders that meet 3:1', () => {
     const css = readFileSync(join(root, 'node_modules/bootstrap/dist/css/bootstrap.css'), 'utf8');
     const light = Object.fromEntries(Object.entries(properties(css, ':root'))
