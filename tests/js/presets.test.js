@@ -5,7 +5,7 @@ import Ajv2020 from 'ajv/dist/2020';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { compile } from 'sass';
-import { normalizeHex, properties } from './css-helpers.js';
+import { contrast, normalizeHex, properties } from './css-helpers.js';
 
 // The theme presets (theme/presets/*.json) describe the shipped stylesheets.
 // These tests fail when a preset and its stylesheet drift apart.
@@ -39,6 +39,15 @@ describe('theme presets', () => {
   test.each(['bootstrap', 'material', 'tailwind'])('%s matches the schema', (name) => {
     expect(validate(preset(name)) ? [] : validate.errors).toEqual([]);
     expect(preset(name).base).toBe(name);
+  });
+
+  test.each(['bootstrap', 'material', 'tailwind'])('%s meets every pair of theme/contrast.json', (name) => {
+    const { pairs } = read('theme/contrast.json');
+    const failures = ['light', 'dark'].flatMap((mode) => pairs
+      .map((pair) => ({ ...pair, ratio: contrast(preset(name)[mode][pair.foreground], preset(name)[mode][pair.background]) }))
+      .filter((pair) => pair.ratio < pair.minimum)
+      .map((pair) => `${mode} ${pair.label}: ${pair.ratio.toFixed(2)}`));
+    expect(failures).toEqual([]);
   });
 
   test('the schema rejects unsafe or malformed values', () => {

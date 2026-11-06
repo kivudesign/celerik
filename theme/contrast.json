@@ -1,0 +1,15 @@
+{
+  "description": "Color pairs every theme palette must meet, in light and dark mode. Used by the PHP Contrast class, the ThemeBuilder and the tests.",
+  "pairs": [
+    { "foreground": "bodyColor", "background": "bodyBg", "minimum": 4.5, "label": "Body text", "wcag": "1.4.3" },
+    { "foreground": "muted", "background": "bodyBg", "minimum": 4.5, "label": "Muted text (help, captions)", "wcag": "1.4.3" },
+    { "foreground": "bodyColor", "background": "surface", "minimum": 4.5, "label": "Text on surfaces (grid header, upload area)", "wcag": "1.4.3" },
+    { "foreground": "muted", "background": "surface", "minimum": 4.5, "label": "Muted text on surfaces", "wcag": "1.4.3" },
+    { "foreground": "primary", "background": "bodyBg", "minimum": 4.5, "label": "Links and outline buttons", "wcag": "1.4.3" },
+    { "foreground": "primaryHover", "background": "bodyBg", "minimum": 4.5, "label": "Hovered links", "wcag": "1.4.3" },
+    { "foreground": "onPrimary", "background": "primary", "minimum": 4.5, "label": "Primary button label", "wcag": "1.4.3" },
+    { "foreground": "onPrimary", "background": "primaryHover", "minimum": 4.5, "label": "Hovered primary button label", "wcag": "1.4.3" },
+    { "foreground": "danger", "background": "bodyBg", "minimum": 4.5, "label": "Error messages", "wcag": "1.4.3" },
+    { "foreground": "inputBorder", "background": "bodyBg", "minimum": 3, "label": "Form field borders", "wcag": "1.4.11" }
+  ]
+}
