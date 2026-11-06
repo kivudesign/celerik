@@ -300,6 +300,7 @@
 @media (forced-colors: active) {
   // !important: FullCalendar and elFinder remove outlines with more specific selectors.
   :is(.dt-container, .celerik-form, .celerik-scheduler, .celerik-scheduler-dialog, .celerik-tabs, .celerik-filemanager,
+    .celerik-theme-builder,
     .celerik-modal, .notyf)
     :focus-visible,
   [aria-haspopup='dialog'][data-bs-toggle='modal']:focus-visible {
