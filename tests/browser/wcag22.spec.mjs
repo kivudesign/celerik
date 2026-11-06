@@ -46,6 +46,38 @@ test('the File Manager tree arrow has a 24 x 24 px hit area', async ({ page }) =
   await expect.poll(expanded).toBe(!before);
 });
 
+// 2.4.11 Focus Not Obscured (Minimum): an element focused behind the toasts is scrolled
+// into the clear. The pager link is first scrolled to sit right under the toast stack, so
+// the check does not depend on the layout of the browser running it.
+test('an element focused behind a toast is scrolled into the clear', async ({ page }) => {
+  await openComponents(page);
+  const toast = page.locator('.celerik-toast-error'); // errors stay until dismissed
+  const next = page.locator('#users_wrapper').getByRole('link', { name: 'Next' });
+  await expect(toast).toBeVisible();
+  // A stable stack: the success toast would expire and move the error toast up.
+  await page.locator('.celerik-toast-success').getByRole('button', { name: /Dismiss/i }).click();
+  await expect(page.locator('.notyf__toast')).toHaveCount(1);
+  await page.waitForTimeout(400);
+
+  // Put the link under the toast: same height on screen, by scrolling the page.
+  const toastBox = await toast.boundingBox();
+  await next.evaluate((link, top) => {
+    window.scrollBy({ top: link.getBoundingClientRect().top - top, behavior: 'instant' });
+  }, toastBox.y + 5);
+  const linkBox = await next.boundingBox();
+  test.skip(linkBox.x + linkBox.width < toastBox.x, 'the pager is not under the toasts at this width');
+
+  // Focus it from the keyboard: Shift+Tab from the element after it.
+  await page.locator('#users_wrapper').getByRole('link', { name: 'Last' }).focus();
+  await page.keyboard.press('Shift+Tab');
+  await expect(next).toBeFocused();
+
+  await expect.poll(async () => {
+    const [link, cover] = [await next.boundingBox(), await toast.boundingBox()];
+    return link.y >= cover.y + cover.height || link.y + link.height <= cover.y;
+  }, { timeout: 1500 }).toBe(true);
+});
+
 // 2.4.11 Focus Not Obscured (Minimum): toasts never cover the focused element entirely.
 test('toasts never hide the focused element', async ({ page }) => {
   await openComponents(page);

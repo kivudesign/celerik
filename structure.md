@@ -96,6 +96,7 @@ celerik/
 │   ├── celerik.css
 │   ├── celerik-material.css  celerik-tailwind.css   # optional themes
 │   └── chunks/                   # grid, chart, form, scheduler, editor, upload (JS + CSS): loaded on demand
+│                                 # public/ is built (npm run build), not committed: releases add it to their tag
 │
 ├── tests/
 │   ├── php/                      # PHPUnit (Celerik\Ui\Tests\)

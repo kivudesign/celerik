@@ -1,2 +1,0 @@
-import{b as s}from"./bootstrap-global-CMKg80Yi.js";function i(t,r){return[...t.querySelectorAll('[role="tab"][data-bs-target]')].find(a=>a.getAttribute("data-bs-target")===r)??null}function u(t,r){const a=s("Tab");if(!a)return null;if(r.rememberInHash){const e=i(t,window.location.hash);e&&a.getOrCreateInstance(e).show(),t.addEventListener("shown.bs.tab",o=>{const n=o.target.getAttribute("data-bs-target");n&&window.history.replaceState(null,"",n)})}return t}export{u as initTabs,i as tabForHash};
-//# sourceMappingURL=tabs-D5lD0mrO.js.map

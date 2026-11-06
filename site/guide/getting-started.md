@@ -35,7 +35,33 @@ cp -r vendor/celerik/ui/public public/vendor/celerik
 
 :::
 
-Publish the assets again after every Celerik update.
+Publish the assets again after every Celerik update. Releases include the built bundle, so no Node.js is needed.
+
+### Or use the CDN or npm
+
+Instead of publishing the assets, load the bundle of the installed version from jsDelivr:
+
+```php
+<?= Celerik\Ui\Assets::tags(Celerik\Ui\Assets::cdnUrl()) ?>
+```
+
+```blade
+<x-celerik-assets :base-url="Celerik\Ui\Assets::cdnUrl()" />
+```
+
+Allow `https://cdn.jsdelivr.net` in `script-src` and `style-src` if you use a [Content Security Policy](./csp). With a JavaScript bundler (Vite, webpack), install it from npm instead:
+
+```bash
+npm install @celerik/ui
+```
+
+```js
+import '@celerik/ui';                       // registers the components and starts them
+import '@celerik/ui/celerik.css';
+import '@celerik/ui/celerik-material.css';  // optional base look
+```
+
+The PHP version and the npm version must match: the components and the bundle change together.
 
 ## Load the assets
 

@@ -8,6 +8,7 @@ use Celerik\Ui\Assets;
 use Celerik\Ui\ComponentRegistry;
 use Celerik\Ui\Components\Grid;
 use InvalidArgumentException;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -77,6 +78,32 @@ final class ComponentRegistryTest extends TestCase
             . '<script type="module" src="/assets/celerik.js"></script>',
             Assets::tags('/assets', theme: 'tailwind', customTheme: '/css/acme.css?v=2&x="'),
         );
+    }
+
+    public function testCdnUrlPointsToAReleaseOnJsDelivr(): void
+    {
+        self::assertSame('https://cdn.jsdelivr.net/npm/@celerik/ui@0.2.0/public', Assets::cdnUrl('0.2.0'));
+        self::assertSame('https://cdn.jsdelivr.net/npm/@celerik/ui@1.0.0-beta.1/public', Assets::cdnUrl('v1.0.0-beta.1'));
+        self::assertStringContainsString(
+            '<script type="module" src="https://cdn.jsdelivr.net/npm/@celerik/ui@0.2.0/public/celerik.js"></script>',
+            Assets::tags(Assets::cdnUrl('0.2.0')),
+        );
+    }
+
+    public function testCdnUrlRejectsVersionsThatAreNotReleases(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Assets::cdnUrl('latest/../../evil');
+    }
+
+    public function testCdnUrlNeedsAVersionForADevelopmentInstall(): void
+    {
+        // In this repository celerik/ui is the root package, installed as a branch (dev-…).
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('which is not on the CDN');
+
+        Assets::cdnUrl();
     }
 
     public function testAssetTagsWithNonceIncludeCspNonceMetaForFullCalendar(): void

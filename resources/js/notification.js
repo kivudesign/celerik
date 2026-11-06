@@ -1,7 +1,7 @@
 import { Notyf } from 'notyf';
 import 'notyf/notyf.min.css';
 import {
-  buildNotyfConfig, durationFor, pausableTimer, toastFor, unescapeHtml,
+  buildNotyfConfig, durationFor, pausableTimer, toastFor, unescapeHtml, uncoverScroll,
 } from './notification-config.js';
 
 let shared = null;
@@ -26,9 +26,35 @@ function dismissWhenUnused(notyf, notification, duration) {
   });
 }
 
+// Toasts float over the page: when keyboard focus lands on an element behind them
+// (after the browser's own scrolling), scroll it into the clear (WCAG 2.4.11). Mouse
+// focus is left alone, so clicks never make the page jump.
+function keepFocusInTheClear(container, y) {
+  document.addEventListener('focusin', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element) || container.contains(target)) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      if (document.activeElement !== target || !target.matches(':focus-visible')) {
+        return;
+      }
+      const toasts = [...container.querySelectorAll('.notyf__toast:not(.notyf__toast--disappear)')]
+        .map((toast) => toast.getBoundingClientRect());
+      const delta = uncoverScroll(target.getBoundingClientRect(), toasts, { y });
+      if (delta !== 0) {
+        window.scrollBy({ top: delta, behavior: 'instant' });
+      }
+    });
+  });
+}
+
 function create(options) {
   const config = buildNotyfConfig(options);
   const notyf = new Notyf(config);
+  if (notyf.view?.container) {
+    keepFocusInTheClear(notyf.view.container, config.position.y);
+  }
   const dismissLabel = options.labels?.dismiss ?? 'Dismiss notification';
 
   // Messages reach Notyf escaped; its live-region announcer (textContent) must read the

@@ -92,3 +92,26 @@ export function pausableTimer(duration, onExpire, clock = {
     },
   };
 }
+
+// How far to scroll the page so the focused element is not hidden behind toasts
+// (WCAG 2.4.11, Focus Not Obscured): 0 when less than half of it is covered. The element
+// clears the whole stack in its column: toasts at the top push it below the lowest one
+// (scroll up, negative), toasts at the bottom above the highest one.
+export function uncoverScroll(target, toasts, { y = 'top', margin = 8 } = {}) {
+  const area = Math.max(1, target.width * target.height);
+  let covered = 0;
+  let edge = null;
+  for (const toast of toasts) {
+    const width = Math.min(target.right, toast.right) - Math.max(target.left, toast.left);
+    if (width <= 0) {
+      continue; // another column
+    }
+    edge = y === 'bottom' ? Math.min(edge ?? Infinity, toast.top) : Math.max(edge ?? -Infinity, toast.bottom);
+    const height = Math.min(target.bottom, toast.bottom) - Math.max(target.top, toast.top);
+    covered += height > 0 ? width * height : 0;
+  }
+  if (edge === null || covered / area < 0.5) {
+    return 0;
+  }
+  return y === 'bottom' ? target.bottom - edge + margin : -(edge - target.top + margin);
+}

@@ -1,0 +1,108 @@
+name: Release
+
+# Publishes a version: Actions > Release > Run workflow, with the version (e.g. 0.2.0).
+#
+# main does not track the built bundle (public/). This workflow tests main, builds the
+# bundle, and commits it on a release commit that only the tag points to: Packagist
+# installs tags, so `composer require celerik/ui` gets the bundle, and main stays
+# source-only. Source maps are not in the package: they are attached to the GitHub
+# release as a zip.
+#
+# With an NPM_TOKEN secret (an npm automation token for the @celerik scope), the same
+# bundle is published to npm as @celerik/ui, which jsDelivr serves: Assets::cdnUrl().
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version, without the "v" (e.g. 0.2.0 or 1.0.0-beta.1)'
+        required: true
+
+permissions:
+  contents: write
+  id-token: write # npm provenance
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check the version
+        run: |
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "::error::Invalid version \"$VERSION\": use 1.2.3 or 1.2.3-beta.1"
+            exit 1
+          fi
+          if git rev-parse -q --verify "refs/tags/v$VERSION" > /dev/null; then
+            echo "::error::Tag v$VERSION already exists"
+            exit 1
+          fi
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: composer update --no-interaction --no-progress
+      - run: npm install --no-audit --no-fund
+      - run: composer lint
+      - run: composer test
+      - run: npm run lint
+      - run: npm test
+
+      - name: Build the bundle
+        run: |
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          npm run build
+
+      - name: Move the source maps to the release download
+        run: |
+          mkdir -p dist
+          (cd public && find . -name '*.map' | sort | zip -q "../dist/celerik-ui-$VERSION-sourcemaps.zip" -@)
+          find public -name '*.map' -delete
+          # Their references would make browsers request missing files.
+          find public -name '*.js' -exec sed -i '/^\/\/# sourceMappingURL=/d' {} +
+          find public -name '*.css' -exec sed -i 's#/\*\# sourceMappingURL=[^*]*\*/##' {} +
+          du -sh public
+
+      - name: Commit the bundle on the release commit and tag it
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --force public
+          git add package.json
+          git commit -q -m "Release v$VERSION (with the built bundle)"
+          git tag -a "v$VERSION" -m "Celerik UI v$VERSION"
+          git push origin "refs/tags/v$VERSION"
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$VERSION" "dist/celerik-ui-$VERSION-sourcemaps.zip" \
+            --title "v$VERSION" --generate-notes --verify-tag \
+            $([[ "$VERSION" == *-* ]] && echo --prerelease)
+
+      - name: Publish to npm
+        if: env.NPM_TOKEN != ''
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Pre-releases go to the "next" tag, so they never become "latest".
+          npm publish --provenance --access public $([[ "$VERSION" == *-* ]] && echo --tag next)
