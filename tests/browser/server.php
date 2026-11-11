@@ -201,6 +201,9 @@ $components = [
         ->date('2026-11-05')
         ->timeZone('UTC')
         ->firstDay(1)
+        // A fixed "today" on an empty day of the month shown: the tinted today cell is
+        // always checked (contrast, forced colors), whatever the real date.
+        ->options(['now' => '2026-11-11T10:00:00Z'])
         ->events([
             ['id' => 1, 'title' => 'Kick-off', 'start' => '2026-11-03T09:00:00Z', 'end' => '2026-11-03T10:00:00Z'],
             ['id' => 2, 'title' => 'Design review', 'start' => '2026-11-05T14:00:00Z', 'end' => '2026-11-05T15:30:00Z', 'color' => '#ffc107'],
