@@ -56,7 +56,7 @@ npx playwright install chromium     # once; or use an installed browser:
 npm run test:a11y                   # PLAYWRIGHT_CHANNEL=msedge (or chrome) npm run test:a11y
 ```
 
-On failure, `test-results/` holds a screenshot and a trace for each failed test (`npx playwright show-trace <trace.zip>`); in CI they are uploaded as the `playwright-results` artifact. Playwright starts its own browser with a temporary profile, so it never touches open browser windows.
+On failure, `test-results/` holds a screenshot and a trace for each failed test (`npx playwright show-trace <trace.zip>`); in CI they are uploaded as the `playwright-results` artifact. CI uses the runner's preinstalled Google Chrome (`PLAYWRIGHT_CHANNEL=chrome`) instead of downloading Chromium. Playwright starts its own browser with a temporary profile, so it never touches open browser windows.
 
 `tests/browser/keyboard.spec.mjs` checks keyboard use once, in the default theme:
 
