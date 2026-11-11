@@ -41,6 +41,9 @@ for (const name of demos) {
         const errors = [];
         page.on('pageerror', (error) => errors.push(error.message));
         page.on('console', (message) => message.type() === 'error' && errors.push(message.text()));
+        // The Scheduler demo shows November 2026: a fixed date keeps its tinted today
+        // cell in view, so the result does not depend on the day the tests run.
+        await page.clock.setFixedTime(new Date('2026-11-11T10:00:00Z'));
         await page.addInitScript(() => {
           window.celerikReady = 0;
           document.addEventListener('celerik:ready', () => {

@@ -84,6 +84,12 @@
     opacity: 1;
   }
 
+  // Day numbers are links: Bootstrap's link color passes on white (4.5:1) but not on
+  // today's tinted background (4.03:1 in the Bootstrap theme).
+  .fc-daygrid-day-number {
+    color: var(--bs-body-color);
+  }
+
   .fc-day-other .fc-daygrid-day-number {
     color: var(--bs-secondary-color);
   }
