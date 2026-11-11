@@ -18,7 +18,7 @@ The bundle in `public/` is built, not committed: run `npm run build` after `npm 
 
 ## Releasing
 
-Run the **Release** workflow (Actions > Release > Run workflow) with the version, e.g. `0.2.0`. It runs every check on `main`, builds the bundle, commits it on a release commit that only the tag `v0.2.0` points to (Packagist installs tags), attaches the source maps to the GitHub release, and, with an `NPM_TOKEN` secret, publishes `@celerik/ui` to npm. Never push a version tag by hand: it would have no bundle.
+Run the **Release** workflow (Actions > Release > Run workflow) with the version, e.g. `0.2.0`. It runs every check on `main`, builds the bundle, commits it on a release commit that only the tag `v0.2.0` points to (Packagist installs tags), attaches the source maps to the GitHub release, and, with an `NPM_TOKEN` secret, publishes `@celerikui/ui` to npm. Never push a version tag by hand: it would have no bundle.
 
 ## Adding a New Component
 
