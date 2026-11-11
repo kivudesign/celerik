@@ -1,0 +1,1 @@
+const e=window.jQuery;if(!e)throw new Error("Celerik: load jQuery before celerik.js.");const r=Object.freeze(Object.defineProperty({__proto__:null,default:e},Symbol.toStringTag,{value:"Module"}));export{r as a,e as j};
