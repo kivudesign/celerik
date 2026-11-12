@@ -65,6 +65,9 @@
         "fixtures": "php tests/js/fixtures/build.php"
     },
     "config": {
+        "platform": {
+            "php": "8.2.0"
+        },
         "sort-packages": true
     },
     "minimum-stability": "stable"
