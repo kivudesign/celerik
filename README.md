@@ -39,7 +39,7 @@ return response()->json($grid->respond(new EloquentDataSource(User::query()), $r
 composer require celerik/ui
 ```
 
-Load Bootstrap 5.3 (CSS, and `bootstrap.bundle.js` for Modal and Tabs) and jQuery 3.7, then the Celerik bundle:
+Load Bootstrap 5.3 (CSS, and `bootstrap.bundle.js` for Modal and Tabs) and jQuery 3.7 or 4, then the Celerik bundle:
 
 | Setup | Publish assets | Assets tag | Render |
 |---|---|---|---|
