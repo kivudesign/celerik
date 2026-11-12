@@ -12,6 +12,11 @@ updates:
     groups:
       npm:
         update-types: [minor, patch]
+    ignore:
+      # Babel 8 needs @babel/preset-env 8 and Jest 30 (babel-jest) at the same time:
+      # a planned migration, not a single bump.
+      - dependency-name: '@babel/*'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: composer
     directory: /

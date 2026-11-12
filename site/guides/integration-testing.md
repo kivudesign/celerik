@@ -36,7 +36,7 @@ Then load a page that uses it in light and dark mode with `check-page.sh`: axe-c
 
 Copy this into your pull request or release notes.
 
-- **Assets**: Bootstrap 5.3 (CSS and `bootstrap.bundle.js`) and jQuery 3.7 load before the Celerik tags; the whole `public/` folder is published, `chunks/` included, again after every update; the base theme and your custom theme load in that order.
+- **Assets**: Bootstrap 5.3 (CSS and `bootstrap.bundle.js`) and jQuery 3.7 or 4 load before the Celerik tags; the whole `public/` folder is published, `chunks/` included, again after every update; the base theme and your custom theme load in that order.
 - **Endpoints**: each endpoint uses the same component definition as its page (`respond()`); endpoints are behind authorization; JSON changes check the CSRF token; bad input answers 400 or 422 with a message.
 - **Data**: dates are converted to the right time zone before saving; uploads are claimed or stored outside the web root, and `purge()` runs from a cron job; editor HTML is sanitized with `EditorHtml::sanitize()`.
 - **Browser**: every component starts, with no console errors; no axe-core violations in each theme and mode; Tab order, Escape in dialogs, arrow keys in tabs, and the calendar's event dialog work from the keyboard; your production CSP reports no violations.

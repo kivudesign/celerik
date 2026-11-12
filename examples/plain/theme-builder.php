@@ -80,7 +80,7 @@ $builder = ThemeBuilder::make('builder')
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Celerik UI — theme builder</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <?= Assets::tags('/assets', theme: $builder->getTheme()->getBase()) ?>
 </head>
