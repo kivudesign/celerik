@@ -150,6 +150,6 @@ Components target WCAG 2.2 AA in every theme, light and dark, and respect reduce
 
 - Core: [MIT](LICENSE.md).
 - Bundled libraries keep their own licenses: see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-- Optional premium extensions may use commercial licensing.
+- Celerik UI is, and will stay, free and open source: there are no paid or premium editions.
 
 Telerik is a trademark of Progress Software Corporation. Celerik UI is an independent project, not affiliated with or endorsed by Progress.
