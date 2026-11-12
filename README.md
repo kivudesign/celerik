@@ -7,7 +7,7 @@ An open-source, Bootstrap-based UI component suite for PHP, inspired by Telerik 
 
 Components are written in PHP and render accessible, escaped HTML. A small JS bundle then enhances them with proven open-source libraries: DataTables, Chart.js, Parsley.js, Inputmask, FullCalendar, Quill, FilePond, Notyf and elFinder. Each library (and its stylesheet) is loaded only on pages that use it.
 
-> **Status: Phase 3 complete.** Grid, Chart, Form (with uploads and a rich text editor), Scheduler, Modal, Tabs, Notification, File Manager and ThemeBuilder are available, accessible to WCAG 2.2 AA and documented. See the [roadmap](ROADMAP.md).
+> **Status: Phase 4 (forms) in progress.** Grid, Chart, Form (with uploads, a rich text editor, choice fields and switches), Scheduler, Modal, Tabs, Notification, File Manager and ThemeBuilder are available, accessible to WCAG 2.2 AA and documented. The [roadmap](ROADMAP.md) lists the components still to come, toward Telerik UI's breadth.
 
 **Documentation: <https://kivudesign.github.io/celerik/>**, with getting started guides for plain PHP, Laravel and Symfony, every component with a live demo, the theming and security guides, and the API reference.
 
