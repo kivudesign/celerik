@@ -49,6 +49,26 @@ jobs:
             exit 1
           fi
 
+      # CHANGELOG.md must have a section for the version ("## [0.2.0] - 2026-12-01"):
+      # it opens the release notes, above the pull requests grouped by label.
+      - name: Read the changelog
+        run: |
+          awk -v v="$VERSION" '
+            index($0, "## [" v "]") == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found && /^\[[^]]+\]: / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [[ ! -s release-notes.md ]] || ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "::error::CHANGELOG.md has no \"## [$VERSION]\" section: rename [Unreleased] to [$VERSION] with the date, merge it, then release."
+            exit 1
+          fi
+          # The previous release, for the list of pull requests: release tags are not on
+          # main's history, so GitHub cannot find it on its own.
+          PREVIOUS=$(git tag --list 'v*' --sort=-version:refname | grep -vx "v$VERSION" | grep -v -- '-' | head -1)
+          echo "PREVIOUS=$PREVIOUS" >> "$GITHUB_ENV"
+          cat release-notes.md
+
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
@@ -96,7 +116,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "v$VERSION" "dist/celerik-ui-$VERSION-sourcemaps.zip" \
-            --title "v$VERSION" --generate-notes --verify-tag \
+            --title "v$VERSION" --notes-file release-notes.md --generate-notes --verify-tag \
+            ${PREVIOUS:+--notes-start-tag "$PREVIOUS"} \
             $([[ "$VERSION" == *-* ]] && echo --prerelease)
 
       - name: Publish to npm

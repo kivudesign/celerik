@@ -10,7 +10,28 @@ We welcome contributions from developers, designers and AI agents.
 4. Add or update documentation in the relevant `.md` file.
 5. Write tests (PHPUnit, Jest, axe-core). See [TESTING.md](TESTING.md).
 6. Run `composer lint && composer test && npm run lint && npm test`.
-7. Submit a pull request with a clear description.
+7. Add a line under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) if users will notice the change.
+8. Submit a pull request with a clear description.
+
+## Pull request titles
+
+Use [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): summary`, e.g. `feat(grid): column filters` or `fix(a11y): focus ring on tabs`. The title labels the pull request, and the label sorts it in the release notes:
+
+| Title | Label | Release notes |
+|---|---|---|
+| `feat:` | `feature` | New features |
+| `fix:` | `bug` | Bug fixes |
+| `…(a11y):` | `accessibility` | Accessibility |
+| `docs:` | `documentation` | Documentation |
+| `chore(deps):` | `dependencies` | Dependencies |
+| `ci:`, `test:`, `chore:`, `build:`, `refactor:`, `perf:`, `style:` | `maintenance` | Maintenance |
+| `!` before the colon, e.g. `feat(form)!:` | `breaking` | Breaking changes |
+
+Add the `skip-changelog` label to leave a pull request out of the release notes.
+
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md) is written for users: what they can now do, what changed and what they need to change. Add entries under `## [Unreleased]`, in the sections **Added**, **Changed**, **Deprecated**, **Removed**, **Fixed**, **Security** or **Development** (tooling and CI), with a link to the pull request.
 
 ## Building the bundle
 
@@ -24,7 +45,10 @@ Dependabot opens weekly pull requests for npm, Composer and GitHub Actions updat
 
 ## Releasing
 
-Run the **Release** workflow (Actions > Release > Run workflow) with the version, e.g. `0.2.0`. It runs every check on `main`, builds the bundle, commits it on a release commit that only the tag `v0.2.0` points to (Packagist installs tags), attaches the source maps to the GitHub release, and, with an `NPM_TOKEN` secret, publishes `@celerikui/ui` to npm. Never push a version tag by hand: it would have no bundle.
+1. In CHANGELOG.md, rename `## [Unreleased]` to the version and date, e.g. `## [0.2.0] - 2026-12-01`, add an empty `## [Unreleased]` above it, update the compare links at the bottom, and merge that to `main`.
+2. Run the **Release** workflow (Actions > Release > Run workflow) with the version, e.g. `0.2.0`.
+
+The workflow stops if CHANGELOG.md has no section for the version. It runs every check on `main`, builds the bundle, commits it on a release commit that only the tag `v0.2.0` points to (Packagist installs tags), creates the GitHub release with the changelog section followed by the pull requests grouped by label, attaches the source maps, and, with an `NPM_TOKEN` secret, publishes `@celerikui/ui` to npm. Never push a version tag by hand: it would have no bundle.
 
 ## Adding a New Component
 

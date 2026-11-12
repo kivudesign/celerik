@@ -76,6 +76,7 @@ export default defineConfig({
             { text: 'Testing', link: '/guides/testing' },
             { text: 'Testing an integration', link: '/guides/integration-testing' },
             { text: 'Roadmap', link: '/guides/roadmap' },
+            { text: 'Changelog', link: '/guides/changelog' },
           ],
         },
       ],
