@@ -10,6 +10,8 @@ export default defineConfig({
   testDir: 'tests/browser',
   testMatch: '*.spec.mjs',
   fullyParallel: true,
+  // GitHub's runners have 4 CPUs; Playwright's default would use 2.
+  workers: process.env.CI ? 4 : undefined,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
@@ -29,6 +31,9 @@ export default defineConfig({
     command: `php -S 127.0.0.1:${port} tests/browser/server.php`,
     url: `http://127.0.0.1:${port}/`,
     reuseExistingServer: !process.env.CI,
+    // php -S serves one request at a time; on Linux it can fork workers, so parallel
+    // tests do not queue behind each other (ignored on Windows).
+    env: { PHP_CLI_SERVER_WORKERS: '4' },
     // PHP's built-in server logs every request on stderr.
     stderr: 'ignore',
   },
