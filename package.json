@@ -80,7 +80,7 @@
     "filepond-plugin-file-validate-size": "^2.2.8",
     "filepond-plugin-file-validate-type": "^1.2.9",
     "filepond-plugin-image-preview": "^4.6.12",
-    "globals": "^15.14.0",
+    "globals": "^17.14.0",
     "inputmask": "^5.0.9",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
