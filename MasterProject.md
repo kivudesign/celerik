@@ -58,7 +58,12 @@ You must use the following documentation files as your blueprint:
 - Phase 1: MVP (Grid, Chart, Form, Laravel and Symfony adapters).
 - Phase 2: Scheduler, File Manager, theming.
 - Phase 3: Accessibility polish, ThemeBuilder UI, docs site.
-- Phase 4: New components and usability, community growth. Celerik UI stays free and open source (MIT): no premium editions.
+- Phase 4: Forms (date pickers, searchable selects, layout, wizard, repeater).
+- Phase 5: Data (grid filters, row and bulk actions, inline editing; tree, list and task board views).
+- Phase 6: Navigation and layout (admin layout, menus, toolbar, accordion, card, splitter, tile layout).
+- Phase 7: Display and feedback (record view, stat tiles and dashboard widgets, badges, tooltips, progress, timeline).
+- Phase 8: Visualization, media and specialized editors.
+- The goal is Telerik UI's breadth, with Filament's depth for admin screens. Celerik UI stays free and open source (MIT): no premium editions.
 
 ## Instructions
 
