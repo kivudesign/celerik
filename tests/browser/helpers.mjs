@@ -27,10 +27,22 @@ export async function openComponents(page, {
     null,
     { timeout: 30_000 },
   );
-  // Let libraries finish their first layout (calendar sizing, chart and toast animations).
-  await page.waitForTimeout(1500);
+  await settled(page);
 
   return errors;
+}
+
+// Waits until the page's CSS animations and transitions (toasts, fades) have finished,
+// instead of a fixed delay: axe checks contrast on what is painted, so a half-faded toast
+// would fail it. Infinite animations (spinners) never finish and are ignored. Charts
+// animate on a canvas, which axe and the DOM assertions do not read.
+export async function settled(page) {
+  await page.waitForFunction(
+    () => document.getAnimations().every((animation) => animation.playState !== 'running'
+      || animation.effect?.getComputedTiming().endTime === Infinity),
+    null,
+    { timeout: 10_000 },
+  );
 }
 
 // Runs axe-core with color-contrast and returns readable violations, one string per node.

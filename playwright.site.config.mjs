@@ -8,6 +8,8 @@ export default defineConfig({
   testDir: 'tests/site',
   testMatch: '*.spec.mjs',
   fullyParallel: true,
+  // GitHub's runners have 4 CPUs; Playwright's default would use 2.
+  workers: process.env.CI ? 4 : undefined,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['list']] : 'list',

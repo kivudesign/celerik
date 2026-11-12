@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { openComponents } from './helpers.mjs';
+import { openComponents, settled } from './helpers.mjs';
 
 // WCAG 2.2 AA checks axe-core cannot make on its own. The axe matrix also runs the wcag22aa rules.
 
@@ -57,7 +57,7 @@ test('an element focused behind a toast is scrolled into the clear', async ({ pa
   // A stable stack: the success toast would expire and move the error toast up.
   await page.locator('.celerik-toast-success').getByRole('button', { name: /Dismiss/i }).click();
   await expect(page.locator('.notyf__toast')).toHaveCount(1);
-  await page.waitForTimeout(400);
+  await settled(page); // the remaining toast slides up
 
   // Put the link under the toast: same height on screen, by scrolling the page.
   const toastBox = await toast.boundingBox();

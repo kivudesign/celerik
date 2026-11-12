@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { settled } from '../browser/helpers.mjs';
 import { demoNames, sitePages, WCAG_TAGS } from './helpers.mjs';
 
 // The built documentation site: npm run docs:build && npm run test:site.
@@ -53,7 +54,7 @@ for (const name of demos) {
 
         await page.goto(`demos/${name}.html?theme=${theme}&mode=${mode}`);
         await page.waitForFunction(() => window.celerikReady === document.querySelectorAll('[data-celerik]').length, null, { timeout: 30_000 });
-        await page.waitForTimeout(800);
+        await settled(page);
 
         expect(errors).toEqual([]);
         expect(await page.evaluate(() => document.documentElement.dataset.bsTheme)).toBe(mode);
