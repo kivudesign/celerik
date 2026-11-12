@@ -6,8 +6,10 @@ namespace Celerik\Ui\Tests\Components;
 
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
+use Celerik\Ui\Data\ArrayDataSource;
 use Celerik\Ui\Upload\UploadRules;
 use InvalidArgumentException;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 final class FormTest extends TestCase
@@ -138,6 +140,71 @@ final class FormTest extends TestCase
         $html = Form::make('f')->submit(null)->add(Field::color('accent')->value('#0d6efd'))->render();
 
         self::assertStringContainsString('<input id="f-accent" name="accent" type="color" value="#0d6efd" class="form-control form-control-color">', $html);
+    }
+
+    public function testSearchableAndMultipleSelects(): void
+    {
+        $html = Form::make('f')->submit(null)->floatingLabels()->add(
+            Field::select('country', ['fr' => 'France', 'ca' => 'Canada'])->searchable()->placeholder('Choose'),
+            Field::select('languages', ['en' => 'English', 'fr' => 'French'])->multiple()->placeholder('None'),
+        )->values(['languages' => ['fr']])->render();
+
+        // Searchable: Tom Select options, the placeholder in the options (not on the select), no floating label.
+        self::assertStringContainsString('<div class="mb-3"><label for="f-country" class="form-label">Country</label><select id="f-country" name="country" data-celerik-select="{&quot;placeholder&quot;:&quot;Choose&quot;}" class="form-select"><option value="">Choose</option>', $html);
+        // Multiple: name[], array value, no empty option.
+        self::assertStringContainsString('<select id="f-languages" name="languages[]" placeholder="None" multiple class="form-select"><option value="en">English</option><option value="fr" selected>French</option></select>', $html);
+    }
+
+    public function testRemoteSelectPassesItsEndpointAndKeepsTheInitialChoices(): void
+    {
+        $html = Form::make('f')->submit(null)->add(
+            Field::select('author', [7 => 'Grace Hopper'])->remote('/people?team=2')->value(7),
+        )->render();
+
+        self::assertStringContainsString('data-celerik-select="{&quot;url&quot;:&quot;/people?team=2&quot;}"', $html);
+        self::assertStringContainsString('<option value="7" selected>Grace Hopper</option>', $html);
+    }
+
+    public function testRemoteSelectRespondsWithTheFirstMatchesSortedByLabelAndOnlyValueAndLabel(): void
+    {
+        $people = new ArrayDataSource([
+            ['id' => 1, 'name' => 'Grace Hopper', 'email' => 'grace@example.com'],
+            ['id' => 2, 'name' => 'Ada Lovelace', 'email' => 'ada@example.com'],
+            ['id' => 3, 'name' => 'Alan Turing', 'email' => 'alan@example.com'],
+            ['id' => 4, 'name' => 'Barbara Liskov', 'email' => 'barbara@example.com'],
+        ]);
+        $field = Field::select('author', [])->remote('/people', limit: 2);
+
+        // The client cannot choose the page size, the sort or the searched fields.
+        $result = $field->respond($people, [
+            'search' => 'a', 'per_page' => 1000, 'sort' => '-email', 'filter' => ['email' => 'grace@example.com'],
+        ])->toArray();
+
+        self::assertSame([['value' => '2', 'label' => 'Ada Lovelace'], ['value' => '3', 'label' => 'Alan Turing']], $result['data']);
+        self::assertSame(4, $result['meta']['filtered']);
+        self::assertSame(2, $result['meta']['perPage']);
+
+        $byEmail = $field->respond($people, ['search' => 'example.com'])->toArray();
+        self::assertSame([], $byEmail['data']);
+    }
+
+    public function testRemoteSelectOptionsAreValidated(): void
+    {
+        $cases = [
+            static fn () => Field::text('name')->remote('/people'),
+            static fn () => Field::select('a', [])->remote('/people', value: 'id; drop'),
+            static fn () => Field::select('a', [])->remote('/people', limit: 101),
+            static fn () => Field::text('name')->multiple(),
+            static fn () => Field::select('a', [])->respond(new ArrayDataSource([]), []),
+        ];
+        foreach ($cases as $case) {
+            try {
+                $case();
+                self::fail('An invalid remote select was accepted.');
+            } catch (InvalidArgumentException | LogicException) {
+                self::addToAssertionCount(1);
+            }
+        }
     }
 
     public function testChoiceGroupsNeedChoicesAndInlineOnlyAppliesToThem(): void

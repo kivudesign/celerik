@@ -141,6 +141,26 @@ $fixtures = [
         )
         ->errors(['plan' => 'Choose a plan.'])
         ->submit('Save'),
+
+    'form-select' => Form::make('assign')
+        ->action('/assign')
+        ->csrf('test-token')
+        ->add(
+            Field::select('country', ['fr' => 'France', 'ca' => 'Canada', 'cd' => 'DR Congo'])
+                ->searchable()
+                ->placeholder('Choose a country')
+                ->required()
+                ->help('Type to filter.'),
+            Field::select('languages', ['en' => 'English', 'fr' => 'French', 'ln' => 'Lingala'])
+                ->multiple()
+                ->searchable()
+                ->value(['fr', 'ln']),
+            Field::select('author', ['7' => 'Grace Hopper'])
+                ->remote('/authors/options')
+                ->placeholder('Search people')
+                ->value(7),
+        )
+        ->submit('Assign'),
 ];
 
 foreach ($fixtures as $name => $component) {

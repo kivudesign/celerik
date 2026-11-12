@@ -6,11 +6,21 @@ export function fieldInputs(field) {
   return (field.$elements ?? []).reduce((all, $input) => all.add($input), field.$element);
 }
 
+// The elements that show a field's state: its inputs, and the visible wrapper of a
+// searchable select (Tom Select hides the select).
+function stateElements(field) {
+  const wrapper = field.$element[0].tomselect?.wrapper;
+  return wrapper ? fieldInputs(field).add(wrapper) : fieldInputs(field);
+}
+
 // Parsley settings that produce Bootstrap 5 validation markup.
 export const parsleyDefaults = {
   errorClass: 'is-invalid',
   successClass: 'is-valid',
-  classHandler: fieldInputs,
+  classHandler: stateElements,
+  // Parsley's default, plus the search boxes of searchable selects (Tom Select): the
+  // hidden select is the field.
+  excluded: 'input[type=button], input[type=submit], input[type=reset], input[type=hidden], .ts-wrapper input',
   errorsContainer: (field) => field.$element.closest('.mb-3'),
   errorsWrapper: '<div class="invalid-feedback d-block" aria-live="polite"></div>',
   errorTemplate: '<div></div>',

@@ -28,6 +28,7 @@ use Celerik\Ui\Components\Notification;
 use Celerik\Ui\Components\Scheduler;
 use Celerik\Ui\Components\Tabs;
 use Celerik\Ui\Components\ThemeBuilder;
+use Celerik\Ui\Data\ArrayDataSource;
 use Celerik\Ui\FileManager\FileManagerConfig;
 use Celerik\Ui\FileManager\FileManagerConnector;
 use Celerik\Ui\Support\Html;
@@ -85,6 +86,19 @@ if (in_array($path, ['/events/create', '/events/update', '/events/delete'], true
     $event['id'] ??= 'new-' . bin2hex(random_bytes(4));
     header('Content-Type: application/json');
     echo json_encode(['data' => $event, 'meta' => []]);
+    exit;
+}
+
+// A remote select and its endpoint, on the same field definition.
+$reviewer = Field::select('reviewer', ['1' => 'Ada Lovelace'])->remote('/people/options', limit: 5)->value('1');
+if ($path === '/people/options') {
+    $people = new ArrayDataSource(array_map(
+        static fn (int $id, string $name): array => ['id' => $id, 'name' => $name, 'email' => strtolower($name) . '@example.com'],
+        range(1, 6),
+        ['Ada Lovelace', 'Alan Turing', 'Grace Hopper', 'Barbara Liskov', 'Margaret Hamilton', 'Katherine Johnson'],
+    ));
+    header('Content-Type: application/json');
+    echo json_encode($reviewer->respond($people, $_GET));
     exit;
 }
 
@@ -193,6 +207,11 @@ $components = [
             Field::switch('newsletter', 'Send me the newsletter')->value(true),
             Field::range('volume')->min(0)->max(10)->value(4),
             Field::color('accent', 'Accent color')->value('#0d6efd'),
+            Field::select('languages', ['en' => 'English', 'fr' => 'French', 'ln' => 'Lingala'])
+                ->multiple()
+                ->searchable()
+                ->value(['fr']),
+            $reviewer,
         )
         ->errors(['plan' => 'Choose a plan.'])
         ->submit('Save'),

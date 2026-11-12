@@ -148,3 +148,40 @@ test.describe('notification', () => {
     await expect(toast).toHaveCount(0);
   });
 });
+
+test.describe('searchable select', () => {
+  test('a remote select searches the endpoint and picks a person from the keyboard', async ({ page }) => {
+    const box = page.getByRole('combobox', { name: 'Reviewer' });
+    const select = page.locator('select[name="reviewer"]');
+    await expect(select).toHaveValue('1');
+
+    await box.focus();
+    await page.keyboard.type('hop');
+    const option = page.getByRole('option', { name: 'Grace Hopper' });
+    await expect(option).toBeVisible({ timeout: 15_000 }); // through the test server
+    // Only the match: the endpoint searched.
+    await expect(page.locator('#preferences-reviewer-ts-dropdown [role="option"]')).toHaveCount(1);
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+
+    await expect(select).toHaveValue('3');
+    await expect(box).toBeFocused();
+  });
+
+  test('a multiple select adds and removes choices from the keyboard', async ({ page }) => {
+    const box = page.getByRole('combobox', { name: 'Languages' });
+    const values = () => page.locator('select[name="languages[]"]').evaluate(
+      (select) => [...select.selectedOptions].map((option) => option.value),
+    );
+    expect(await values()).toEqual(['fr']);
+
+    await box.focus();
+    await page.keyboard.type('lin');
+    await page.keyboard.press('Enter');
+    await expect.poll(values).toEqual(['fr', 'ln']);
+
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Backspace');
+    await expect.poll(values).toEqual(['fr']);
+  });
+});

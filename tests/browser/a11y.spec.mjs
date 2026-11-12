@@ -30,6 +30,15 @@ for (const theme of THEMES) {
         await settled(page);
         expect(await axeViolations(page, { include: '.modal.show' })).toEqual([]);
       });
+
+      test('no axe-core violations with a searchable select open, matches highlighted', async ({ page }) => {
+        await openComponents(page, { theme, mode });
+        await page.getByRole('combobox', { name: 'Reviewer' }).focus();
+        await page.keyboard.type('an');
+        // The endpoint answers through the test server: allow for a slow machine.
+        await expect(page.locator('#preferences-reviewer-ts-dropdown .highlight').first()).toBeVisible({ timeout: 15_000 });
+        expect(await axeViolations(page, { include: '#preferences' })).toEqual([]);
+      });
     });
   }
 }
