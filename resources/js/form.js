@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import 'parsleyjs';
 import Inputmask from 'inputmask';
-import { buildParsleyConfig, renderErrorSummary } from './form-config.js';
+import { buildParsleyConfig, fieldInputs, renderErrorSummary } from './form-config.js';
 import { csrfTokenFor } from './upload-config.js';
 
 export async function initForm(element, options) {
@@ -13,14 +13,30 @@ export async function initForm(element, options) {
 
   // Server-side errors are rendered by PHP; drop them once the field is re-validated.
   parsley.on('field:validated', (field) => {
-    const input = field.$element[0];
-    input.closest('.mb-3')?.querySelector('.celerik-server-error')?.remove();
-    if (field.isValid()) {
-      input.removeAttribute('aria-invalid');
-    } else {
-      input.setAttribute('aria-invalid', 'true');
+    const inputs = fieldInputs(field).toArray();
+    inputs[0].closest('.mb-3')?.querySelector('.celerik-server-error')?.remove();
+    for (const input of inputs) {
+      if (field.isValid()) {
+        input.removeAttribute('aria-invalid');
+      } else {
+        input.setAttribute('aria-invalid', 'true');
+      }
     }
   });
+
+  // Range fields show their value after the label.
+  for (const output of element.querySelectorAll('output.celerik-range-value')) {
+    const input = document.getElementById(output.htmlFor.value);
+    if (input) {
+      const show = () => {
+        output.textContent = input.value;
+      };
+      input.addEventListener('input', show);
+      // A reset changes the value without an input event, after the reset event.
+      element.addEventListener('reset', () => setTimeout(show));
+      show();
+    }
+  }
 
   const summary = options.errorSummary ? element.querySelector('.celerik-error-summary') : null;
   if (summary) {

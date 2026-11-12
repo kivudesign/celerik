@@ -184,6 +184,19 @@ $components = [
         ->errors(['email' => 'This e-mail is already registered.'])
         ->submit('Create account'),
 
+    Form::make('preferences')
+        ->action('/preferences')
+        ->csrf('test-token')
+        ->add(
+            Field::radio('plan', ['free' => 'Free', 'team' => 'Team', 'business' => 'Business'])->required(),
+            Field::checkboxes('topics', ['news' => 'News', 'releases' => 'Releases'])->inline()->help('Choose at least one.'),
+            Field::switch('newsletter', 'Send me the newsletter')->value(true),
+            Field::range('volume')->min(0)->max(10)->value(4),
+            Field::color('accent', 'Accent color')->value('#0d6efd'),
+        )
+        ->errors(['plan' => 'Choose a plan.'])
+        ->submit('Save'),
+
     Form::make('article')
         ->errorSummary()
         ->action('/articles')
