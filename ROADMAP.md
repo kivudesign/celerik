@@ -22,6 +22,7 @@
 
 - Releases include the built bundle, so installing needs no Node.js ([GitHub releases](https://github.com/kivudesign/celerik/releases), [Packagist](https://packagist.org/packages/celerik/ui)).
 - The bundle on npm (`@celerikui/ui`) and on the jsDelivr CDN (`Assets::cdnUrl()`).
+- Reproducible CI and releases: committed lockfiles, a lowest-dependencies PHP job, weekly Dependabot updates.
 
 ## Phase 4 — Components and usability
 
