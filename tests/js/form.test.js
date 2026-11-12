@@ -172,3 +172,75 @@ describe('radio, checkbox group, switch, range and color fields', () => {
     expect(data.get('accent')).toBe('#0d6efd');
   });
 });
+
+describe('searchable selects (Tom Select)', () => {
+  let form;
+  let parsley;
+
+  beforeEach(async () => {
+    global.fetch = jest.fn(async (url) => ({
+      ok: true,
+      json: async () => ({
+        data: [{ value: 3, label: `Ada Lovelace (${new URL(url).searchParams.get('search')})` }],
+        meta: {},
+      }),
+    }));
+    form = loadFixture('form-select');
+    parsley = await initForm(form, readOptions(form));
+  });
+
+  afterEach(() => {
+    parsley.destroy();
+    delete global.fetch;
+  });
+
+  const select = (name) => form.querySelector(`select[name="${name}"]`);
+
+  test('replaces each select, keeps its value, labels and describes the search box', () => {
+    for (const name of ['country', 'languages[]', 'author']) {
+      expect(select(name).tomselect).toBeDefined();
+    }
+    const country = select('country').tomselect;
+    // Tom Select points the label at its search box.
+    const label = select('country').closest('.mb-3').querySelector('label');
+    expect(label.htmlFor).toBe(country.control_input.id);
+    expect(country.control_input.getAttribute('aria-labelledby')).toBe(label.id);
+    expect(country.control_input.getAttribute('aria-describedby')).toBe('assign-country-help');
+    expect(country.control_input.getAttribute('placeholder')).toBe('Choose a country');
+
+    expect(select('languages[]').tomselect.getValue()).toEqual(['fr', 'ln']);
+    expect(select('author').tomselect.getValue()).toBe('7');
+    expect(new FormData(form).getAll('languages[]')).toEqual(['fr', 'ln']);
+  });
+
+  test('a required select shows its error on the visible control', () => {
+    expect(parsley.validate()).toBe(false);
+    const country = select('country').tomselect;
+    expect(country.wrapper.classList.contains('is-invalid')).toBe(true);
+    expect(country.control_input.getAttribute('aria-invalid')).toBe('true');
+
+    country.setValue('ca');
+    expect(parsley.validate()).toBe(true);
+    expect(country.wrapper.classList.contains('is-invalid')).toBe(false);
+    expect(country.control_input.hasAttribute('aria-invalid')).toBe(false);
+  });
+
+  test('focusing the hidden select focuses the search box (error summary links)', () => {
+    select('country').focus();
+    expect(document.activeElement).toBe(select('country').tomselect.control_input);
+  });
+
+  test('a remote select loads its choices from the endpoint as the user types', async () => {
+    const author = select('author').tomselect;
+    await new Promise((resolve) => {
+      author.on('load', resolve);
+      author.load('ada');
+    });
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringMatching(/\/authors\/options\?search=ada$/),
+      expect.objectContaining({ credentials: 'same-origin' }),
+    );
+    expect(author.options['3'].label).toBe('Ada Lovelace (ada)');
+  });
+});

@@ -157,6 +157,34 @@
   }
 }
 
+// Searchable selects (Tom Select, Bootstrap 5 theme). Its stylesheet loads with its chunk,
+// after celerik.css, so these selectors are one class more specific. Its focus ring and
+// tag separators are fixed Bootstrap colors: follow the theme and the mode.
+.celerik-form .ts-wrapper {
+  &.focus .ts-control {
+    border-color: color-mix(in srgb, var(--bs-primary) 50%, var(--bs-body-bg));
+    box-shadow: var(--celerik-focus-ring);
+  }
+
+  // The matched text: Bootstrap's <mark> colors, which follow the mode (Tom Select's
+  // translucent yellow is muddy under light text).
+  .ts-dropdown .highlight {
+    color: var(--bs-highlight-color);
+    background-color: var(--bs-highlight-bg);
+  }
+
+  // The tag's remove button is a 24 x 24 px target (WCAG 2.5.8).
+  &.plugin-remove_button .item .remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0;
+    border-left-color: var(--bs-border-color);
+  }
+}
+
 // Rich text editor (Quill, snow theme) in Bootstrap form styling.
 .celerik-editor {
   background-color: var(--bs-body-bg);
@@ -352,6 +380,13 @@
   .ql-container.ql-snow:focus-within,
   .celerik-modal:focus-visible .modal-content {
     outline: 2px solid Highlight;
+  }
+
+  // A searchable select's search box is a small input inside the control: outline the
+  // control, like its focus ring does.
+  .celerik-form .ts-wrapper.focus .ts-control {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 
   .celerik-tabs .nav-link.active {

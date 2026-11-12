@@ -20,7 +20,10 @@ async function invisibleFocus(page, stops) {
       }
       const component = element.closest('[data-celerik], .dt-container')?.id ?? null;
       // Bootstrap's focus trap can focus the modal itself: its dialog box shows the outline.
-      const style = getComputedStyle(element.matches('.modal') ? element.querySelector('.modal-content') : element);
+      // A searchable select's search box is inside the control, which shows the outline.
+      const shown = element.matches('.modal') ? element.querySelector('.modal-content')
+        : element.closest('.ts-control') ?? element;
+      const style = getComputedStyle(shown);
       const visible = style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0;
       const name = element.id ? `#${element.id}` : `${element.tagName.toLowerCase()}.${[...element.classList].join('.')}`;
       const label = `${name} "${(element.getAttribute('aria-label') ?? element.textContent).trim().slice(0, 30)}"`;

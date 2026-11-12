@@ -60,6 +60,20 @@ Chart::make('signups')->type('bar')->title('Sign-ups per day')->url('/stats/sign
 echo json_encode(['data' => Chart::make()->labels($days)->dataset('Sign-ups', $counts)->toData()]);
 ```
 
+## Searchable select
+
+A select with `remote()` asks `GET /authors/options?search=ada` as the user types. `respond()` searches and sorts on the label field only, ignores any other parameter, and answers with the value and label of the first matches:
+
+```php
+$author = Field::select('author_id', [])->remote('/authors/options', value: 'id', label: 'name', limit: 20);
+
+// GET /authors/options
+echo json_encode($author->respond(new ArrayDataSource($users), $_GET));
+// {"data": [{"value": "2", "label": "Ada Lovelace"}], "meta": {...}}
+```
+
+See [Form: searchable and multiple selects](../components/form#searchable-and-multiple-selects).
+
 ## Scheduler
 
 The calendar requests the visible range, `?start=…&end=…`, and posts changes as JSON:

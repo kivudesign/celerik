@@ -38,6 +38,31 @@ Field::hidden('id', 42);
 
 Rich text and files have their own pages: [Rich text editor](./editor) and [File upload](./upload).
 
+### Searchable and multiple selects
+
+<Demo name="form-select" :min-height="420" />
+
+<<< @/demos/form-select.php
+
+| Option | Use |
+|---|---|
+| `searchable()` | The user types to filter the choices ([Tom Select](https://tom-select.js.org)). The original `<select>` still submits the value, so validation and old input work as usual. |
+| `multiple()` | Several choices: submits `name[]`, and `value()` takes an array. Searchable, they show as tags with a remove button. |
+| `remote($url, value: 'id', label: 'name', limit: 20)` | Loads the choices from your endpoint as the user types: for long lists such as users or products. Makes the select searchable. |
+
+A remote select asks `GET $url?search=ada` and expects `{"data": [{"value": "…", "label": "…"}]}`. Answer with `respond()` on **the same field definition**, which searches and sorts on the label field only, returns at most `limit` choices, and keeps only the value and label of each row:
+
+```php
+$author = Field::select('author_id', [$post->author_id => $post->author->name])
+    ->remote('/authors/options', value: 'id', label: 'name')
+    ->value($post->author_id);
+
+// GET /authors/options?search=ada (Laravel)
+return response()->json($author->respond(new EloquentDataSource(User::query(), searchable: ['name']), $request->query()));
+```
+
+The choices passed to `select()` are the initial ones: include the selected value, so its label shows before any search. Any [data source](../guide/data#data-sources) works, and the endpoint must check the user's authorization like any other.
+
 ### Choices, switches, sliders and colors
 
 <Demo name="form-choices" :min-height="520" />
@@ -67,5 +92,6 @@ Rich text and files have their own pages: [Rich text editor](./editor) and [File
 
 - Every field has a label; help and error texts are linked with `aria-describedby`, and invalid fields get `aria-invalid`.
 - Radio and checkbox groups are fieldsets whose legend names the group; every input of an invalid group gets `aria-invalid`.
+- A searchable select is a combobox labelled by the field's label, with its help and error texts; error summary links move focus to it. Its tags' remove buttons are 24 x 24 px.
 - A failed submit focuses the first invalid field, or the error summary, which is announced once instead of one message per field.
 - Required fields are marked with an asterisk hidden from screen readers, plus `required`.

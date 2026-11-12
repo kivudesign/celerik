@@ -15,7 +15,8 @@ export async function initForm(element, options) {
   parsley.on('field:validated', (field) => {
     const inputs = fieldInputs(field).toArray();
     inputs[0].closest('.mb-3')?.querySelector('.celerik-server-error')?.remove();
-    for (const input of inputs) {
+    // A searchable select's search box is what assistive technology reads.
+    for (const input of inputs.flatMap((input) => [input, input.tomselect?.control_input].filter(Boolean))) {
       if (field.isValid()) {
         input.removeAttribute('aria-invalid');
       } else {
@@ -47,6 +48,9 @@ export async function initForm(element, options) {
   const enhancements = [];
   if (element.querySelector('textarea[data-celerik-editor]')) {
     enhancements.push(import('./editor.js').then(({ initEditors }) => initEditors(element)));
+  }
+  if (element.querySelector('select[data-celerik-select]')) {
+    enhancements.push(import('./select.js').then(({ initSelects }) => initSelects(element)));
   }
   if (element.querySelector('input[type="file"][data-celerik-upload]')) {
     const token = csrfTokenFor(element, options);

@@ -8,10 +8,11 @@ test('interactive controls are at least 24 x 24 px', async ({ page }) => {
   await openComponents(page);
   const small = await page.evaluate(() => {
     const selector = 'a[href], button, input:not([type=hidden]), select, textarea, [tabindex="0"], [role="button"]';
-    // Exempt: inline links in text, controls hidden from pointer use, checkboxes whose label
-    // is part of the target, and sort buttons inside a header cell that sorts when clicked.
+    // Exempt: inline links in text, controls hidden from pointer use (including the select a
+    // searchable select replaces), checkboxes whose label is part of the target, and sort
+    // buttons inside a header cell that sorts when clicked.
     const exempt = (element) => (element.tagName === 'A' && getComputedStyle(element).display === 'inline')
-      || element.matches('.visually-hidden, .filepond--browser, .filepond--label-action')
+      || element.matches('.visually-hidden, .ts-hidden-accessible, .filepond--browser, .filepond--label-action')
       || (element.matches('.form-check-input') && element.labels?.length > 0)
       || element.matches('th .dt-column-order');
     return [...document.querySelectorAll(selector)]

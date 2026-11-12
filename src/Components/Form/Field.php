@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Celerik\Ui\Components\Form;
 
+use Celerik\Ui\Data\DataRequest;
+use Celerik\Ui\Data\DataResult;
+use Celerik\Ui\Data\DataSourceInterface;
 use Celerik\Ui\Support\Arr;
 use Celerik\Ui\Support\Html;
 use Celerik\Ui\Upload\UploadRules;
 use InvalidArgumentException;
+use LogicException;
 
 /**
  * A Bootstrap form control with validation rules.
@@ -30,6 +34,12 @@ final class Field
     private string|array $toolbar = 'standard';
 
     private bool $inline = false;
+    private bool $searchable = false;
+    private bool $multiple = false;
+
+    /** @var array{url: string, value: string, label: string, limit: int}|null */
+    private ?array $remote = null;
+
     private ?string $placeholder = null;
     private ?string $help = null;
     private mixed $value = null;
@@ -229,6 +239,91 @@ final class Field
     }
 
     /**
+     * A select the user can type in to filter its choices (Tom Select). Works on
+     * multiple() selects too.
+     */
+    public function searchable(bool $searchable = true): self
+    {
+        $this->assertType('select', 'searchable');
+        $this->searchable = $searchable;
+
+        return $this;
+    }
+
+    /**
+     * Several choices: submits `name[]`, and value() takes an array. Searchable selects
+     * show the choices as removable tags.
+     */
+    public function multiple(bool $multiple = true): self
+    {
+        $this->assertType('select', 'multiple');
+        $this->multiple = $multiple;
+
+        return $this;
+    }
+
+    /**
+     * Loads the choices from an endpoint as the user types (`GET $url?search=ada`), and
+     * makes the select searchable. The endpoint answers with respond(), on the same
+     * field definition. The choices given to select() are the initial ones: include the
+     * selected value, so its label shows before any search.
+     *
+     * @param string $value Field of the data source rows submitted as the value.
+     * @param string $label Field shown, searched and sorted on.
+     * @param int $limit Choices per search (1 to 100).
+     */
+    public function remote(string $url, string $value = 'id', string $label = 'name', int $limit = 20): self
+    {
+        $this->assertType('select', 'remote');
+
+        foreach ([$value, $label] as $field) {
+            if (!DataRequest::isValidField($field)) {
+                throw new InvalidArgumentException(sprintf('Invalid field name "%s".', $field));
+            }
+        }
+        if ($limit < 1 || $limit > 100) {
+            throw new InvalidArgumentException('The limit must be between 1 and 100.');
+        }
+
+        $this->remote = ['url' => $url, 'value' => $value, 'label' => $label, 'limit' => $limit];
+        $this->searchable = true;
+
+        return $this;
+    }
+
+    /**
+     * The endpoint of a remote() select: the first choices whose label contains the
+     * `search` term, sorted by label, as `{"data": [{"value": …, "label": …}], "meta": {…}}`.
+     * Only the value and label fields leave the data source.
+     *
+     * @param array<string, mixed> $query Usually `$_GET` or `$request->query()`.
+     */
+    public function respond(DataSourceInterface $source, array $query): DataResult
+    {
+        if ($this->remote === null) {
+            throw new LogicException(sprintf('Field "%s" has no remote() endpoint.', $this->name));
+        }
+
+        ['value' => $value, 'label' => $label, 'limit' => $limit] = $this->remote;
+        $request = DataRequest::fromArray(
+            [
+                'search' => $query['search'] ?? null,
+                'page' => $query['page'] ?? 1,
+                'per_page' => $limit,
+                'sort' => $label,
+            ],
+            sortable: [$label],
+            searchable: [$label],
+            defaultPerPage: $limit,
+        );
+
+        return $source->fetch($request)->map(static fn (array $row): array => [
+            'value' => Arr::toText(Arr::get($row, $value)),
+            'label' => Arr::toText(Arr::get($row, $label)),
+        ]);
+    }
+
+    /**
      * Shows the choices of a radio or checkbox group on one line.
      */
     public function inline(bool $inline = true): self
@@ -404,7 +499,16 @@ final class Field
             ),
             'select' => Html::tag(
                 'select',
-                $attributes + ['class' => $this->controlClass('form-select', $error)],
+                array_merge($attributes, [
+                    'name' => $this->multiple && !str_ends_with($this->name, '[]') ? $this->name . '[]' : $this->name,
+                    'multiple' => $this->multiple,
+                    // Tom Select shows the placeholder in its search box.
+                    'placeholder' => $this->searchable ? null : $attributes['placeholder'],
+                    'data-celerik-select' => $this->searchable ? self::json([
+                        'url' => $this->remote['url'] ?? null,
+                        'placeholder' => $this->placeholder,
+                    ]) : null,
+                ]) + ['class' => $this->controlClass('form-select', $error)],
                 $this->renderChoices($value),
             ),
             'file' => $this->renderFile($attributes, $error),
@@ -486,7 +590,8 @@ final class Field
 
     private function canFloat(): bool
     {
-        return !in_array(
+        // Tom Select replaces the select: its search box has no floating label.
+        return !$this->searchable && !$this->multiple && !in_array(
             $this->type,
             ['checkbox', 'switch', 'radio', 'checkboxes', 'range', 'color', 'file', 'editor', 'hidden'],
             true,
@@ -506,14 +611,7 @@ final class Field
         ?string $errorId,
     ): string {
         $radio = $this->type === 'radio';
-        $selected = array_map(
-            static fn (mixed $item): string => Arr::toText($item),
-            match (true) {
-                is_array($value) => array_values($value),
-                $value === null => [],
-                default => [$value],
-            },
-        );
+        $selected = self::selectedValues($value);
 
         $inputs = '';
         $index = 0;
@@ -672,20 +770,38 @@ final class Field
         return $error === null ? $base : $base . ' is-invalid';
     }
 
-    private function renderChoices(mixed $selected): string
+    private function renderChoices(mixed $value): string
     {
-        $html = $this->placeholder === null
+        // A multiple select has no "nothing chosen" option: nothing selected is empty.
+        $html = $this->placeholder === null || $this->multiple
             ? ''
             : Html::tag('option', ['value' => ''], Html::escape($this->placeholder));
+        $selected = self::selectedValues($value);
 
-        foreach ($this->choices as $value => $label) {
+        foreach ($this->choices as $choice => $label) {
             $html .= Html::tag('option', [
-                'value' => (string) $value,
-                'selected' => $selected !== null && (string) $selected === (string) $value,
+                'value' => (string) $choice,
+                'selected' => in_array((string) $choice, $selected, true),
             ], Html::escape($label));
         }
 
         return $html;
+    }
+
+    /**
+     * The selected values of a select or a choice group, as strings.
+     *
+     * @return list<string>
+     */
+    private static function selectedValues(mixed $value): array
+    {
+        $values = match (true) {
+            is_array($value) => array_values($value),
+            $value === null => [],
+            default => [$value],
+        };
+
+        return array_map(static fn (mixed $item): string => Arr::toText($item), $values);
     }
 
     private static function humanize(string $name): string

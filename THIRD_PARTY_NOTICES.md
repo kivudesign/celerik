@@ -9,6 +9,8 @@ Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The built bundle in `
 | [Chart.js](https://www.chartjs.org) | 4.x | MIT | `chunks/chart-*.js` |
 | [Parsley.js](https://parsleyjs.org) | 2.9 | MIT | `chunks/form-*.js` |
 | [Inputmask](https://github.com/RobinHerbots/Inputmask) | 5.x | MIT | `chunks/form-*.js` |
+| [Tom Select](https://tom-select.js.org) (base build and its `remove_button` plugin) | 2.x | Apache-2.0 | `chunks/select-*.js`, `chunks/select-*.css` |
+| [@orchidjs/sifter](https://github.com/orchidjs/sifter), [@orchidjs/unicode-variants](https://github.com/orchidjs/unicode-variants) (Tom Select dependencies) | 1.x | Apache-2.0 | `chunks/select-*.js` |
 | [FullCalendar](https://fullcalendar.io) (`core`, `daygrid`, `timegrid`, `list`, `interaction`) | 6.x | MIT | `chunks/scheduler-*.js` |
 | [Preact](https://preactjs.com) (FullCalendar dependency) | 10.x | MIT | `chunks/scheduler-*.js` |
 | [FilePond](https://pqina.nl/filepond/) and its `file-validate-type`, `file-validate-size`, `image-preview` plugins | 4.x | MIT | `chunks/upload-*.js`, `chunks/upload-*.css` |
@@ -23,7 +25,7 @@ Celerik UI is MIT licensed (see [LICENSE.md](LICENSE.md)). The built bundle in `
 | Library | Version | License |
 |---|---|---|
 | [Bootstrap](https://getbootstrap.com) (CSS; `bootstrap.bundle.js` for Modal and Tabs) | 5.3 | MIT |
-| [jQuery](https://jquery.com) | 3.7 | MIT |
+| [jQuery](https://jquery.com) | 3.7 or 4 | MIT |
 | [elFinder](https://github.com/Studio-42/elFinder) (`studio-42/elfinder`, for the File Manager: connector, JS, CSS, images) | 2.1 | BSD-3-Clause |
 
 Full license texts are in each package under `node_modules/<package>/LICENSE` after `npm install`. They must be kept with any redistribution of the files in `public/`.
