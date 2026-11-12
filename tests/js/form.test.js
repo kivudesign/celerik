@@ -109,3 +109,66 @@ describe('error summary', () => {
     expect(summary().hidden).toBe(true);
   });
 });
+
+describe('radio, checkbox group, switch, range and color fields', () => {
+  let form;
+  let parsley;
+
+  beforeEach(async () => {
+    form = loadFixture('form-choices');
+    parsley = await initForm(form, readOptions(form));
+  });
+
+  afterEach(() => parsley.destroy());
+
+  const inputs = (name) => [...form.querySelectorAll(`[name="${name}"]`)];
+
+  test('a required group flags every input, and its message follows the group', () => {
+    expect(parsley.validate()).toBe(false);
+
+    for (const name of ['plan', 'topics[]']) {
+      expect(inputs(name).length).toBe(3);
+      expect(inputs(name).every((input) => input.classList.contains('is-invalid'))).toBe(true);
+      expect(inputs(name).every((input) => input.getAttribute('aria-invalid') === 'true')).toBe(true);
+      const group = inputs(name)[0].closest('.mb-3');
+      expect(group.querySelector('fieldset')).not.toBeNull();
+      expect(group.querySelector('.parsley-errors-list, .invalid-feedback:not(.celerik-server-error)').textContent)
+        .toMatch(/required/i);
+    }
+    // The server error is replaced by Parsley's.
+    expect(form.querySelector('.celerik-server-error')).toBeNull();
+  });
+
+  test('one radio and one checkbox are enough', () => {
+    inputs('plan')[1].checked = true;
+    inputs('topics[]')[2].checked = true;
+
+    expect(parsley.validate()).toBe(true);
+    expect(inputs('plan').some((input) => input.hasAttribute('aria-invalid'))).toBe(false);
+    expect(new FormData(form).getAll('topics[]')).toEqual(['security']);
+  });
+
+  test('the range value follows the slider, and a reset', () => {
+    jest.useFakeTimers();
+    const range = inputs('volume')[0];
+    const output = form.querySelector('output.celerik-range-value');
+    expect(output.textContent).toBe('4');
+
+    range.value = '7';
+    range.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(output.textContent).toBe('7');
+
+    form.reset();
+    jest.runAllTimers();
+    expect(output.textContent).toBe('4');
+    jest.useRealTimers();
+  });
+
+  test('switch and color submit their values', () => {
+    expect(inputs('newsletter')[0].getAttribute('role')).toBe('switch');
+    inputs('newsletter')[0].checked = true;
+    const data = new FormData(form);
+    expect(data.get('newsletter')).toBe('1');
+    expect(data.get('accent')).toBe('#0d6efd');
+  });
+});

@@ -72,4 +72,14 @@ describe('accessibility (axe-core, WCAG 2.1 AA)', () => {
     expect(await violations()).toEqual([]);
     parsley.destroy();
   });
+
+  test('radio, checkbox group, switch, range and color markup, before and after failed validation', async () => {
+    const form = loadFixture('form-choices');
+    expect(await violations()).toEqual([]);
+
+    const parsley = await initForm(form, readOptions(form));
+    parsley.validate();
+    expect(await violations()).toEqual([]);
+    parsley.destroy();
+  });
 });

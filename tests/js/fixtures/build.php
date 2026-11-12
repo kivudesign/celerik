@@ -125,6 +125,22 @@ $fixtures = [
         )
         ->errors(['email' => 'This e-mail is already registered.'])
         ->submit('Create account'),
+
+    'form-choices' => Form::make('preferences')
+        ->action('/preferences')
+        ->csrf('test-token')
+        ->add(
+            Field::radio('plan', ['free' => 'Free', 'team' => 'Team', 'business' => 'Business'])->required(),
+            Field::checkboxes('topics', ['news' => 'News', 'releases' => 'Releases', 'security' => 'Security'])
+                ->inline()
+                ->required()
+                ->help('Choose at least one.'),
+            Field::switch('newsletter', 'Send me the newsletter'),
+            Field::range('volume')->min(0)->max(10)->value(4),
+            Field::color('accent', 'Accent color')->value('#0d6efd'),
+        )
+        ->errors(['plan' => 'Choose a plan.'])
+        ->submit('Save'),
 ];
 
 foreach ($fixtures as $name => $component) {

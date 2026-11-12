@@ -76,6 +76,82 @@ final class FormTest extends TestCase
         self::assertStringNotContainsString('<button', $html);
     }
 
+    public function testRadioGroupIsAFieldsetWithALegendAndOneRequiredRadioPerChoice(): void
+    {
+        $html = Form::make('f')->submit(null)->add(
+            Field::radio('plan', ['free' => 'Free', 'team' => 'Team <b>'])->required()->help('Billed monthly.'),
+        )->values(['plan' => 'team'])->render();
+
+        self::assertStringContainsString('<fieldset id="f-plan-group" aria-describedby="f-plan-help"><legend class="form-label fs-6">Plan <span class="celerik-required" aria-hidden="true">*</span></legend>', $html);
+        self::assertStringContainsString('<div class="form-check"><input type="radio" id="f-plan" name="plan" value="free" required class="form-check-input"><label for="f-plan" class="form-check-label">Free</label></div>', $html);
+        self::assertStringContainsString('<input type="radio" id="f-plan-1" name="plan" value="team" checked required class="form-check-input"><label for="f-plan-1" class="form-check-label">Team &lt;b&gt;</label>', $html);
+        self::assertStringContainsString('</fieldset><div id="f-plan-help" class="form-text">Billed monthly.</div>', $html);
+    }
+
+    public function testCheckboxGroupSubmitsAnArrayAndRequiresOneBoxThroughParsley(): void
+    {
+        $html = Form::make('f')->submit(null)->add(
+            Field::checkboxes('topics', ['news' => 'News', 'security' => 'Security', 3 => 'Other'])->required()->inline(),
+        )->values(['topics' => ['security', 3]])->render();
+
+        self::assertStringContainsString('<div class="form-check form-check-inline"><input type="checkbox" id="f-topics" name="topics[]" value="news" data-parsley-required="true" class="form-check-input">', $html);
+        self::assertStringContainsString('id="f-topics-1" name="topics[]" value="security" checked class="form-check-input"', $html);
+        self::assertStringContainsString('id="f-topics-2" name="topics[]" value="3" checked class="form-check-input"', $html);
+        // Native "required" on every box would require every box.
+        self::assertStringNotContainsString(' required ', $html);
+    }
+
+    public function testChoiceGroupShowsTheServerErrorAndMarksEveryInputInvalid(): void
+    {
+        $html = Form::make('f')->submit(null)->errorSummary()->add(
+            Field::radio('plan', ['free' => 'Free', 'team' => 'Team']),
+        )->errors(['plan' => 'Choose a plan.'])->render();
+
+        self::assertStringContainsString('aria-describedby="f-plan-error"', $html);
+        self::assertSame(2, substr_count($html, 'aria-invalid="true" class="form-check-input is-invalid"'));
+        self::assertStringContainsString('</fieldset><div id="f-plan-error" class="invalid-feedback d-block celerik-server-error">Choose a plan.</div>', $html);
+        // The summary links to the first radio button.
+        self::assertStringContainsString('<a href="#f-plan" class="alert-link">Choose a plan.</a>', $html);
+    }
+
+    public function testSwitchIsACheckboxWithTheSwitchRole(): void
+    {
+        $html = Form::make('f')->submit(null)->add(Field::switch('newsletter')->value('1'))->render();
+
+        self::assertStringContainsString('<div class="mb-3 form-check form-switch"><input id="f-newsletter" name="newsletter" type="checkbox" role="switch" value="1" checked class="form-check-input"><label for="f-newsletter" class="form-check-label">Newsletter</label></div>', $html);
+    }
+
+    public function testRangeShowsItsValueAfterTheLabel(): void
+    {
+        $html = Form::make('f')->submit(null)->floatingLabels()->add(
+            Field::range('volume')->min(0)->max(10)->step(2)->value(4),
+            Field::range('zoom')->min(1)->max(4),
+        )->render();
+
+        self::assertStringContainsString('<div class="mb-3"><label for="f-volume" class="form-label">Volume: <output for="f-volume" class="celerik-range-value" aria-hidden="true">4</output></label><input min="0" max="10" step="2" id="f-volume" name="volume" type="range" value="4" class="form-range"></div>', $html);
+        // Without a value, browsers start halfway.
+        self::assertStringContainsString('<output for="f-zoom" class="celerik-range-value" aria-hidden="true">2.5</output>', $html);
+    }
+
+    public function testColorUsesBootstrapsColorControl(): void
+    {
+        $html = Form::make('f')->submit(null)->add(Field::color('accent')->value('#0d6efd'))->render();
+
+        self::assertStringContainsString('<input id="f-accent" name="accent" type="color" value="#0d6efd" class="form-control form-control-color">', $html);
+    }
+
+    public function testChoiceGroupsNeedChoicesAndInlineOnlyAppliesToThem(): void
+    {
+        try {
+            Field::radio('plan', []);
+            self::fail('An empty radio group was accepted.');
+        } catch (InvalidArgumentException) {
+        }
+
+        $this->expectException(InvalidArgumentException::class);
+        Field::select('plan', ['a' => 'A'])->inline();
+    }
+
     public function testRejectsInvalidMethodAndFieldName(): void
     {
         $this->expectException(InvalidArgumentException::class);

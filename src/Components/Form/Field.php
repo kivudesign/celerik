@@ -29,6 +29,7 @@ final class Field
     /** @var string|list<mixed> */
     private string|array $toolbar = 'standard';
 
+    private bool $inline = false;
     private ?string $placeholder = null;
     private ?string $help = null;
     private mixed $value = null;
@@ -41,7 +42,7 @@ final class Field
     private array $attributes = [];
 
     /**
-     * @param array<string|int, string> $choices value => label, for select fields
+     * @param array<string|int, string> $choices value => label, for select, radio and checkbox group fields
      */
     private function __construct(
         private readonly string $type,
@@ -117,6 +118,52 @@ final class Field
     }
 
     /**
+     * On/off switch: a checkbox shown as a toggle, announced as a switch. Submits "1" when on.
+     */
+    public static function switch(string $name, ?string $label = null): self
+    {
+        return new self('switch', $name, $label ?? self::humanize($name));
+    }
+
+    /**
+     * Radio buttons in a fieldset, the label as its legend. required() requires a choice.
+     *
+     * @param array<string|int, string> $choices value => label
+     */
+    public static function radio(string $name, array $choices, ?string $label = null): self
+    {
+        return new self('radio', $name, $label ?? self::humanize($name), self::assertChoices($choices));
+    }
+
+    /**
+     * Checkboxes in a fieldset, the label as its legend. Submits the checked values as an
+     * array (`name[]`); value() takes an array. required() requires at least one.
+     *
+     * @param array<string|int, string> $choices value => label
+     */
+    public static function checkboxes(string $name, array $choices, ?string $label = null): self
+    {
+        return new self('checkboxes', $name, $label ?? self::humanize($name), self::assertChoices($choices));
+    }
+
+    /**
+     * Slider (min 0, max 100 and step 1 unless set). The current value is shown next to
+     * the label.
+     */
+    public static function range(string $name, ?string $label = null): self
+    {
+        return new self('range', $name, $label ?? self::humanize($name));
+    }
+
+    /**
+     * Color picker. Submits a lowercase hex color such as `#0d6efd`.
+     */
+    public static function color(string $name, ?string $label = null): self
+    {
+        return new self('color', $name, $label ?? self::humanize($name));
+    }
+
+    /**
      * File upload. Without upload() it is a plain file input (the form switches to
      * multipart); with upload() FilePond sends each file to that endpoint first.
      */
@@ -181,6 +228,19 @@ final class Field
         return $this;
     }
 
+    /**
+     * Shows the choices of a radio or checkbox group on one line.
+     */
+    public function inline(bool $inline = true): self
+    {
+        if (!in_array($this->type, ['radio', 'checkboxes'], true)) {
+            throw new InvalidArgumentException('inline() is only available on radio and checkboxes fields.');
+        }
+        $this->inline = $inline;
+
+        return $this;
+    }
+
     public function required(bool $required = true): self
     {
         $this->required = $required;
@@ -206,6 +266,15 @@ final class Field
     public function max(int|float|string $max): self
     {
         return $this->attribute('max', $max);
+    }
+
+    /**
+     * Granularity of number, range, date and time fields, e.g. 0.5, or 900 (15 minutes,
+     * in seconds) for a time field.
+     */
+    public function step(int|float|string $step): self
+    {
+        return $this->attribute('step', $step);
     }
 
     /**
@@ -309,6 +378,10 @@ final class Field
         $errorId = $error === null ? null : $id . '-error';
         $asyncUpload = $this->type === 'file' && $this->uploadUrl !== null;
 
+        if ($this->type === 'radio' || $this->type === 'checkboxes') {
+            return $this->renderGroup($id, $value, $error, $helpText, $helpId, $errorId);
+        }
+
         $attributes = array_merge($this->attributes, [
             'id' => $id,
             'name' => $this->name,
@@ -347,11 +420,22 @@ final class Field
                 ],
                 Html::escape(Arr::toText($value)),
             ),
-            'checkbox' => Html::tag('input', $attributes + [
+            'checkbox', 'switch' => Html::tag('input', $attributes + [
                 'type' => 'checkbox',
+                'role' => $this->type === 'switch' ? 'switch' : null,
                 'value' => '1',
-                'checked' => $value !== null && $value !== false && $value !== '' && $value !== '0',
+                'checked' => self::isOn($value),
                 'class' => $this->controlClass('form-check-input', $error),
+            ]),
+            'range' => Html::tag('input', $attributes + [
+                'type' => 'range',
+                'value' => $value === null ? null : Arr::toText($value),
+                'class' => $this->controlClass('form-range', $error),
+            ]),
+            'color' => Html::tag('input', $attributes + [
+                'type' => 'color',
+                'value' => $value === null ? null : Arr::toText($value),
+                'class' => $this->controlClass('form-control form-control-color', $error),
             ]),
             default => Html::tag('input', $attributes + [
                 'type' => $this->type,
@@ -367,12 +451,13 @@ final class Field
                 // The editor's content area and FilePond's input are labelled by id (aria-labelledby).
                 'id' => in_array($this->type, ['editor', 'file'], true) ? $id . '-label' : null,
                 'class' => match (true) {
-                    $this->type === 'checkbox' => 'form-check-label',
+                    $this->type === 'checkbox', $this->type === 'switch' => 'form-check-label',
                     $floating => null,
                     default => 'form-label',
                 },
             ],
-            Html::escape($this->label) . ($this->required ? self::REQUIRED_MARKER : ''),
+            Html::escape($this->label) . ($this->required ? self::REQUIRED_MARKER : '')
+                . $this->rangeOutput($id, $value),
         );
 
         $help = $helpId === null
@@ -384,13 +469,14 @@ final class Field
             Html::escape($error),
         );
 
-        // Checkboxes and floating labels put the control before its label.
-        $content = $this->type === 'checkbox' || $floating
+        // Checkboxes, switches and floating labels put the control before its label.
+        $content = $this->type === 'checkbox' || $this->type === 'switch' || $floating
             ? $control . $label . $feedback . $help
             : $label . $control . $feedback . $help;
 
         $wrapper = match (true) {
             $this->type === 'checkbox' => 'mb-3 form-check',
+            $this->type === 'switch' => 'mb-3 form-check form-switch',
             $floating => 'form-floating mb-3',
             default => 'mb-3',
         };
@@ -400,7 +486,127 @@ final class Field
 
     private function canFloat(): bool
     {
-        return !in_array($this->type, ['checkbox', 'file', 'editor', 'hidden'], true);
+        return !in_array(
+            $this->type,
+            ['checkbox', 'switch', 'radio', 'checkboxes', 'range', 'color', 'file', 'editor', 'hidden'],
+            true,
+        );
+    }
+
+    /**
+     * A fieldset of radio buttons or checkboxes. The first input has the field's id, so
+     * error summary links lead to the group.
+     */
+    private function renderGroup(
+        string $id,
+        mixed $value,
+        ?string $error,
+        ?string $helpText,
+        ?string $helpId,
+        ?string $errorId,
+    ): string {
+        $radio = $this->type === 'radio';
+        $selected = array_map(
+            static fn (mixed $item): string => Arr::toText($item),
+            match (true) {
+                is_array($value) => array_values($value),
+                $value === null => [],
+                default => [$value],
+            },
+        );
+
+        $inputs = '';
+        $index = 0;
+        foreach ($this->choices as $choice => $choiceLabel) {
+            $inputId = $index === 0 ? $id : $id . '-' . $index;
+            $input = Html::tag('input', array_merge($this->attributes, [
+                'type' => $radio ? 'radio' : 'checkbox',
+                'id' => $inputId,
+                'name' => $radio || str_ends_with($this->name, '[]') ? $this->name : $this->name . '[]',
+                'value' => (string) $choice,
+                'checked' => in_array((string) $choice, $selected, true),
+                // Every radio of a required group is required (HTML). A checkbox group needs
+                // one checked box, which only Parsley checks: native "required" on each box
+                // would mean every box.
+                'required' => $radio && $this->required,
+                'data-parsley-required' => !$radio && $this->required && $index === 0 ? 'true' : null,
+                'data-parsley-error-message' => $index === 0 ? $this->message : null,
+                'aria-invalid' => $error === null ? null : 'true',
+                'class' => $this->controlClass('form-check-input', $error),
+            ]));
+            $label = Html::tag('label', ['for' => $inputId, 'class' => 'form-check-label'], Html::escape($choiceLabel));
+            $inputs .= Html::tag(
+                'div',
+                ['class' => $this->inline ? 'form-check form-check-inline' : 'form-check'],
+                $input . $label,
+            );
+            $index++;
+        }
+
+        $legend = Html::tag(
+            'legend',
+            ['class' => 'form-label fs-6'],
+            Html::escape($this->label) . ($this->required ? self::REQUIRED_MARKER : ''),
+        );
+        $fieldset = Html::tag('fieldset', [
+            'id' => $id . '-group',
+            'aria-describedby' => Html::classes([$helpId, $errorId]),
+        ], $legend . $inputs);
+
+        // The inputs are not siblings of the message: show it explicitly (d-block).
+        $feedback = $errorId === null ? '' : Html::tag(
+            'div',
+            ['id' => $errorId, 'class' => 'invalid-feedback d-block celerik-server-error'],
+            Html::escape($error),
+        );
+        $help = $helpId === null
+            ? ''
+            : Html::tag('div', ['id' => $helpId, 'class' => 'form-text'], Html::escape($helpText));
+
+        return Html::tag('div', ['class' => 'mb-3'], $fieldset . $feedback . $help);
+    }
+
+    /**
+     * The value of a range field, after its label. form.js updates it as the slider moves.
+     * Hidden from assistive technology: the slider announces its value itself.
+     */
+    private function rangeOutput(string $id, mixed $value): string
+    {
+        if ($this->type !== 'range') {
+            return '';
+        }
+
+        if ($value === null || $value === '') {
+            // Without a value, browsers start the slider halfway between min and max.
+            $min = (float) ($this->attributes['min'] ?? 0);
+            $max = (float) ($this->attributes['max'] ?? 100);
+            $value = $min + ($max - $min) / 2;
+            $value = $value == (int) $value ? (int) $value : $value;
+        }
+
+        return ': ' . Html::tag('output', [
+            'for' => $id,
+            'class' => 'celerik-range-value',
+            'aria-hidden' => 'true',
+        ], Html::escape(Arr::toText($value)));
+    }
+
+    private static function isOn(mixed $value): bool
+    {
+        return $value !== null && $value !== false && $value !== '' && $value !== '0' && $value !== 0;
+    }
+
+    /**
+     * @param array<string|int, string> $choices
+     * @return array<string|int, string>
+     */
+    private static function assertChoices(array $choices): array
+    {
+        if ($choices === []) {
+            throw new InvalidArgumentException('A radio or checkboxes field needs at least one choice.');
+        }
+
+        return $choices;
     }
 
     public static function fieldId(string $formId, string $name): string

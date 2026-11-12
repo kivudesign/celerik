@@ -127,6 +127,34 @@
   .celerik-required {
     color: var(--celerik-required-color);
   }
+
+  // Bootstrap compiles the slider thumb's color: follow the theme's primary color.
+  // One rule per vendor pseudo-element: a browser drops a selector list it cannot parse.
+  .form-range {
+    &::-webkit-slider-thumb {
+      background-color: var(--bs-primary);
+    }
+
+    &::-webkit-slider-thumb:active {
+      background-color: color-mix(in srgb, var(--bs-primary) 70%, var(--bs-body-bg));
+    }
+
+    &:focus::-webkit-slider-thumb {
+      box-shadow: var(--celerik-focus-ring);
+    }
+
+    &::-moz-range-thumb {
+      background-color: var(--bs-primary);
+    }
+
+    &::-moz-range-thumb:active {
+      background-color: color-mix(in srgb, var(--bs-primary) 70%, var(--bs-body-bg));
+    }
+
+    &:focus::-moz-range-thumb {
+      box-shadow: var(--celerik-focus-ring);
+    }
+  }
 }
 
 // Rich text editor (Quill, snow theme) in Bootstrap form styling.
