@@ -16,6 +16,12 @@ We welcome contributions from developers, designers and AI agents.
 
 The bundle in `public/` is built, not committed: run `npm run build` after `npm install`, and again after changing `resources/`. The examples, the browser tests and the documentation site use it. Path-repository installs (`composer require celerik/ui:@dev` in an example app) need it too, before publishing the assets.
 
+## Dependencies
+
+`composer.lock` and `package-lock.json` are committed, so CI, releases and every contributor get the same versions: install with `composer install` and `npm ci`. Run `composer update` or `npm update` only to change a dependency, and commit the lockfile with it. The Composer lockfile is resolved for PHP 8.2 (`config.platform.php`), the lowest version we support, so it installs on every PHP version in CI; a separate CI job also tests the lowest versions `composer.json` allows.
+
+Dependabot opens weekly pull requests for npm, Composer and GitHub Actions updates: minor and patch updates grouped, major ones on their own.
+
 ## Releasing
 
 Run the **Release** workflow (Actions > Release > Run workflow) with the version, e.g. `0.2.0`. It runs every check on `main`, builds the bundle, commits it on a release commit that only the tag `v0.2.0` points to (Packagist installs tags), attaches the source maps to the GitHub release, and, with an `NPM_TOKEN` secret, publishes `@celerikui/ui` to npm. Never push a version tag by hand: it would have no bundle.

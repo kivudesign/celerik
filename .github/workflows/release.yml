@@ -59,8 +59,8 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      - run: composer update --no-interaction --no-progress
-      - run: npm install --no-audit --no-fund
+      - run: composer install --no-interaction --no-progress
+      - run: npm ci --no-audit --no-fund
       - run: composer lint
       - run: composer test
       - run: npm run lint
@@ -86,7 +86,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add --force public
-          git add package.json
+          git add package.json package-lock.json
           git commit -q -m "Release v$VERSION (with the built bundle)"
           git tag -a "v$VERSION" -m "Celerik UI v$VERSION"
           git push origin "refs/tags/v$VERSION"

@@ -2,8 +2,6 @@
 # The built bundle (npm run build). Releases add it to their tag: .github/workflows/release.yml.
 /public/
 /node_modules/
-/composer.lock
-/package-lock.json
 /.phpunit.cache/
 /coverage/
 /test-results/
