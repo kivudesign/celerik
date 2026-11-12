@@ -1,0 +1,57 @@
+name: PR labels
+
+# Labels each pull request from its Conventional Commits title, for the release notes
+# categories (.github/release.yml):
+#
+#   feat: / feat(grid):            feature
+#   fix:                           bug
+#   fix(a11y): / feat(a11y):       accessibility (plus bug or feature)
+#   docs:                          documentation
+#   chore(deps): / build(deps):    dependencies
+#   ci: test: chore: build: refactor: perf: style:   maintenance
+#   feat!: / fix(grid)!:           breaking (plus the type's label)
+#
+# pull_request_target runs with the base repository's token, so pull requests from
+# forks get labels too. It only reads the title: no code from the pull request runs.
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const managed = ['breaking', 'feature', 'accessibility', 'bug', 'documentation', 'dependencies', 'maintenance'];
+            const title = context.payload.pull_request.title;
+            const match = /^(\w+)(?:\(([^)]*)\))?(!)?:/.exec(title);
+            const wanted = new Set();
+            if (match) {
+              const [, type, scope = '', bang] = match;
+              const scopes = scope.split(',').map((s) => s.trim());
+              if (type === 'feat') wanted.add('feature');
+              else if (type === 'fix') wanted.add('bug');
+              else if (type === 'docs') wanted.add('documentation');
+              else if (scopes.includes('deps')) wanted.add('dependencies');
+              else if (['ci', 'test', 'chore', 'build', 'refactor', 'perf', 'style'].includes(type)) wanted.add('maintenance');
+              if (scopes.includes('a11y')) wanted.add('accessibility');
+              if (bang) wanted.add('breaking');
+            }
+
+            const issue = { owner: context.repo.owner, repo: context.repo.repo, issue_number: context.payload.pull_request.number };
+            const current = context.payload.pull_request.labels.map((label) => label.name);
+            for (const name of current.filter((name) => managed.includes(name) && !wanted.has(name))) {
+              await github.rest.issues.removeLabel({ ...issue, name });
+            }
+            const missing = [...wanted].filter((name) => !current.includes(name));
+            if (missing.length > 0) {
+              await github.rest.issues.addLabels({ ...issue, labels: missing });
+            }
+            core.info(`"${title}": ${[...wanted].join(', ') || 'no label (Other changes)'}`);
