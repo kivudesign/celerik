@@ -3,6 +3,7 @@ import 'parsleyjs';
 import Inputmask from 'inputmask';
 import { boundValidators, buildParsleyConfig, compareValues, fieldInputs, renderErrorSummary } from './form-config.js';
 import { csrfTokenFor } from './upload-config.js';
+import { initWizard } from './form-wizard.js';
 
 // min, max and range that also understand times and date-times, and "after" for the end of
 // a date range (Field::dateRange()). Parsley keeps its messages for min, max and range.
@@ -34,6 +35,10 @@ export async function initForm(element, options) {
   parsley.on('field:validated', (field) => {
     const inputs = fieldInputs(field).toArray();
     inputs[0].closest('.mb-3')?.querySelector('.celerik-server-error')?.remove();
+    // A collapsed section opens on an error, before Parsley focuses the first invalid field.
+    if (!field.isValid()) {
+      reveal(inputs[0]);
+    }
     // A searchable select's search box is what assistive technology reads.
     for (const input of inputs.flatMap((input) => [input, input.tomselect?.control_input].filter(Boolean))) {
       if (field.isValid()) {
@@ -85,9 +90,14 @@ export async function initForm(element, options) {
   }
 
   const summary = options.errorSummary ? element.querySelector('.celerik-error-summary') : null;
-  if (summary) {
-    initErrorSummary(element, summary, parsley);
-  }
+  const showErrors = summary ? initErrorSummary(element, summary, parsley) : null;
+
+  // A wizard checks each step's fields before the next one.
+  element.celerikWizard = initWizard(element, parsley, {
+    summary,
+    onInvalid: (fields) => (showErrors ? showErrors(fields) : focusField(fields[0].$element[0])),
+    onValid: () => showErrors?.([]),
+  });
 
   // Quill and FilePond are large: load them only for forms that use them.
   const enhancements = [];
@@ -108,15 +118,19 @@ export async function initForm(element, options) {
 
 // The error summary: filled and focused after a failed submit, focused on load when the
 // server rendered errors, and its links move focus to the field (or its editor).
+// Returns showErrors(fields): fills the summary with these Parsley fields' errors and focuses
+// it, or hides it when there are none.
 function initErrorSummary(element, summary, parsley) {
-  parsley.on('form:error', () => {
-    const errors = parsley.fields
-      .filter((field) => field.validationResult !== true)
+  const showErrors = (fields) => {
+    const errors = fields
       .map((field) => ({ id: field.$element[0].id, message: field.getErrorsMessages()[0] ?? '' }))
       .filter(({ id, message }) => id && message);
     renderErrorSummary(summary, errors);
-    summary.focus();
-  });
+    if (errors.length > 0) {
+      summary.focus();
+    }
+  };
+  parsley.on('form:error', () => showErrors(parsley.fields.filter((field) => field.validationResult !== true)));
   parsley.on('form:success', () => renderErrorSummary(summary, []));
 
   summary.addEventListener('click', (event) => {
@@ -126,10 +140,26 @@ function initErrorSummary(element, summary, parsley) {
       return;
     }
     event.preventDefault();
-    (field.celerikEditor?.root ?? field).focus();
+    focusField(field);
   });
 
   if (!summary.hidden) {
     summary.focus();
+  }
+
+  return showErrors;
+}
+
+// Focuses a field, or its rich text editor, after showing it.
+function focusField(field) {
+  reveal(field);
+  (field.celerikEditor?.root ?? field).focus();
+}
+
+// Shows an element: its wizard step, and the collapsed sections (<details>) around it.
+function reveal(element) {
+  element.closest('form')?.celerikWizard?.showStepOf(element);
+  for (let details = element.closest('details'); details; details = details.parentElement.closest('details')) {
+    details.open = true;
   }
 }

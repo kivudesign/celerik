@@ -21,6 +21,41 @@ Bootstrap forms with client-side validation ([Parsley.js](https://parsleyjs.org/
 
 Client-side validation is a convenience: always validate again on the server and pass the messages to `errors()`.
 
+## Layout
+
+<Demo name="form-layout" :min-height="760" />
+
+<<< @/demos/form-layout.php
+
+| Method | Use |
+|---|---|
+| `columns($count, $breakpoint = 'md')` | On the form or a section: 1, 2, 3, 4 or 6 columns from a Bootstrap breakpoint (`sm` to `xxl`) up, one column below it. |
+| `columnSpan(2)`, `columnSpan('full')` | On a field or a section: how many columns it takes. |
+| `Section::make($heading)` | A card with a heading: `h2`, or `h3` in another section. |
+| `Section::fieldset($legend)` | A fieldset whose legend names its fields for screen readers: for fields that belong together, such as an address. |
+| `description($text)` | A line under the heading or legend, read with it by screen readers. |
+| `collapsible($collapsed = false)` | A section the user can open and close (a native `<details>`). It opens by itself when a field inside it has an error, from the server or the browser. |
+| `add(...)` | Fields and other sections. |
+
+Fields keep their order in the error summary and for screen readers: columns only change where they appear on wide screens.
+
+## Wizard
+
+<Demo name="form-wizard" :min-height="520" />
+
+<<< @/demos/form-wizard.php
+
+`wizard()` shows the form's sections one at a time, as steps, with a step indicator and Back and Next buttons:
+
+- **Next** checks the current step's fields, with the error summary if the form has one, and moves to the next step only if they are valid. Enter in a field means Next, except on the last step.
+- **Back** needs no check, and keeps what was typed.
+- **The submit button** (`submit($label)`) is on the last step. The whole form is sent at once, like any other form: validate it all again on the server.
+- **After a failed submit**, in the browser or from the server's `errors()`, the form shows the first step with an error.
+
+Each step is a `Section::make()` (not a fieldset, nor collapsible). Inside, use any field, `columns()` and nested sections; hidden fields can stay outside the steps. Translate the texts with `wizard(next: 'Suivant', previous: 'Retour', progress: 'Progression', stepOf: 'Étape %d sur %d : ', completed: 'terminée')`.
+
+On phones, the indicator names only the current step. The wizard needs JavaScript: without it, only the first step shows.
+
 ## Fields
 
 ```php
@@ -112,3 +147,5 @@ The choices passed to `select()` are the initial ones: include the selected valu
 - A searchable select is a combobox labelled by the field's label, with its help and error texts; error summary links move focus to it. Its tags' remove buttons are 24 x 24 px.
 - A failed submit focuses the first invalid field, or the error summary, which is announced once instead of one message per field.
 - Required fields are marked with an asterisk hidden from screen readers, plus `required`.
+- Sections are regions named by their heading, fieldsets are groups named by their legend, and a collapsible section's heading is a button that opens it with Enter or Space. Columns never change the reading or tab order.
+- A wizard's indicator is a list labelled "Progress" whose current step has `aria-current="step"`, and completed steps say so to screen readers. Moving to a step focuses its heading, read as "Step 2 of 3: Company".

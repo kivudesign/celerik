@@ -57,8 +57,8 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 | Component | Library | License | Phase |
 |---|---|---|---|
 | Form, validation | Parsley.js 🧩 | MIT | 1 ✅ |
-| Form layout: sections, fieldsets, columns | Native | – | 4 |
-| Wizard, Stepper | Native | – | 4 |
+| Form layout: sections, fieldsets, columns | Native | – | 4 ✅ (`Section`, `columns()`) |
+| Wizard, Stepper | Native | – | 4 ✅ (`Form::wizard()`; standalone Stepper later) |
 | Upload | FilePond (+ validate-type, validate-size, image-preview plugins) | MIT | 2 ✅ (`Field::file`) |
 | Rich Text Editor | Quill 2 | BSD-3 | 2 ✅ (`Field::editor`) |
 | Markdown Editor | EasyMDE | MIT | 8 |

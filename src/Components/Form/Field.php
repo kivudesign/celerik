@@ -48,6 +48,7 @@ final class Field
 
     private ?string $placeholder = null;
     private ?string $help = null;
+    private int|string|null $columnSpan = null;
     private mixed $value = null;
     private bool $required = false;
     private ?string $equalTo = null;
@@ -496,6 +497,22 @@ final class Field
         $this->attributes[$name] = $value;
 
         return $this;
+    }
+
+    /**
+     * How many columns of its form or section the field takes: a number, or "full".
+     */
+    public function columnSpan(int|string $span): self
+    {
+        Grid::assertSpan($span);
+        $this->columnSpan = $span;
+
+        return $this;
+    }
+
+    public function getColumnSpan(): int|string|null
+    {
+        return $this->columnSpan;
     }
 
     public function getName(): string

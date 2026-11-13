@@ -11,6 +11,7 @@ use Celerik\Ui\Components\Chart;
 use Celerik\Ui\Components\FileManager;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
+use Celerik\Ui\Components\Form\Section;
 use Celerik\Ui\Components\Grid;
 use Celerik\Ui\Components\Modal;
 use Celerik\Ui\Components\Notification;
@@ -104,6 +105,48 @@ $fixtures = [
             Field::editor('notes')->required(),
         )
         ->submit('Order'),
+
+    'form-layout' => Form::make('signup')
+        ->errorSummary()
+        ->columns(2)
+        ->add(
+            Field::text('first_name')->required(),
+            Field::text('last_name')->required(),
+            Section::make('Address')
+                ->description('Where we send the card.')
+                ->columnSpan('full')
+                ->columns(2)
+                ->add(
+                    Field::text('street')->columnSpan('full'),
+                    Section::fieldset('City')->columnSpan('full')->columns(2)->add(
+                        Field::text('city'),
+                        Field::text('zip', 'ZIP code'),
+                    ),
+                ),
+            Section::make('Company')
+                ->collapsible(collapsed: true)
+                ->columnSpan('full')
+                ->add(Field::text('vat', 'VAT number')->required()),
+        )
+        ->submit('Sign up'),
+
+    'form-wizard' => Form::make('join')
+        ->wizard()
+        ->add(
+            Section::make('Account')->add(Field::text('name')->required(), Field::email('email')->required()),
+            Section::make('Team')->add(Field::text('team')->required(), Field::text('role')),
+            Section::make('Confirm')->add(Field::checkbox('terms', 'I accept the terms')->required()),
+        )
+        ->submit('Join'),
+
+    'form-wizard-summary' => Form::make('join')
+        ->wizard()
+        ->errorSummary()
+        ->add(
+            Section::make('Account')->add(Field::text('name')->required()),
+            Section::make('Team')->add(Field::text('team')->required()),
+        )
+        ->submit('Join'),
 
     'themebuilder' => ThemeBuilder::make('builder')
         ->theme(Theme::preset('material')->color('light', 'danger', '#dd3545'))
