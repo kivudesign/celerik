@@ -142,6 +142,18 @@ $fixtures = [
         ->errors(['plan' => 'Choose a plan.'])
         ->submit('Save'),
 
+    'form-dates' => Form::make('booking')
+        ->action('/bookings')
+        ->csrf('test-token')
+        ->add(
+            Field::date('day')->min('2026-01-01')->max('2026-12-31'),
+            Field::time('arrival')->min('08:00')->max('18:00')->step(900),
+            Field::datetime('reminder'),
+            Field::dateRange('stay')->labels('Arrival', 'Departure')->min('2026-01-01')->required(),
+            Field::dateRange('shift', 'Shift', 'time'),
+        )
+        ->submit('Book'),
+
     'form-select' => Form::make('assign')
         ->action('/assign')
         ->csrf('test-token')

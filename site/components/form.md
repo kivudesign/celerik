@@ -38,6 +38,23 @@ Field::hidden('id', 42);
 
 Rich text and files have their own pages: [Rich text editor](./editor) and [File upload](./upload).
 
+### Dates, times and ranges
+
+<Demo name="form-dates" :min-height="440" />
+
+<<< @/demos/form-dates.php
+
+| Field | Submits |
+|---|---|
+| `Field::date($name)` | `2026-11-05` |
+| `Field::time($name)` | `09:30` (with seconds if `step()` is under 60) |
+| `Field::datetime($name)` | `2026-11-05T09:30`, without a time zone: convert it with the user's time zone on the server |
+| `Field::dateRange($name, $label, $type = 'date')` | `name[start]` and `name[end]`; `$type` is `date`, `time` or `datetime-local` |
+
+They use the browser's own pickers: keyboard and screen reader support, the user's language and date format, and the native picker on phones, with no JavaScript library. `min()`, `max()` and `step()` limit the choices (`step(900)`: every 15 minutes).
+
+A date range is a fieldset with two inputs, labelled "From" and "To" unless you call `labels($start, $end)`. The end must be on or after the start, and its picker starts at the start date. `value()` and old input take `['start' => …, 'end' => …]`, and a server error on `stay`, `stay.start` or `stay.end` shows under the range.
+
 ### Searchable and multiple selects
 
 <Demo name="form-select" :min-height="420" />

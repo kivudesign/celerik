@@ -207,6 +207,51 @@ final class FormTest extends TestCase
         }
     }
 
+    public function testTimeAndDateTimeUseNativeInputs(): void
+    {
+        $html = Form::make('f')->submit(null)->add(
+            Field::time('opens')->min('08:00')->step(900)->value('09:30'),
+            Field::datetime('reminder'),
+        )->render();
+
+        self::assertStringContainsString('<input min="08:00" step="900" id="f-opens" name="opens" type="time" value="09:30" class="form-control">', $html);
+        self::assertStringContainsString('<input id="f-reminder" name="reminder" type="datetime-local" class="form-control">', $html);
+    }
+
+    public function testDateRangeIsAFieldsetOfTwoLinkedInputs(): void
+    {
+        $html = Form::make('f')->submit(null)->floatingLabels()->add(
+            Field::dateRange('stay')->labels('Arrival', 'Departure')->min('2026-01-01')->required()->help('Up to 30 nights.'),
+        )->values(['stay' => ['start' => '2026-03-01', 'end' => '2026-03-04']])->render();
+
+        self::assertStringContainsString('<fieldset id="f-stay-group" aria-describedby="f-stay-help"><legend class="form-label fs-6">Stay <span class="celerik-required" aria-hidden="true">*</span></legend><div class="row g-2">', $html);
+        self::assertStringContainsString('<div class="col-sm-6"><label for="f-stay" class="form-label">Arrival</label><input min="2026-01-01" type="date" id="f-stay" name="stay[start]" value="2026-03-01" required class="form-control"></div>', $html);
+        self::assertStringContainsString('<label for="f-stay-end" class="form-label">Departure</label><input min="2026-01-01" type="date" id="f-stay-end" name="stay[end]" value="2026-03-04" required data-parsley-after="#f-stay" class="form-control">', $html);
+    }
+
+    public function testDateRangeShowsAnErrorReportedOnEitherInput(): void
+    {
+        $html = Form::make('f')->submit(null)->errorSummary()->add(
+            Field::dateRange('shift', 'Shift', 'time'),
+        )->errors(['shift.end' => 'The end must be after the start.'])->render();
+
+        self::assertStringContainsString('type="time" id="f-shift" name="shift[start]" aria-invalid="true" class="form-control is-invalid"', $html);
+        self::assertStringContainsString('</fieldset><div id="f-shift-error" class="invalid-feedback d-block celerik-server-error">The end must be after the start.</div>', $html);
+        self::assertStringContainsString('<a href="#f-shift" class="alert-link">The end must be after the start.</a>', $html);
+    }
+
+    public function testDateRangeRejectsOtherTypesAndLabelsOnlyApplyToIt(): void
+    {
+        try {
+            Field::dateRange('stay', null, 'month');
+            self::fail('A month range was accepted.');
+        } catch (InvalidArgumentException) {
+        }
+
+        $this->expectException(InvalidArgumentException::class);
+        Field::date('day')->labels('From', 'To');
+    }
+
     public function testChoiceGroupsNeedChoicesAndInlineOnlyAppliesToThem(): void
     {
         try {

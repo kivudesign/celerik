@@ -47,8 +47,8 @@ Everything a create or edit screen needs.
 
 - Fields:
   - ✅ radio group, checkbox group, switch, range, color;
-  - searchable, multiple and remote selects (in review);
-  - date, time and date-time pickers, date and time ranges;
+  - ✅ searchable, multiple and remote selects;
+  - ✅ date, time and date-time pickers, date and time ranges (the browser's native pickers);
   - tags input, rating, OTP code, key-value list.
 - Layout: sections, fieldsets and columns inside a form; a wizard (multi-step form, the Telerik Stepper and Wizard).
 - Repeatable groups of fields (a repeater): order lines, addresses, contacts.

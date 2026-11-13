@@ -246,7 +246,12 @@ final class Form extends Component
 
     private function errorFor(Field $field): ?string
     {
-        $error = $this->errors[$this->key($field)] ?? null;
+        $key = $this->key($field);
+        // A date range's validator may report on one of its two inputs (Laravel: "stay.end").
+        $error = $this->errors[$key] ?? null;
+        if ($error === null && $field->getType() === 'period') {
+            $error = $this->errors[$key . '.start'] ?? $this->errors[$key . '.end'] ?? null;
+        }
 
         if (is_array($error)) {
             $error = $error[0] ?? null;

@@ -41,8 +41,8 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 | Switch | Native (Bootstrap `form-switch`) | MIT | 4 ✅ (`Field::switch`) |
 | Slider | Native (`input type=range`) | – | 4 ✅ (`Field::range`) |
 | ColorPicker | Native (`input type=color`) | – | 4 ✅ (`Field::color`) |
-| DropDownList, ComboBox, MultiSelect, AutoComplete | Tom Select | Apache 2.0 | 4 (`->searchable()`, `->multiple()`, `->remote()`, in review) |
-| DatePicker, TimePicker, DateTimePicker, DateRangePicker | Flatpickr, or Air Datepicker (to evaluate) | MIT | 4 |
+| DropDownList, ComboBox, MultiSelect, AutoComplete | Tom Select | Apache 2.0 | 4 ✅ (`->searchable()`, `->multiple()`, `->remote()`) |
+| DatePicker, TimePicker, DateTimePicker, DateRangePicker | Native (`input type=date`, `time`, `datetime-local`): keyboard, screen reader and mobile pickers from the browser | – | 4 ✅ (`Field::date`, `time`, `datetime`, `dateRange`) |
 | Tags input (Telerik ChipList) | Tom Select (create mode) | Apache 2.0 | 4 |
 | Rating | Native (radio buttons) | – | 4 |
 | OTP input | Native | – | 4 |
@@ -164,7 +164,7 @@ These were considered earlier and replaced because they are archived, unmaintain
 | SimpleMDE | EasyMDE | Unmaintained fork origin |
 | Selectize.js | Tom Select | Abandoned; Tom Select is its successor |
 | Select2 | Tom Select | Needs jQuery, slow release cadence |
-| Pikaday, Bootstrap Timepicker | Flatpickr | Unmaintained / Bootstrap 3 era |
+| Pikaday, Bootstrap Timepicker, Flatpickr | Native date and time inputs | Unmaintained (Flatpickr's last release is from 2022); the browsers' pickers are accessible and localized |
 | Bootstrap Switch, Switchery | Bootstrap `form-switch` | Bootstrap 3 era / abandoned; native in Bootstrap 5 |
 | Spectrum, Pickr | Native `input type=color` | Spectrum is unmaintained and needs jQuery; the native picker needs no library |
 | RichFilemanager | elFinder | Abandoned |
