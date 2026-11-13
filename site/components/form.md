@@ -39,6 +39,23 @@ Client-side validation is a convenience: always validate again on the server and
 
 Fields keep their order in the error summary and for screen readers: columns only change where they appear on wide screens.
 
+## Wizard
+
+<Demo name="form-wizard" :min-height="520" />
+
+<<< @/demos/form-wizard.php
+
+`wizard()` shows the form's sections one at a time, as steps, with a step indicator and Back and Next buttons:
+
+- **Next** checks the current step's fields, with the error summary if the form has one, and moves to the next step only if they are valid. Enter in a field means Next, except on the last step.
+- **Back** needs no check, and keeps what was typed.
+- **The submit button** (`submit($label)`) is on the last step. The whole form is sent at once, like any other form: validate it all again on the server.
+- **After a failed submit**, in the browser or from the server's `errors()`, the form shows the first step with an error.
+
+Each step is a `Section::make()` (not a fieldset, nor collapsible). Inside, use any field, `columns()` and nested sections; hidden fields can stay outside the steps. Translate the texts with `wizard(next: 'Suivant', previous: 'Retour', progress: 'Progression', stepOf: 'Étape %d sur %d : ', completed: 'terminée')`.
+
+On phones, the indicator names only the current step. The wizard needs JavaScript: without it, only the first step shows.
+
 ## Fields
 
 ```php
@@ -131,3 +148,4 @@ The choices passed to `select()` are the initial ones: include the selected valu
 - A failed submit focuses the first invalid field, or the error summary, which is announced once instead of one message per field.
 - Required fields are marked with an asterisk hidden from screen readers, plus `required`.
 - Sections are regions named by their heading, fieldsets are groups named by their legend, and a collapsible section's heading is a button that opens it with Enter or Space. Columns never change the reading or tab order.
+- A wizard's indicator is a list labelled "Progress" whose current step has `aria-current="step"`, and completed steps say so to screen readers. Moving to a step focuses its heading, read as "Step 2 of 3: Company".

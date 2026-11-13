@@ -265,6 +265,17 @@ $components = [
         ->url('/files/connector')
         ->assetsUrl('/elfinder')
         ->height(380),
+
+    Form::make('join')
+        ->action('/join')
+        ->csrf('test-token')
+        ->wizard()
+        ->add(
+            Section::make('Your account')->add(Field::text('full_name')->required()),
+            Section::make('Your team')->columns(2)->add(Field::text('team_name')->required(), Field::text('team_role')),
+            Section::make('Confirm')->add(Field::checkbox('join_terms', 'I accept the terms')->required()),
+        )
+        ->submit('Join'),
 ];
 
 $modal = Modal::make('contact-modal')

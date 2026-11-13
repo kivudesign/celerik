@@ -130,6 +130,24 @@ $fixtures = [
         )
         ->submit('Sign up'),
 
+    'form-wizard' => Form::make('join')
+        ->wizard()
+        ->add(
+            Section::make('Account')->add(Field::text('name')->required(), Field::email('email')->required()),
+            Section::make('Team')->add(Field::text('team')->required(), Field::text('role')),
+            Section::make('Confirm')->add(Field::checkbox('terms', 'I accept the terms')->required()),
+        )
+        ->submit('Join'),
+
+    'form-wizard-summary' => Form::make('join')
+        ->wizard()
+        ->errorSummary()
+        ->add(
+            Section::make('Account')->add(Field::text('name')->required()),
+            Section::make('Team')->add(Field::text('team')->required()),
+        )
+        ->submit('Join'),
+
     'themebuilder' => ThemeBuilder::make('builder')
         ->theme(Theme::preset('material')->color('light', 'danger', '#dd3545'))
         ->saveUrl('/theme')

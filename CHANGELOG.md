@@ -8,6 +8,7 @@ The same version is published on Packagist (`celerik/ui`) and npm (`@celerikui/u
 
 ### Added
 
+- Form wizard: `Form::wizard()` shows the form's sections one at a time, with a step indicator and Back and Next buttons. Next checks the step's fields first, Enter means Next, and after a failed submit (browser or server) the form shows the first step with an error. Its texts can be translated.
 - Form layout: `Section::make()` (a card with a heading, `collapsible()`) and `Section::fieldset()` group fields; `columns()` on a form or section lays them out in 1 to 6 columns from a breakpoint, and `columnSpan()` widens a field or section. A collapsed section opens by itself when a field inside it has an error.
 - Date and time fields: `Field::time()`, `Field::datetime()`, and `Field::dateRange($name, $label, 'date'|'time'|'datetime-local')`, two linked native inputs (`name[start]`, `name[end]`) whose end must be on or after the start.
 - Searchable selects ([Tom Select](https://tom-select.js.org)): `Field::select()->searchable()`, `->multiple()` (tags), and `->remote($url)` to load choices from an endpoint as the user types, answered by `$field->respond($source, $_GET)` with any data source.

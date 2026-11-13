@@ -203,3 +203,39 @@ test.describe('form section', () => {
     await expect(page.getByLabel('Call time')).toBeFocused();
   });
 });
+
+test.describe('form wizard', () => {
+  test('moves through the steps from the keyboard, checking each one', async ({ page }) => {
+    const name = page.getByLabel('Full name');
+    const team = page.getByLabel('Team name');
+    const next = page.locator('#join [data-celerik-wizard="next"]');
+
+    // Enter on an empty step: it stays, with the error.
+    await name.focus();
+    await page.keyboard.press('Enter');
+    await expect(name).toBeFocused();
+    await expect(name).toHaveAttribute('aria-invalid', 'true');
+
+    // Enter means Next; focus moves to the next step's heading, then into the step.
+    await name.fill('Ada Lovelace');
+    await page.keyboard.press('Enter');
+    const heading = page.getByRole('heading', { name: 'Step 2 of 3: Your team' });
+    await expect(heading).toBeFocused();
+    await expect(name).toBeHidden();
+    await page.keyboard.press('Tab');
+    await expect(team).toBeFocused();
+
+    await page.keyboard.type('Analytical Engine');
+    await next.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('heading', { name: 'Step 3 of 3: Confirm' })).toBeFocused();
+    await expect(page.locator('#join [type="submit"]')).toBeVisible();
+
+    // Back, with Space.
+    await page.locator('#join [data-celerik-wizard="previous"]').focus();
+    await page.keyboard.press('Space');
+    await expect(heading).toBeFocused();
+    await expect(team).toHaveValue('Analytical Engine');
+    await expect(page.locator('#join [aria-current="step"]')).toContainText('Your team');
+  });
+});

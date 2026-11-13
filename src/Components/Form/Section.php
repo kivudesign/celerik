@@ -140,9 +140,15 @@ final class Section
      * @param Closure(Field): string $renderField the form renders each field, with its error and value
      * @param Closure(Field): bool   $hasError
      * @param int                    $level       the heading level: 2 in a form, 3 in a section
+     * @param string|null            $stepLabel   a wizard step's "Step 1 of 3: ", for screen readers
      */
-    public function render(string $formId, Closure $renderField, Closure $hasError, int $level = 2): string
-    {
+    public function render(
+        string $formId,
+        Closure $renderField,
+        Closure $hasError,
+        int $level = 2,
+        ?string $stepLabel = null,
+    ): string {
         $id = $this->id ?? Field::fieldId($formId, 'section-' . $this->heading);
         $descriptionId = $this->description === null ? null : $id . '-description';
         $description = $descriptionId === null ? '' : Html::tag(
@@ -194,10 +200,15 @@ final class Section
             );
         }
 
+        $prefix = $stepLabel === null
+            ? ''
+            : Html::tag('span', ['class' => 'visually-hidden'], Html::escape($stepLabel));
         $heading = Html::tag('h' . $level, [
             'id' => $headingId,
             'class' => 'card-title h' . min($level + 3, 6) . ($description === '' ? ' mb-3' : ' mb-1'),
-        ], Html::escape($this->heading));
+            // form.js moves focus to a wizard step's heading when the step changes.
+            'tabindex' => $stepLabel === null ? null : '-1',
+        ], $prefix . Html::escape($this->heading));
 
         return Html::tag('section', [
             'id' => $id,
@@ -207,10 +218,27 @@ final class Section
         ], Html::tag('div', ['class' => 'card-body'], $heading . $body));
     }
 
+    public function getHeading(): string
+    {
+        return $this->heading;
+    }
+
+    public function isFieldset(): bool
+    {
+        return $this->fieldset;
+    }
+
+    public function isCollapsible(): bool
+    {
+        return $this->collapsible;
+    }
+
     /**
+     * Whether a field of the section, or of its sections, has an error.
+     *
      * @param Closure(Field): bool $hasError
      */
-    private function hasErrors(Closure $hasError): bool
+    public function hasErrors(Closure $hasError): bool
     {
         foreach ($this->getFields() as $field) {
             if ($hasError($field)) {

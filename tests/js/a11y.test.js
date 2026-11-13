@@ -93,6 +93,20 @@ describe('accessibility (axe-core, WCAG 2.1 AA)', () => {
     parsley.destroy();
   });
 
+  test('a wizard, on each step and after failed validation', async () => {
+    const form = loadFixture('form-wizard');
+    expect(await violations()).toEqual([]);
+
+    const parsley = await initForm(form, readOptions(form));
+    form.querySelector('[data-celerik-wizard="next"]').click();
+    expect(await violations()).toEqual([]);
+    form.querySelector('[name="name"]').value = 'Ada';
+    form.querySelector('[name="email"]').value = 'ada@example.com';
+    form.querySelector('[data-celerik-wizard="next"]').click();
+    expect(await violations()).toEqual([]);
+    parsley.destroy();
+  });
+
   test('searchable selects, before and after Tom Select and a failed validation', async () => {
     const form = loadFixture('form-select');
     expect(await violations()).toEqual([]);

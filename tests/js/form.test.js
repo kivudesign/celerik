@@ -379,3 +379,133 @@ describe('sections', () => {
     expect(company().open).toBe(false);
   });
 });
+
+describe('wizard', () => {
+  let form;
+  let parsley;
+
+  const setUp = async (fixture) => {
+    form = loadFixture(fixture);
+    parsley = await initForm(form, readOptions(form));
+  };
+
+  afterEach(() => parsley.destroy());
+
+  const button = (name) => form.querySelector(`[data-celerik-wizard="${name}"]`);
+  const submitButton = () => form.querySelector('.celerik-wizard-nav [type="submit"]');
+  const visibleStep = () => [...form.querySelectorAll('[data-celerik-step]')].findIndex((step) => !step.hidden);
+  const current = () => form.querySelector('.celerik-wizard-steps [aria-current="step"]').textContent;
+  const fill = (values) => {
+    for (const [name, value] of Object.entries(values)) {
+      const input = form.querySelector(`[name="${name}"]`);
+      if (input.type === 'checkbox') {
+        input.checked = value;
+      } else {
+        input.value = value;
+      }
+    }
+  };
+  const submit = () => form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  const invalid = () => [...form.querySelectorAll('.is-invalid')].map((element) => element.name);
+
+  test('Next checks only the current step, then shows the next one and focuses its heading', async () => {
+    await setUp('form-wizard');
+    expect(visibleStep()).toBe(0);
+    expect(button('previous').hidden).toBe(true);
+    expect(submitButton().hidden).toBe(true);
+
+    button('next').click();
+    expect(visibleStep()).toBe(0);
+    expect(invalid()).toEqual(['name', 'email']);
+    expect(document.activeElement).toBe(form.querySelector('[name="name"]'));
+
+    fill({ name: 'Ada', email: 'ada@example.com' });
+    button('next').click();
+    expect(visibleStep()).toBe(1);
+    // The later steps were not checked.
+    expect(invalid()).toEqual([]);
+    expect(document.activeElement.id).toBe('join-section-Team-heading');
+    expect(document.activeElement.textContent).toBe('Step 2 of 3: Team');
+    expect(current()).toMatch(/^2Team/);
+    // "(completed)", for screen readers, on the steps before the current one only.
+    const done = [...form.querySelectorAll('.celerik-wizard-done')].map((span) => !span.hidden);
+    expect(done).toEqual([true, false, false]);
+    expect(button('previous').hidden).toBe(false);
+  });
+
+  test('Back needs no check; the last step shows the submit button', async () => {
+    await setUp('form-wizard');
+    fill({ name: 'Ada', email: 'ada@example.com', team: 'Engines' });
+    button('next').click();
+    button('next').click();
+    expect(visibleStep()).toBe(2);
+    expect(button('next').hidden).toBe(true);
+    expect(submitButton().hidden).toBe(false);
+
+    fill({ team: '' });
+    button('previous').click();
+    expect(visibleStep()).toBe(1);
+    expect(invalid()).toEqual([]);
+    expect(submitButton().hidden).toBe(true);
+    expect(form.querySelector('.celerik-wizard-steps li:nth-child(3) .celerik-wizard-done').hidden).toBe(true);
+  });
+
+  test('Enter in a field means Next before the last step', async () => {
+    await setUp('form-wizard');
+    fill({ name: 'Ada', email: 'ada@example.com' });
+    const submitted = jest.fn();
+    parsley.on('form:validate', submitted);
+
+    const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+    form.querySelector('[name="email"]').dispatchEvent(enter);
+
+    expect(enter.defaultPrevented).toBe(true);
+    expect(visibleStep()).toBe(1);
+    expect(submitted).not.toHaveBeenCalled();
+  });
+
+  test('a failed submit shows the first step with an error and focuses its field', async () => {
+    await setUp('form-wizard');
+    fill({ name: 'Ada', email: 'ada@example.com', team: 'Engines' });
+    button('next').click();
+    button('next').click();
+    // The server or another script emptied a field of an earlier step.
+    fill({ team: '', terms: true });
+
+    submit();
+
+    expect(visibleStep()).toBe(1);
+    expect(document.activeElement).toBe(form.querySelector('[name="team"]'));
+    expect(submitButton().hidden).toBe(true);
+  });
+
+  test('with an error summary: a step lists its errors there, and the links show their step', async () => {
+    await setUp('form-wizard-summary');
+    const summary = form.querySelector('.celerik-error-summary');
+
+    button('next').click();
+    expect(summary.hidden).toBe(false);
+    expect(document.activeElement).toBe(summary);
+    expect([...summary.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual(['#join-name']);
+
+    fill({ name: 'Ada' });
+    button('next').click();
+    expect(summary.hidden).toBe(true);
+    expect(visibleStep()).toBe(1);
+
+    fill({ name: '' });
+    submit();
+    expect(visibleStep()).toBe(0);
+    expect(document.activeElement).toBe(summary);
+    button('next').click();
+    fill({ name: 'Ada' });
+
+    // A link to a field of another step shows that step.
+    submit();
+    button('previous').click();
+    expect(visibleStep()).toBe(0);
+    summary.querySelector('a[href="#join-team"]').click();
+    expect(visibleStep()).toBe(1);
+    expect(document.activeElement).toBe(form.querySelector('#join-team'));
+  });
+});

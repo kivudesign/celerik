@@ -8,6 +8,7 @@ use Celerik\Ui\Component;
 use Celerik\Ui\Components\Form\Field;
 use Celerik\Ui\Components\Form\Grid;
 use Celerik\Ui\Components\Form\Section;
+use Celerik\Ui\Components\Form\Wizard;
 use Celerik\Ui\Support\Arr;
 use Celerik\Ui\Support\Html;
 use InvalidArgumentException;
@@ -36,6 +37,8 @@ final class Form extends Component
     private int $columns = 1;
 
     private string $breakpoint = 'md';
+
+    private ?Wizard $wizard = null;
 
     private ?string $submitLabel = 'Submit';
 
@@ -104,6 +107,26 @@ final class Form extends Component
         Grid::assertColumns($columns, $breakpoint);
         $this->columns = $columns;
         $this->breakpoint = $breakpoint;
+
+        return $this;
+    }
+
+    /**
+     * Shows the form's sections one at a time, as the steps of a wizard, with a step
+     * indicator and Back and Next buttons. Next checks the step's fields first; the submit
+     * button is on the last step, and after a failed submit the form opens at the first step
+     * with an error. Add Section::make() items (and hidden fields).
+     *
+     * @param string $stepOf the screen reader prefix of a step's heading (sprintf: step, count)
+     */
+    public function wizard(
+        string $next = 'Next',
+        string $previous = 'Back',
+        string $progress = 'Progress',
+        string $stepOf = 'Step %d of %d: ',
+        string $completed = 'completed',
+    ): self {
+        $this->wizard = new Wizard($next, $previous, $progress, $stepOf, $completed);
 
         return $this;
     }
@@ -213,16 +236,20 @@ final class Form extends Component
             $this->floatingLabels,
         );
         $hasError = fn (Field $field): bool => $this->errorFor($field) !== null;
-        $content .= Grid::render(
-            $this->items,
-            $this->columns,
-            $this->breakpoint,
-            fn (Field|Section $item): string => $item instanceof Section
-                ? $item->render($this->id, $renderField, $hasError)
-                : $renderField($item),
-        );
+        if ($this->wizard !== null) {
+            $content .= $this->wizard->render($this->id, $this->items, $renderField, $hasError, $this->submitLabel);
+        } else {
+            $content .= Grid::render(
+                $this->items,
+                $this->columns,
+                $this->breakpoint,
+                fn (Field|Section $item): string => $item instanceof Section
+                    ? $item->render($this->id, $renderField, $hasError)
+                    : $renderField($item),
+            );
+        }
 
-        if ($this->submitLabel !== null) {
+        if ($this->submitLabel !== null && $this->wizard === null) {
             $content .= Html::tag(
                 'button',
                 ['type' => 'submit', 'class' => 'btn btn-primary'],
@@ -230,7 +257,8 @@ final class Form extends Component
             );
         }
 
-        $attributes = array_merge($this->rootAttributes(['celerik-form']), [
+        $classes = $this->wizard === null ? ['celerik-form'] : ['celerik-form', 'celerik-wizard'];
+        $attributes = array_merge($this->rootAttributes($classes), [
             'action' => $this->action,
             'method' => $spoofed ? 'POST' : $this->method,
             'enctype' => $this->hasFileField() ? 'multipart/form-data' : null,
