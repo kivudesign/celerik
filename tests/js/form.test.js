@@ -333,3 +333,49 @@ describe('date, time and date range fields', () => {
     expect([...messages].map((message) => message.textContent)).toEqual(['This must be on or after the start.']);
   });
 });
+
+describe('sections', () => {
+  let form;
+  let parsley;
+
+  beforeEach(async () => {
+    form = loadFixture('form-layout');
+    parsley = await initForm(form, readOptions(form));
+  });
+
+  afterEach(() => parsley.destroy());
+
+  const company = () => form.querySelector('details.celerik-form-section');
+  const fillNames = () => {
+    form.querySelector('[name="first_name"]').value = 'Ada';
+    form.querySelector('[name="last_name"]').value = 'Lovelace';
+  };
+
+  test('a collapsed section opens when a field inside it is invalid', () => {
+    fillNames();
+    expect(company().open).toBe(false);
+
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+    expect(company().open).toBe(true);
+    const link = form.querySelector('.celerik-error-summary a');
+    expect(link.getAttribute('href')).toBe('#signup-vat');
+  });
+
+  test('an error summary link opens the collapsed section of its field', () => {
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    company().open = false;
+
+    form.querySelector('.celerik-error-summary a[href="#signup-vat"]').click();
+
+    expect(company().open).toBe(true);
+    expect(document.activeElement).toBe(form.querySelector('#signup-vat'));
+  });
+
+  test('a valid collapsed section stays closed', () => {
+    fillNames();
+    form.querySelector('[name="vat"]').value = 'FR123';
+    expect(parsley.validate()).toBe(true);
+    expect(company().open).toBe(false);
+  });
+});

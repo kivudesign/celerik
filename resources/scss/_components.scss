@@ -161,6 +161,75 @@
       box-shadow: var(--celerik-focus-ring);
     }
   }
+
+  // Sections and fieldsets (Section::make(), Section::fieldset()). Their last field's
+  // margin is the bottom padding.
+  .celerik-form-section > .card-body:not(summary) {
+    padding-bottom: 0;
+  }
+
+  .celerik-form-fieldset {
+    padding: 0.25rem 1rem 0;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--celerik-radius);
+  }
+
+  // Bootstrap's legend floats across the full width: put it back on the border.
+  .celerik-form-legend {
+    float: none;
+    width: auto;
+    padding: 0 0.5rem;
+    margin: 0 0 0.5rem -0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  // A collapsible section's summary is both its heading and its button.
+  .celerik-form-summary {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0;
+    cursor: pointer;
+    border-radius: inherit;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    // A chevron: right when closed, down when open.
+    &::before {
+      flex-shrink: 0;
+      width: 0.5em;
+      height: 0.5em;
+      content: '';
+      border-right: 2px solid currentcolor;
+      border-bottom: 2px solid currentcolor;
+      transform: rotate(-45deg);
+      transition: transform 0.2s;
+    }
+
+    &:focus-visible {
+      outline: 0;
+      box-shadow: var(--celerik-focus-ring);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &::before {
+        transition: none;
+      }
+    }
+  }
+
+  // Open: as close to its content as a section heading.
+  .celerik-form-section[open] > .celerik-form-summary {
+    padding-bottom: 0.25rem;
+
+    &::before {
+      transform: rotate(45deg);
+    }
+  }
 }
 
 // Searchable selects (Tom Select, Bootstrap 5 theme). Its stylesheet loads with its chunk,

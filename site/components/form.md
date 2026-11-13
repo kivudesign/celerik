@@ -21,6 +21,24 @@ Bootstrap forms with client-side validation ([Parsley.js](https://parsleyjs.org/
 
 Client-side validation is a convenience: always validate again on the server and pass the messages to `errors()`.
 
+## Layout
+
+<Demo name="form-layout" :min-height="760" />
+
+<<< @/demos/form-layout.php
+
+| Method | Use |
+|---|---|
+| `columns($count, $breakpoint = 'md')` | On the form or a section: 1, 2, 3, 4 or 6 columns from a Bootstrap breakpoint (`sm` to `xxl`) up, one column below it. |
+| `columnSpan(2)`, `columnSpan('full')` | On a field or a section: how many columns it takes. |
+| `Section::make($heading)` | A card with a heading: `h2`, or `h3` in another section. |
+| `Section::fieldset($legend)` | A fieldset whose legend names its fields for screen readers: for fields that belong together, such as an address. |
+| `description($text)` | A line under the heading or legend, read with it by screen readers. |
+| `collapsible($collapsed = false)` | A section the user can open and close (a native `<details>`). It opens by itself when a field inside it has an error, from the server or the browser. |
+| `add(...)` | Fields and other sections. |
+
+Fields keep their order in the error summary and for screen readers: columns only change where they appear on wide screens.
+
 ## Fields
 
 ```php
@@ -112,3 +130,4 @@ The choices passed to `select()` are the initial ones: include the selected valu
 - A searchable select is a combobox labelled by the field's label, with its help and error texts; error summary links move focus to it. Its tags' remove buttons are 24 x 24 px.
 - A failed submit focuses the first invalid field, or the error summary, which is announced once instead of one message per field.
 - Required fields are marked with an asterisk hidden from screen readers, plus `required`.
+- Sections are regions named by their heading, fieldsets are groups named by their legend, and a collapsible section's heading is a button that opens it with Enter or Space. Columns never change the reading or tab order.

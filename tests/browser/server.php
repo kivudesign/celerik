@@ -22,6 +22,7 @@ use Celerik\Ui\Components\Chart;
 use Celerik\Ui\Components\FileManager;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
+use Celerik\Ui\Components\Form\Section;
 use Celerik\Ui\Components\Grid;
 use Celerik\Ui\Components\Modal;
 use Celerik\Ui\Components\Notification;
@@ -212,8 +213,13 @@ $components = [
                 ->searchable()
                 ->value(['fr']),
             $reviewer,
-            Field::time('call', 'Call time')->min('08:00')->max('18:00')->value('09:30'),
-            Field::dateRange('holidays')->labels('First day', 'Last day')->value(['start' => '2026-07-01', 'end' => '2026-07-14']),
+            Section::make('Availability')->collapsible()->columns(2)->add(
+                Field::time('call', 'Call time')->min('08:00')->max('18:00')->value('09:30'),
+                Field::dateRange('holidays')
+                    ->labels('First day', 'Last day')
+                    ->value(['start' => '2026-07-01', 'end' => '2026-07-14'])
+                    ->columnSpan('full'),
+            ),
         )
         ->errors(['plan' => 'Choose a plan.'])
         ->submit('Save'),

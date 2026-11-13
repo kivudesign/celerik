@@ -185,3 +185,21 @@ test.describe('searchable select', () => {
     await expect.poll(values).toEqual(['fr']);
   });
 });
+
+test.describe('form section', () => {
+  test('a collapsible section opens and closes from the keyboard', async ({ page }) => {
+    const toggle = page.locator('#preferences-section-Availability-heading');
+    const group = page.getByRole('group', { name: 'Availability' });
+    await expect(group).toBeVisible();
+
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(group).toBeHidden();
+    await expect(toggle).toBeFocused();
+
+    await page.keyboard.press('Space');
+    await expect(group).toBeVisible();
+    await page.keyboard.press('Tab');
+    await expect(page.getByLabel('Call time')).toBeFocused();
+  });
+});

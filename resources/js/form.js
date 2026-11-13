@@ -34,6 +34,10 @@ export async function initForm(element, options) {
   parsley.on('field:validated', (field) => {
     const inputs = fieldInputs(field).toArray();
     inputs[0].closest('.mb-3')?.querySelector('.celerik-server-error')?.remove();
+    // A collapsed section opens on an error, before Parsley focuses the first invalid field.
+    if (!field.isValid()) {
+      reveal(inputs[0]);
+    }
     // A searchable select's search box is what assistive technology reads.
     for (const input of inputs.flatMap((input) => [input, input.tomselect?.control_input].filter(Boolean))) {
       if (field.isValid()) {
@@ -126,10 +130,18 @@ function initErrorSummary(element, summary, parsley) {
       return;
     }
     event.preventDefault();
+    reveal(field);
     (field.celerikEditor?.root ?? field).focus();
   });
 
   if (!summary.hidden) {
     summary.focus();
+  }
+}
+
+// Opens the collapsed sections (<details>) around an element, so it can be seen and focused.
+function reveal(element) {
+  for (let details = element.closest('details'); details; details = details.parentElement.closest('details')) {
+    details.open = true;
   }
 }
