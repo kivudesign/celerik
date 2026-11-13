@@ -7,6 +7,7 @@ namespace Celerik\Ui\Components;
 use Celerik\Ui\Component;
 use Celerik\Ui\Components\Form\Field;
 use Celerik\Ui\Components\Form\Grid;
+use Celerik\Ui\Components\Form\Repeater;
 use Celerik\Ui\Components\Form\Section;
 use Celerik\Ui\Components\Form\Wizard;
 use Celerik\Ui\Support\Arr;
@@ -31,7 +32,7 @@ final class Form extends Component
 
     private string $csrfField = '_token';
 
-    /** @var list<Field|Section> */
+    /** @var list<Field|Section|Repeater> */
     private array $items = [];
 
     private int $columns = 1;
@@ -89,9 +90,10 @@ final class Form extends Component
     }
 
     /**
-     * Fields, and sections that group them (Section::make(), Section::fieldset()).
+     * Fields, sections that group them (Section::make(), Section::fieldset()) and
+     * repeaters (Repeater::make()).
      */
-    public function add(Field|Section ...$items): self
+    public function add(Field|Section|Repeater ...$items): self
     {
         array_push($this->items, ...$items);
 
@@ -138,6 +140,8 @@ final class Form extends Component
      */
     public function getFields(): array
     {
+        $this->fillRepeaters();
+
         return Section::make('')->add(...$this->items)->getFields();
     }
 
@@ -210,6 +214,8 @@ final class Form extends Component
 
     public function render(): string
     {
+        // Old input decides a repeater's rows, which the error summary lists too.
+        $this->fillRepeaters();
         $spoofed = !in_array($this->method, ['GET', 'POST'], true);
         $content = '';
 
@@ -229,13 +235,16 @@ final class Form extends Component
             $content .= $this->renderErrorSummary();
         }
 
-        $renderField = fn (Field $field): string => $field->render(
+        $renderOne = fn (Field $field): string => $field->render(
             $this->id,
             $this->errorFor($field),
             $this->valueFor($field),
             $this->floatingLabels,
         );
-        $hasError = fn (Field $field): bool => $this->errorFor($field) !== null;
+        $renderField = fn (Field|Repeater $item): string => $item instanceof Repeater
+            ? $item->render($this->id, $renderOne, $this->errorFor($item))
+            : $renderOne($item);
+        $hasError = fn (Field|Repeater $item): bool => $this->errorFor($item) !== null;
         if ($this->wizard !== null) {
             $content .= $this->wizard->render($this->id, $this->items, $renderField, $hasError, $this->submitLabel);
         } else {
@@ -243,7 +252,7 @@ final class Form extends Component
                 $this->items,
                 $this->columns,
                 $this->breakpoint,
-                fn (Field|Section $item): string => $item instanceof Section
+                fn (Field|Section|Repeater $item): string => $item instanceof Section
                     ? $item->render($this->id, $renderField, $hasError)
                     : $renderField($item),
             );
@@ -283,7 +292,7 @@ final class Form extends Component
     {
         $titleId = $this->id . '-error-summary-title';
         $items = '';
-        foreach ($this->getFields() as $field) {
+        foreach ($this->summaryTargets($this->items) as $field) {
             $error = $this->errorFor($field);
             if ($error !== null) {
                 $href = '#' . Field::fieldId($this->id, $field->getName());
@@ -303,13 +312,50 @@ final class Form extends Component
             . Html::tag('ul', ['class' => 'mb-0'], $items));
     }
 
-    private function errorFor(Field $field): ?string
+    /**
+     * The fields and repeaters that can have an error, in order.
+     *
+     * @param list<Field|Section|Repeater> $items
+     *
+     * @return list<Field|Repeater>
+     */
+    private function summaryTargets(array $items): array
     {
-        $key = $this->key($field);
+        $targets = [];
+        foreach ($items as $item) {
+            array_push($targets, ...match (true) {
+                $item instanceof Section => $this->summaryTargets($item->getItems()),
+                $item instanceof Repeater => [$item, ...$item->getFields()],
+                default => [$item],
+            });
+        }
+
+        return $targets;
+    }
+
+    /**
+     * Gives each repeater its old input, which decides its rows.
+     *
+     * @param list<Field|Section|Repeater>|null $items
+     */
+    private function fillRepeaters(?array $items = null): void
+    {
+        foreach ($items ?? $this->items as $item) {
+            if ($item instanceof Section) {
+                $this->fillRepeaters($item->getItems());
+            } elseif ($item instanceof Repeater) {
+                $item->fill(Arr::get($this->values, $item->getName()));
+            }
+        }
+    }
+
+    private function errorFor(Field|Repeater $field): ?string
+    {
+        $key = $field instanceof Repeater ? $field->getName() : $this->key($field);
         $error = $this->errors[$key] ?? null;
         // A field that submits an array may get an error on one of its items
-        // (Laravel: "tags.1", "stay.end", "photos.0").
-        if ($error === null && $field->submitsArray()) {
+        // (Laravel: "tags.1", "stay.end", "photos.0"). A repeater's rows show their own.
+        if ($error === null && $field instanceof Field && $field->submitsArray()) {
             foreach ($this->errors as $name => $message) {
                 if (str_starts_with((string) $name, $key . '.')) {
                     $error = $message;

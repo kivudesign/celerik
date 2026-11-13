@@ -53,7 +53,7 @@ Everything a create or edit screen needs.
 - Layout:
   - ✅ sections (collapsible), fieldsets and columns inside a form;
   - ✅ a wizard (multi-step form, the Telerik Wizard); a standalone Stepper comes with navigation (Phase 6).
-- Repeatable groups of fields (a repeater): order lines, addresses, contacts.
+- ✅ Repeatable groups of fields (a repeater): order lines, addresses, contacts.
 
 ### Phase 5 — Data
 

@@ -43,8 +43,8 @@ final class Grid
     }
 
     /**
-     * @param list<Field|Section>            $items
-     * @param Closure(Field|Section): string $render
+     * @param list<Field|Section|Repeater>            $items
+     * @param Closure(Field|Section|Repeater): string $render
      */
     public static function render(array $items, int $columns, string $breakpoint, Closure $render): string
     {

@@ -15,7 +15,7 @@ use LogicException;
  */
 final class Section
 {
-    /** @var list<Field|Section> */
+    /** @var list<Field|Section|Repeater> */
     private array $items = [];
 
     private ?string $description = null;
@@ -52,7 +52,7 @@ final class Section
         return new self($legend, true);
     }
 
-    public function add(Field|Section ...$items): self
+    public function add(Field|Section|Repeater ...$items): self
     {
         array_push($this->items, ...$items);
 
@@ -130,15 +130,16 @@ final class Section
     {
         $fields = [];
         foreach ($this->items as $item) {
-            array_push($fields, ...($item instanceof self ? $item->getFields() : [$item]));
+            array_push($fields, ...($item instanceof Field ? [$item] : $item->getFields()));
         }
 
         return $fields;
     }
 
     /**
-     * @param Closure(Field): string $renderField the form renders each field, with its error and value
-     * @param Closure(Field): bool   $hasError
+     * @param Closure(Field|Repeater): string $renderField the form renders each field or repeater,
+     *                                                with its error and value
+     * @param Closure(Field|Repeater): bool   $hasError
      * @param int                    $level       the heading level: 2 in a form, 3 in a section
      * @param string|null            $stepLabel   a wizard step's "Step 1 of 3: ", for screen readers
      */
@@ -160,7 +161,7 @@ final class Section
             $this->items,
             $this->columns,
             $this->breakpoint,
-            fn (Field|Section $item): string => $item instanceof self
+            fn (Field|Section|Repeater $item): string => $item instanceof self
                 ? $item->render($formId, $renderField, $hasError, min($level + 1, 6))
                 : $renderField($item),
         );
@@ -234,14 +235,27 @@ final class Section
     }
 
     /**
-     * Whether a field of the section, or of its sections, has an error.
+     * @return list<Field|Section|Repeater>
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
+     * Whether a field or repeater of the section, or of its sections, has an error.
      *
-     * @param Closure(Field): bool $hasError
+     * @param Closure(Field|Repeater): bool $hasError
      */
     public function hasErrors(Closure $hasError): bool
     {
-        foreach ($this->getFields() as $field) {
-            if ($hasError($field)) {
+        foreach ($this->items as $item) {
+            $failed = match (true) {
+                $item instanceof self => $item->hasErrors($hasError),
+                $item instanceof Repeater => $hasError($item) || array_filter($item->getFields(), $hasError) !== [],
+                default => $hasError($item),
+            };
+            if ($failed) {
                 return true;
             }
         }

@@ -11,6 +11,7 @@ use Celerik\Ui\Components\Chart;
 use Celerik\Ui\Components\FileManager;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
+use Celerik\Ui\Components\Form\Repeater;
 use Celerik\Ui\Components\Form\Section;
 use Celerik\Ui\Components\Grid;
 use Celerik\Ui\Components\Modal;
@@ -147,6 +148,32 @@ $fixtures = [
             Section::make('Team')->add(Field::text('team')->required()),
         )
         ->submit('Join'),
+
+    'form-repeater' => Form::make('order')
+        ->errorSummary()
+        ->add(
+            Repeater::make('lines', 'Order lines')
+                ->schema(
+                    Field::select('product', ['tea' => 'Tea', 'coffee' => 'Coffee'])->placeholder('Choose...')->searchable()->required(),
+                    Field::number('qty', 'Quantity')->min(1)->required(),
+                    Field::dateRange('delivery'),
+                )
+                ->min(1)
+                ->max(3)
+                ->reorderable()
+                ->labels(add: 'Add a line', item: 'Line %d'),
+        )
+        ->submit('Order'),
+
+    'form-wizard-repeater' => Form::make('trip')
+        ->wizard()
+        ->add(
+            Section::make('Travellers')->add(
+                Repeater::make('people')->schema(Field::text('name')->required())->defaultItems(0),
+            ),
+            Section::make('Confirm')->add(Field::checkbox('ok', 'Confirm')),
+        )
+        ->submit('Book'),
 
     'themebuilder' => ThemeBuilder::make('builder')
         ->theme(Theme::preset('material')->color('light', 'danger', '#dd3545'))

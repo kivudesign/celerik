@@ -239,3 +239,37 @@ test.describe('form wizard', () => {
     await expect(page.locator('#join [aria-current="step"]')).toContainText('Your team');
   });
 });
+
+test.describe('form repeater', () => {
+  test('rows are added, moved and removed from the keyboard', async ({ page }) => {
+    // The repeater is on the wizard's second step.
+    await page.getByLabel('Full name').fill('Ada Lovelace');
+    await page.getByLabel('Full name').press('Enter');
+    const add = page.getByRole('button', { name: 'Add a member' });
+    const members = page.locator('#join-members .celerik-repeater-items > li');
+
+    await add.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('textbox', { name: 'Member e-mail' })).toBeFocused();
+    await page.keyboard.type('ada@example.com');
+    await add.focus();
+    await page.keyboard.press('Enter');
+    await page.keyboard.type('grace@example.com');
+    await expect(members).toHaveCount(2);
+
+    // Move the second member up: the button keeps the focus, or passes it to Move down.
+    const second = page.getByRole('group', { name: 'Member 2' });
+    await second.getByRole('button', { name: 'Move up' }).focus();
+    await page.keyboard.press('Enter');
+    const first = page.getByRole('group', { name: 'Member 1' });
+    await expect(first.getByRole('textbox')).toHaveValue('grace@example.com');
+    await expect(first.getByRole('button', { name: 'Move down' })).toBeFocused();
+
+    // Remove the first: focus goes to the member that takes its place.
+    await first.getByRole('button', { name: 'Remove' }).focus();
+    await page.keyboard.press('Space');
+    await expect(members).toHaveCount(1);
+    await expect(page.getByRole('group', { name: 'Member 1' }).getByRole('textbox')).toBeFocused();
+    await expect(page.getByRole('group', { name: 'Member 1' }).getByRole('textbox')).toHaveValue('ada@example.com');
+  });
+});
