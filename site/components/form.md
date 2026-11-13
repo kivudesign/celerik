@@ -13,7 +13,7 @@ Bootstrap forms with client-side validation ([Parsley.js](https://parsleyjs.org/
 | `action($url)`, `method('POST')` | `PUT`, `PATCH` and `DELETE` are sent as `POST` with a `_method` field (the Laravel and Symfony convention). |
 | `csrf($token, $field = '_token')` | A hidden CSRF field. |
 | `add(Field ...$fields)` | The fields, in order. |
-| `errors([...])` | Server-side errors: `field => message` or `field => [messages]`; `address.city` matches `address[city]`. |
+| `errors([...])` | Server-side errors: `field => message` or `field => [messages]`; `address.city` matches `address[city]`, and an error on one item of an array field (`tags.1`) shows under the field. |
 | `values($_POST)` | Old input after a failed submit (passwords are never refilled). |
 | `errorSummary($enabled = true, $title = 'There is a problem')` | Lists every error at the top with a link to each field, and moves focus to it after a failed submit. |
 | `floatingLabels()` | Bootstrap floating labels (the Material look). |
@@ -37,6 +37,23 @@ Field::hidden('id', 42);
 ```
 
 Rich text and files have their own pages: [Rich text editor](./editor) and [File upload](./upload).
+
+### Dates, times and ranges
+
+<Demo name="form-dates" :min-height="440" />
+
+<<< @/demos/form-dates.php
+
+| Field | Submits |
+|---|---|
+| `Field::date($name)` | `2026-11-05` |
+| `Field::time($name)` | `09:30` (with seconds if `step()` is under 60) |
+| `Field::datetime($name)` | `2026-11-05T09:30`, without a time zone: convert it with the user's time zone on the server |
+| `Field::dateRange($name, $label, $type = 'date')` | `name[start]` and `name[end]`; `$type` is `date`, `time` or `datetime-local` |
+
+They use the browser's own pickers: keyboard and screen reader support, the user's language and date format, and the native picker on phones, with no JavaScript library. `min()`, `max()` and `step()` limit the choices (`step(900)`: every 15 minutes).
+
+A date range is a fieldset with two inputs, labelled "From" and "To" unless you call `labels($start, $end)`. The end must be on or after the start, and its picker starts at the start date. `value()` and old input take `['start' => …, 'end' => …]`, and a server error on `stay`, `stay.start` or `stay.end` shows under the range.
 
 ### Searchable and multiple selects
 

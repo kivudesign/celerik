@@ -1,8 +1,27 @@
 import $ from 'jquery';
 import 'parsleyjs';
 import Inputmask from 'inputmask';
-import { buildParsleyConfig, fieldInputs, renderErrorSummary } from './form-config.js';
+import { boundValidators, buildParsleyConfig, compareValues, fieldInputs, renderErrorSummary } from './form-config.js';
 import { csrfTokenFor } from './upload-config.js';
+
+// min, max and range that also understand times and date-times, and "after" for the end of
+// a date range (Field::dateRange()). Parsley keeps its messages for min, max and range.
+const { Parsley } = window;
+Parsley.updateValidator('min', { requirementType: 'string', validateString: boundValidators.min, priority: 30 });
+Parsley.updateValidator('max', { requirementType: 'string', validateString: boundValidators.max, priority: 30 });
+Parsley.updateValidator('range', {
+  requirementType: ['string', 'string'],
+  validateString: (value, min, max) => boundValidators.range(value, [min, max]),
+  priority: 30,
+});
+Parsley.addValidator('after', {
+  requirementType: 'string',
+  validateString: (value, selector) => boundValidators.after(value, document.querySelector(selector)?.value ?? ''),
+  messages: { en: 'This must be on or after the start.' },
+  // Above min (30): the end's min follows the start, and Parsley shows only the failed
+  // checks of the highest priority, so one message, not two.
+  priority: 31,
+});
 
 export async function initForm(element, options) {
   for (const input of element.querySelectorAll('[data-celerik-mask]')) {
@@ -24,6 +43,32 @@ export async function initForm(element, options) {
       }
     }
   });
+
+  // Date ranges: the end picker starts at the start (also for old input and after a reset),
+  // and an end already checked is checked again when the start changes.
+  for (const end of element.querySelectorAll('input[data-parsley-after]')) {
+    const start = element.querySelector(end.getAttribute('data-parsley-after'));
+    if (start) {
+      const ownMin = end.getAttribute('min');
+      const followStart = () => {
+        const min = [start.value, ownMin].filter(Boolean).sort(compareValues).pop();
+        if (min) {
+          end.setAttribute('min', min);
+        } else {
+          end.removeAttribute('min');
+        }
+      };
+      start.addEventListener('change', () => {
+        followStart();
+        if (end.classList.contains('is-invalid') || end.classList.contains('is-valid')) {
+          $(end).parsley().validate();
+        }
+      });
+      // A reset changes the value without a change event, after the reset event.
+      element.addEventListener('reset', () => setTimeout(followStart));
+      followStart();
+    }
+  }
 
   // Range fields show their value after the label.
   for (const output of element.querySelectorAll('output.celerik-range-value')) {

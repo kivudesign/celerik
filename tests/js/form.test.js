@@ -244,3 +244,92 @@ describe('searchable selects (Tom Select)', () => {
     expect(author.options['3'].label).toBe('Ada Lovelace (ada)');
   });
 });
+
+describe('date, time and date range fields', () => {
+  let form;
+  let parsley;
+
+  beforeEach(async () => {
+    form = loadFixture('form-dates');
+    parsley = await initForm(form, readOptions(form));
+  });
+
+  afterEach(() => parsley.destroy());
+
+  const input = (name) => form.querySelector(`[name="${name}"]`);
+  const fill = (values) => {
+    for (const [name, value] of Object.entries(values)) {
+      input(name).value = value;
+    }
+  };
+  const invalid = () => [...form.querySelectorAll('.is-invalid')].map((element) => element.name);
+
+  test('times and date-times are checked against min and max as times, not numbers', () => {
+    fill({ 'stay[start]': '2026-03-01', 'stay[end]': '2026-03-04', arrival: '09:30', day: '2026-06-01' });
+    expect(parsley.validate()).toBe(true);
+
+    fill({ arrival: '07:45', day: '2027-01-01' });
+    expect(parsley.validate()).toBe(false);
+    expect(invalid()).toEqual(['day', 'arrival']);
+  });
+
+  test('a date range needs both dates, the end on or after the start', () => {
+    expect(parsley.validate()).toBe(false);
+    expect(invalid()).toEqual(['stay[start]', 'stay[end]']);
+
+    fill({ 'stay[start]': '2026-03-04', 'stay[end]': '2026-03-01' });
+    expect(parsley.validate()).toBe(false);
+    expect(invalid()).toEqual(['stay[end]']);
+    expect(input('stay[end]').closest('.mb-3').textContent).toMatch('on or after the start');
+
+    fill({ 'stay[end]': '2026-03-04' });
+    expect(parsley.validate()).toBe(true);
+
+    // Time ranges too, and an empty optional range is fine.
+    fill({ 'shift[start]': '14:00', 'shift[end]': '09:00' });
+    expect(parsley.validate()).toBe(false);
+    expect(invalid()).toEqual(['shift[end]']);
+  });
+
+  test('the end picker starts at the start, never before its own min', () => {
+    const start = input('stay[start]');
+    const end = input('stay[end]');
+    expect(end.getAttribute('min')).toBe('2026-01-01');
+
+    start.value = '2026-05-10';
+    start.dispatchEvent(new Event('change'));
+    expect(end.getAttribute('min')).toBe('2026-05-10');
+
+    start.value = '';
+    start.dispatchEvent(new Event('change'));
+    expect(end.getAttribute('min')).toBe('2026-01-01');
+  });
+
+  test('the end picker follows a start from old input, and a reset', async () => {
+    parsley.destroy();
+    form = loadFixture('form-dates');
+    form.querySelector('[name="stay[start]"]').setAttribute('value', '2026-04-02');
+    form.querySelector('[name="stay[start]"]').value = '2026-04-02';
+    parsley = await initForm(form, readOptions(form));
+    expect(input('stay[end]').getAttribute('min')).toBe('2026-04-02');
+
+    input('stay[start]').value = '2026-08-01';
+    input('stay[start]').dispatchEvent(new Event('change'));
+    form.reset();
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(input('stay[end]').getAttribute('min')).toBe('2026-04-02');
+  });
+
+  test('changing the start checks an end that was already checked', () => {
+    fill({ 'stay[start]': '2026-03-01', 'stay[end]': '2026-03-04' });
+    parsley.validate();
+    expect(input('stay[end]').classList.contains('is-valid')).toBe(true);
+
+    fill({ 'stay[start]': '2026-03-09' });
+    input('stay[start]').dispatchEvent(new Event('change'));
+    expect(input('stay[end]').classList.contains('is-invalid')).toBe(true);
+    // One message: the end's min now follows the start, but only "after" is shown.
+    const messages = input('stay[end]').closest('.mb-3').querySelectorAll('.invalid-feedback li, .invalid-feedback > div');
+    expect([...messages].map((message) => message.textContent)).toEqual(['This must be on or after the start.']);
+  });
+});

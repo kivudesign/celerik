@@ -128,6 +128,12 @@
     color: var(--celerik-required-color);
   }
 
+  // Tab reaches the browser's calendar or clock button inside a date or time input: the
+  // input is then not :focus, only :focus-within, and Bootstrap's focus ring disappears.
+  .form-control:is([type='date'], [type='time'], [type='datetime-local']):focus-within {
+    box-shadow: var(--celerik-focus-ring);
+  }
+
   // Bootstrap compiles the slider thumb's color: follow the theme's primary color.
   // One rule per vendor pseudo-element: a browser drops a selector list it cannot parse.
   .form-range {
@@ -380,6 +386,12 @@
   .ql-container.ql-snow:focus-within,
   .celerik-modal:focus-visible .modal-content {
     outline: 2px solid Highlight;
+  }
+
+  // Date and time inputs: see .celerik-form above.
+  .celerik-form :is(input[type='date'], input[type='time'], input[type='datetime-local']):focus-within {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 
   // A searchable select's search box is a small input inside the control: outline the

@@ -26,6 +26,7 @@ final class Field
     ];
     private const REQUIRED_MARKER = ' <span class="celerik-required" aria-hidden="true">*</span>';
     private const TOOLBARS = ['basic', 'standard', 'full'];
+    private const PERIOD_TYPES = ['date', 'time', 'datetime-local'];
 
     private ?UploadRules $uploadRules = null;
     private ?string $uploadUrl = null;
@@ -34,6 +35,11 @@ final class Field
     private string|array $toolbar = 'standard';
 
     private bool $inline = false;
+    private string $periodType = 'date';
+
+    /** @var array{string, string} */
+    private array $periodLabels = ['From', 'To'];
+
     private bool $searchable = false;
     private bool $multiple = false;
 
@@ -99,9 +105,63 @@ final class Field
         return self::input('tel', $name, $label);
     }
 
+    /**
+     * A date (`YYYY-MM-DD`), with the browser's date picker.
+     */
     public static function date(string $name, ?string $label = null): self
     {
         return self::input('date', $name, $label);
+    }
+
+    /**
+     * A time (`HH:MM`, or `HH:MM:SS` with a step under 60), with the browser's time picker.
+     */
+    public static function time(string $name, ?string $label = null): self
+    {
+        return self::input('time', $name, $label);
+    }
+
+    /**
+     * A local date and time (`YYYY-MM-DDTHH:MM`), with the browser's picker. It has no
+     * time zone: convert it on the server with the user's time zone.
+     */
+    public static function datetime(string $name, ?string $label = null): self
+    {
+        return self::input('datetime-local', $name, $label);
+    }
+
+    /**
+     * A start and an end, in a fieldset: two native inputs that submit `name[start]` and
+     * `name[end]`. The end must be on or after the start. min(), max() and step() apply to
+     * both; value() takes `['start' => …, 'end' => …]`.
+     *
+     * @param string $type "date", "time" or "datetime-local"
+     */
+    public static function dateRange(string $name, ?string $label = null, string $type = 'date'): self
+    {
+        if (!in_array($type, self::PERIOD_TYPES, true)) {
+            throw new InvalidArgumentException(sprintf(
+                'Unsupported range type "%s". Use %s.',
+                $type,
+                implode(', ', self::PERIOD_TYPES),
+            ));
+        }
+
+        $field = new self('period', $name, $label ?? self::humanize($name));
+        $field->periodType = $type;
+
+        return $field;
+    }
+
+    /**
+     * Labels of the two inputs of a dateRange() field (default "From" and "To").
+     */
+    public function labels(string $start, string $end): self
+    {
+        $this->assertType('period', 'labels');
+        $this->periodLabels = [$start, $end];
+
+        return $this;
     }
 
     public static function hidden(string $name, string|int|float $value): self
@@ -477,6 +537,10 @@ final class Field
             return $this->renderGroup($id, $value, $error, $helpText, $helpId, $errorId);
         }
 
+        if ($this->type === 'period') {
+            return $this->renderPeriod($id, $value, $error, $helpText, $helpId, $errorId);
+        }
+
         $attributes = array_merge($this->attributes, [
             'id' => $id,
             'name' => $this->name,
@@ -593,7 +657,7 @@ final class Field
         // Tom Select replaces the select: its search box has no floating label.
         return !$this->searchable && !$this->multiple && !in_array(
             $this->type,
-            ['checkbox', 'switch', 'radio', 'checkboxes', 'range', 'color', 'file', 'editor', 'hidden'],
+            ['checkbox', 'switch', 'radio', 'checkboxes', 'period', 'range', 'color', 'file', 'editor', 'hidden'],
             true,
         );
     }
@@ -665,6 +729,64 @@ final class Field
     }
 
     /**
+     * A dateRange() field: a fieldset with the start and end inputs side by side. The start
+     * has the field's id, so error summary links lead to it.
+     */
+    private function renderPeriod(
+        string $id,
+        mixed $value,
+        ?string $error,
+        ?string $helpText,
+        ?string $helpId,
+        ?string $errorId,
+    ): string {
+        $inputs = '';
+        foreach (['start', 'end'] as $index => $part) {
+            $inputId = $part === 'start' ? $id : $id . '-end';
+            $partValue = is_array($value) ? ($value[$part] ?? null) : null;
+            $input = Html::tag('input', array_merge($this->attributes, [
+                'type' => $this->periodType,
+                'id' => $inputId,
+                'name' => $this->name . '[' . $part . ']',
+                'value' => $partValue === null || $partValue === '' ? null : Arr::toText($partValue),
+                'required' => $this->required,
+                'aria-invalid' => $error === null ? null : 'true',
+                'data-parsley-error-message' => $this->message,
+                // form.js: on or after the start, and the end picker starts there.
+                'data-parsley-after' => $part === 'end' ? '#' . $id : null,
+                'class' => $this->controlClass('form-control', $error),
+            ]));
+            $label = Html::tag(
+                'label',
+                ['for' => $inputId, 'class' => 'form-label'],
+                Html::escape($this->periodLabels[$index]),
+            );
+            $inputs .= Html::tag('div', ['class' => 'col-sm-6'], $label . $input);
+        }
+
+        $legend = Html::tag(
+            'legend',
+            ['class' => 'form-label fs-6'],
+            Html::escape($this->label) . ($this->required ? self::REQUIRED_MARKER : ''),
+        );
+        $fieldset = Html::tag('fieldset', [
+            'id' => $id . '-group',
+            'aria-describedby' => Html::classes([$helpId, $errorId]),
+        ], $legend . Html::tag('div', ['class' => 'row g-2'], $inputs));
+
+        $feedback = $errorId === null ? '' : Html::tag(
+            'div',
+            ['id' => $errorId, 'class' => 'invalid-feedback d-block celerik-server-error'],
+            Html::escape($error),
+        );
+        $help = $helpId === null
+            ? ''
+            : Html::tag('div', ['id' => $helpId, 'class' => 'form-text'], Html::escape($helpText));
+
+        return Html::tag('div', ['class' => 'mb-3'], $fieldset . $feedback . $help);
+    }
+
+    /**
      * The value of a range field, after its label. form.js updates it as the slider moves.
      * Hidden from assistive technology: the slider announces its value itself.
      */
@@ -715,6 +837,18 @@ final class Field
     public function isFile(): bool
     {
         return $this->type === 'file';
+    }
+
+    /**
+     * Whether the field submits an array: a date range, checkboxes, a multiple select or
+     * several files.
+     */
+    public function submitsArray(): bool
+    {
+        return str_ends_with($this->name, '[]')
+            || in_array($this->type, ['period', 'checkboxes'], true)
+            || ($this->type === 'select' && $this->multiple)
+            || ($this->isFile() && ($this->uploadRules ?? UploadRules::images())->maxFiles > 1);
     }
 
     /**

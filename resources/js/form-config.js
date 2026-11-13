@@ -13,6 +13,35 @@ function stateElements(field) {
   return wrapper ? fieldInputs(field).add(wrapper) : fieldInputs(field);
 }
 
+const NUMBER = /^-?(\d+\.?\d*|\.\d+)$/;
+
+// Compares a field value with a bound (min, max, the start of a range): numbers as
+// numbers, anything else as text, which orders ISO dates, times and date-times
+// (2026-11-05, 09:30, 2026-11-05T09:30). Parsley compares as numbers only, so it rejects
+// every time and date-time with a min or max. Returns a negative number, 0 or a positive one.
+export function compareValues(value, bound) {
+  if (NUMBER.test(value) && NUMBER.test(bound)) {
+    return parseFloat(value) - parseFloat(bound);
+  }
+  const [a, b] = [withSeconds(value), withSeconds(bound)];
+  return a < b ? -1 : Number(a > b);
+}
+
+// 17:00 and 17:00:00 are the same time: browsers add the seconds when the step is under a
+// minute, while bounds are usually written without them.
+function withSeconds(text) {
+  return String(text).replace(/(^|T)(\d{2}:\d{2})$/, '$1$2:00');
+}
+
+// Validators that replace Parsley's min, max and range, and add "after" (the end of a date
+// range: on or after its start, given by a selector). Empty values are left to "required".
+export const boundValidators = {
+  min: (value, min) => value === '' || compareValues(value, min) >= 0,
+  max: (value, max) => value === '' || compareValues(value, max) <= 0,
+  range: (value, [min, max]) => value === '' || (compareValues(value, min) >= 0 && compareValues(value, max) <= 0),
+  after: (value, start) => value === '' || !start || compareValues(value, start) >= 0,
+};
+
 // Parsley settings that produce Bootstrap 5 validation markup.
 export const parsleyDefaults = {
   errorClass: 'is-invalid',

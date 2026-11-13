@@ -212,6 +212,8 @@ $components = [
                 ->searchable()
                 ->value(['fr']),
             $reviewer,
+            Field::time('call', 'Call time')->min('08:00')->max('18:00')->value('09:30'),
+            Field::dateRange('holidays')->labels('First day', 'Last day')->value(['start' => '2026-07-01', 'end' => '2026-07-14']),
         )
         ->errors(['plan' => 'Choose a plan.'])
         ->submit('Save'),

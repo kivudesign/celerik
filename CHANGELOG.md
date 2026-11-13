@@ -8,6 +8,7 @@ The same version is published on Packagist (`celerik/ui`) and npm (`@celerikui/u
 
 ### Added
 
+- Date and time fields: `Field::time()`, `Field::datetime()`, and `Field::dateRange($name, $label, 'date'|'time'|'datetime-local')`, two linked native inputs (`name[start]`, `name[end]`) whose end must be on or after the start.
 - Searchable selects ([Tom Select](https://tom-select.js.org)): `Field::select()->searchable()`, `->multiple()` (tags), and `->remote($url)` to load choices from an endpoint as the user types, answered by `$field->respond($source, $_GET)` with any data source.
 - Form fields: `Field::radio()` and `Field::checkboxes()` (groups in a fieldset, `inline()`), `Field::switch()`, `Field::range()` (shows its value) and `Field::color()`; `step()` for number, range, date and time fields.
 - jQuery 4 support: the peer dependency accepts `^3.7.1 || ^4.0.0`, and the tests run on jQuery 4 ([#83](https://github.com/kivudesign/celerik/pull/83)).
@@ -15,7 +16,12 @@ The same version is published on Packagist (`celerik/ui`) and npm (`@celerikui/u
 ### Changed
 
 - Docs and examples load `jquery@4.0.0` from the CDN ([#83](https://github.com/kivudesign/celerik/pull/83)).
-- The roadmap's Phase 4 is about components and usability. Celerik UI stays free and open source, with no paid or premium editions ([#81](https://github.com/kivudesign/celerik/pull/81)).
+- The roadmap aims at Telerik UI's breadth with Filament's depth for admin screens, in phases by family of components. Celerik UI stays free and open source, with no paid or premium editions ([#81](https://github.com/kivudesign/celerik/pull/81), [#93](https://github.com/kivudesign/celerik/pull/93)).
+
+### Fixed
+
+- Client-side validation rejected every time and date-time field with a `min()` or `max()`: Parsley compared them as numbers. Bounds now compare numbers as numbers and ISO dates and times as text, and `17:00:00` equals `17:00`.
+- Server errors reported on one item of a field that submits an array (Laravel: `tags.1`, `languages.0`, `photos.0`) were not shown; they now show under the field and in the error summary.
 
 ### Development
 

@@ -246,7 +246,18 @@ final class Form extends Component
 
     private function errorFor(Field $field): ?string
     {
-        $error = $this->errors[$this->key($field)] ?? null;
+        $key = $this->key($field);
+        $error = $this->errors[$key] ?? null;
+        // A field that submits an array may get an error on one of its items
+        // (Laravel: "tags.1", "stay.end", "photos.0").
+        if ($error === null && $field->submitsArray()) {
+            foreach ($this->errors as $name => $message) {
+                if (str_starts_with((string) $name, $key . '.')) {
+                    $error = $message;
+                    break;
+                }
+            }
+        }
 
         if (is_array($error)) {
             $error = $error[0] ?? null;
