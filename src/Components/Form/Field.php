@@ -840,6 +840,18 @@ final class Field
     }
 
     /**
+     * Whether the field submits an array: a date range, checkboxes, a multiple select or
+     * several files.
+     */
+    public function submitsArray(): bool
+    {
+        return str_ends_with($this->name, '[]')
+            || in_array($this->type, ['period', 'checkboxes'], true)
+            || ($this->type === 'select' && $this->multiple)
+            || ($this->isFile() && ($this->uploadRules ?? UploadRules::images())->maxFiles > 1);
+    }
+
+    /**
      * @param array<string, string|int|float|bool|null> $attributes
      */
     private function renderFile(array $attributes, ?string $error): string

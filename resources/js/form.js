@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import 'parsleyjs';
 import Inputmask from 'inputmask';
-import { boundValidators, buildParsleyConfig, fieldInputs, renderErrorSummary } from './form-config.js';
+import { boundValidators, buildParsleyConfig, compareValues, fieldInputs, renderErrorSummary } from './form-config.js';
 import { csrfTokenFor } from './upload-config.js';
 
 // min, max and range that also understand times and date-times, and "after" for the end of
@@ -44,23 +44,29 @@ export async function initForm(element, options) {
     }
   });
 
-  // Date ranges: the end picker starts at the start, and an end already checked is
-  // checked again when the start changes.
+  // Date ranges: the end picker starts at the start (also for old input and after a reset),
+  // and an end already checked is checked again when the start changes.
   for (const end of element.querySelectorAll('input[data-parsley-after]')) {
     const start = element.querySelector(end.getAttribute('data-parsley-after'));
     if (start) {
       const ownMin = end.getAttribute('min');
-      start.addEventListener('change', () => {
-        const min = [start.value, ownMin].filter(Boolean).sort().pop();
+      const followStart = () => {
+        const min = [start.value, ownMin].filter(Boolean).sort(compareValues).pop();
         if (min) {
           end.setAttribute('min', min);
         } else {
           end.removeAttribute('min');
         }
+      };
+      start.addEventListener('change', () => {
+        followStart();
         if (end.classList.contains('is-invalid') || end.classList.contains('is-valid')) {
           $(end).parsley().validate();
         }
       });
+      // A reset changes the value without a change event, after the reset event.
+      element.addEventListener('reset', () => setTimeout(followStart));
+      followStart();
     }
   }
 

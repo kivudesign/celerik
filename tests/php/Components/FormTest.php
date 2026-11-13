@@ -240,6 +240,25 @@ final class FormTest extends TestCase
         self::assertStringContainsString('<a href="#f-shift" class="alert-link">The end must be after the start.</a>', $html);
     }
 
+    public function testArrayFieldsShowAnErrorReportedOnOneOfTheirItems(): void
+    {
+        $html = Form::make('f')->submit(null)->errorSummary()->add(
+            Field::checkboxes('tags', ['a' => 'A', 'b' => 'B']),
+            Field::select('languages', ['fr' => 'French', 'en' => 'English'])->multiple(),
+            Field::text('name'),
+        )->errors([
+            'tags.1' => 'The selected tag is invalid.',
+            'languages.0' => 'The selected language is invalid.',
+            'name.first' => 'Not for a field that submits one value.',
+        ])->render();
+
+        self::assertStringContainsString('<a href="#f-tags" class="alert-link">The selected tag is invalid.</a>', $html);
+        self::assertStringContainsString('<a href="#f-languages" class="alert-link">The selected language is invalid.</a>', $html);
+        self::assertStringNotContainsString('Not for a field', $html);
+        self::assertTrue(Field::dateRange('stay')->submitsArray());
+        self::assertFalse(Field::select('country', ['fr' => 'France'])->submitsArray());
+    }
+
     public function testDateRangeRejectsOtherTypesAndLabelsOnlyApplyToIt(): void
     {
         try {

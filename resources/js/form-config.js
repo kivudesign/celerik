@@ -23,7 +23,14 @@ export function compareValues(value, bound) {
   if (NUMBER.test(value) && NUMBER.test(bound)) {
     return parseFloat(value) - parseFloat(bound);
   }
-  return value < bound ? -1 : Number(value > bound);
+  const [a, b] = [withSeconds(value), withSeconds(bound)];
+  return a < b ? -1 : Number(a > b);
+}
+
+// 17:00 and 17:00:00 are the same time: browsers add the seconds when the step is under a
+// minute, while bounds are usually written without them.
+function withSeconds(text) {
+  return String(text).replace(/(^|T)(\d{2}:\d{2})$/, '$1$2:00');
 }
 
 // Validators that replace Parsley's min, max and range, and add "after" (the end of a date

@@ -305,6 +305,21 @@ describe('date, time and date range fields', () => {
     expect(end.getAttribute('min')).toBe('2026-01-01');
   });
 
+  test('the end picker follows a start from old input, and a reset', async () => {
+    parsley.destroy();
+    form = loadFixture('form-dates');
+    form.querySelector('[name="stay[start]"]').setAttribute('value', '2026-04-02');
+    form.querySelector('[name="stay[start]"]').value = '2026-04-02';
+    parsley = await initForm(form, readOptions(form));
+    expect(input('stay[end]').getAttribute('min')).toBe('2026-04-02');
+
+    input('stay[start]').value = '2026-08-01';
+    input('stay[start]').dispatchEvent(new Event('change'));
+    form.reset();
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(input('stay[end]').getAttribute('min')).toBe('2026-04-02');
+  });
+
   test('changing the start checks an end that was already checked', () => {
     fill({ 'stay[start]': '2026-03-01', 'stay[end]': '2026-03-04' });
     parsley.validate();

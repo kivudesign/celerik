@@ -9,6 +9,15 @@ describe('bounds for numbers, dates and times', () => {
     expect(compareValues('2026-12-01', '2026-11-30')).toBeGreaterThan(0);
   });
 
+  test('a time with seconds equals the same time without them', () => {
+    // Browsers add the seconds when the step is under a minute.
+    expect(compareValues('17:00:00', '17:00')).toBe(0);
+    expect(compareValues('2026-11-05T09:30:00', '2026-11-05T09:30')).toBe(0);
+    expect(boundValidators.max('17:00:00', '17:00')).toBe(true);
+    expect(boundValidators.max('17:00:01', '17:00')).toBe(false);
+    expect(boundValidators.min('07:59:59', '08:00')).toBe(false);
+  });
+
   test('min, max, range and after accept empty values and bounds themselves', () => {
     expect(boundValidators.min('', '08:00')).toBe(true);
     expect(boundValidators.min('08:00', '08:00')).toBe(true);
