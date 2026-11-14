@@ -3,6 +3,7 @@ import 'parsleyjs';
 import Inputmask from 'inputmask';
 import { boundValidators, buildParsleyConfig, compareValues, fieldInputs, renderErrorSummary } from './form-config.js';
 import { csrfTokenFor } from './upload-config.js';
+import { initRepeaters } from './form-repeater.js';
 import { initWizard } from './form-wizard.js';
 
 // min, max and range that also understand times and date-times, and "after" for the end of
@@ -25,10 +26,6 @@ Parsley.addValidator('after', {
 });
 
 export async function initForm(element, options) {
-  for (const input of element.querySelectorAll('[data-celerik-mask]')) {
-    Inputmask(input.getAttribute('data-celerik-mask')).mask(input);
-  }
-
   const parsley = $(element).parsley(buildParsleyConfig(options));
 
   // Server-side errors are rendered by PHP; drop them once the field is re-validated.
@@ -49,10 +46,44 @@ export async function initForm(element, options) {
     }
   });
 
+  const summary = options.errorSummary ? element.querySelector('.celerik-error-summary') : null;
+  const showErrors = summary ? initErrorSummary(element, summary, parsley) : null;
+
+  // A wizard checks each step's fields before the next one.
+  element.celerikWizard = initWizard(element, parsley, {
+    summary,
+    onInvalid: (fields) => (showErrors ? showErrors(fields) : focusField(fields[0].$element[0])),
+    onValid: () => showErrors?.([]),
+  });
+
+  // Rows added to a repeater get the same set-up as the form's own fields.
+  initRepeaters(element, parsley, (row) => enhanceFields(element, row));
+
+  // Quill and FilePond are large: load them only for forms that use them.
+  const enhancements = [enhanceFields(element, element)];
+  if (element.querySelector('textarea[data-celerik-editor]')) {
+    enhancements.push(import('./editor.js').then(({ initEditors }) => initEditors(element)));
+  }
+  if (element.querySelector('input[type="file"][data-celerik-upload]')) {
+    const token = csrfTokenFor(element, options);
+    enhancements.push(import('./upload.js').then(({ initUploads }) => initUploads(element, token)));
+  }
+  await Promise.all(enhancements);
+
+  return parsley;
+}
+
+// Sets up the fields in a container (the form, or a repeater's new row): input masks, date
+// ranges, range values, and searchable selects (loaded on demand).
+function enhanceFields(form, container) {
+  for (const input of container.querySelectorAll('[data-celerik-mask]')) {
+    Inputmask(input.getAttribute('data-celerik-mask')).mask(input);
+  }
+
   // Date ranges: the end picker starts at the start (also for old input and after a reset),
   // and an end already checked is checked again when the start changes.
-  for (const end of element.querySelectorAll('input[data-parsley-after]')) {
-    const start = element.querySelector(end.getAttribute('data-parsley-after'));
+  for (const end of container.querySelectorAll('input[data-parsley-after]')) {
+    const start = form.querySelector(end.getAttribute('data-parsley-after'));
     if (start) {
       const ownMin = end.getAttribute('min');
       const followStart = () => {
@@ -70,13 +101,13 @@ export async function initForm(element, options) {
         }
       });
       // A reset changes the value without a change event, after the reset event.
-      element.addEventListener('reset', () => setTimeout(followStart));
+      form.addEventListener('reset', () => setTimeout(followStart));
       followStart();
     }
   }
 
   // Range fields show their value after the label.
-  for (const output of element.querySelectorAll('output.celerik-range-value')) {
+  for (const output of container.querySelectorAll('output.celerik-range-value')) {
     const input = document.getElementById(output.htmlFor.value);
     if (input) {
       const show = () => {
@@ -84,36 +115,15 @@ export async function initForm(element, options) {
       };
       input.addEventListener('input', show);
       // A reset changes the value without an input event, after the reset event.
-      element.addEventListener('reset', () => setTimeout(show));
+      form.addEventListener('reset', () => setTimeout(show));
       show();
     }
   }
 
-  const summary = options.errorSummary ? element.querySelector('.celerik-error-summary') : null;
-  const showErrors = summary ? initErrorSummary(element, summary, parsley) : null;
-
-  // A wizard checks each step's fields before the next one.
-  element.celerikWizard = initWizard(element, parsley, {
-    summary,
-    onInvalid: (fields) => (showErrors ? showErrors(fields) : focusField(fields[0].$element[0])),
-    onValid: () => showErrors?.([]),
-  });
-
-  // Quill and FilePond are large: load them only for forms that use them.
-  const enhancements = [];
-  if (element.querySelector('textarea[data-celerik-editor]')) {
-    enhancements.push(import('./editor.js').then(({ initEditors }) => initEditors(element)));
+  if (container.querySelector('select[data-celerik-select]')) {
+    return import('./select.js').then(({ initSelects }) => initSelects(container));
   }
-  if (element.querySelector('select[data-celerik-select]')) {
-    enhancements.push(import('./select.js').then(({ initSelects }) => initSelects(element)));
-  }
-  if (element.querySelector('input[type="file"][data-celerik-upload]')) {
-    const token = csrfTokenFor(element, options);
-    enhancements.push(import('./upload.js').then(({ initUploads }) => initUploads(element, token)));
-  }
-  await Promise.all(enhancements);
-
-  return parsley;
+  return Promise.resolve();
 }
 
 // The error summary: filled and focused after a failed submit, focused on load when the

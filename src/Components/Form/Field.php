@@ -24,7 +24,7 @@ final class Field
     private const INPUT_TYPES = [
         'text', 'email', 'password', 'number', 'tel', 'url', 'date', 'time', 'datetime-local', 'search', 'hidden',
     ];
-    private const REQUIRED_MARKER = ' <span class="celerik-required" aria-hidden="true">*</span>';
+    public const REQUIRED_MARKER = ' <span class="celerik-required" aria-hidden="true">*</span>';
     private const TOOLBARS = ['basic', 'standard', 'full'];
     private const PERIOD_TYPES = ['date', 'time', 'datetime-local'];
 
@@ -63,7 +63,7 @@ final class Field
      */
     private function __construct(
         private readonly string $type,
-        private readonly string $name,
+        private string $name,
         private readonly string $label,
         private readonly array $choices = [],
     ) {
@@ -518,6 +518,24 @@ final class Field
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * A copy of the field under another name: a repeater's row, e.g. `lines[0][product]`.
+     *
+     * @internal
+     */
+    public function withName(string $name): self
+    {
+        $copy = clone $this;
+        $copy->name = $name;
+
+        return $copy;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
     }
 
     public function getType(): string

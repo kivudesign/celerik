@@ -22,6 +22,7 @@ use Celerik\Ui\Components\Chart;
 use Celerik\Ui\Components\FileManager;
 use Celerik\Ui\Components\Form;
 use Celerik\Ui\Components\Form\Field;
+use Celerik\Ui\Components\Form\Repeater;
 use Celerik\Ui\Components\Form\Section;
 use Celerik\Ui\Components\Grid;
 use Celerik\Ui\Components\Modal;
@@ -272,7 +273,17 @@ $components = [
         ->wizard()
         ->add(
             Section::make('Your account')->add(Field::text('full_name')->required()),
-            Section::make('Your team')->columns(2)->add(Field::text('team_name')->required(), Field::text('team_role')),
+            Section::make('Your team')->columns(2)->add(
+                Field::text('team_name')->required(),
+                Field::text('team_role'),
+                Repeater::make('members')
+                    ->schema(Field::email('email', 'Member e-mail')->required())
+                    ->reorderable()
+                    ->defaultItems(0)
+                    ->max(3)
+                    ->labels(add: 'Add a member', item: 'Member %d')
+                    ->columnSpan('full'),
+            ),
             Section::make('Confirm')->add(Field::checkbox('join_terms', 'I accept the terms')->required()),
         )
         ->submit('Join'),

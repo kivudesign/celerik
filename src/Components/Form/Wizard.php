@@ -27,9 +27,9 @@ final class Wizard
     }
 
     /**
-     * @param list<Field|Section>    $items
-     * @param Closure(Field): string $renderField
-     * @param Closure(Field): bool   $hasError
+     * @param list<Field|Section|Repeater>    $items
+     * @param Closure(Field|Repeater): string $renderField
+     * @param Closure(Field|Repeater): bool   $hasError
      */
     public function render(
         string $formId,

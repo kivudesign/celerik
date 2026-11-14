@@ -509,3 +509,120 @@ describe('wizard', () => {
     expect(document.activeElement).toBe(form.querySelector('#join-team'));
   });
 });
+
+describe('repeater', () => {
+  let form;
+  let parsley;
+
+  const setUp = async (fixture = 'form-repeater') => {
+    form = loadFixture(fixture);
+    parsley = await initForm(form, readOptions(form));
+  };
+
+  afterEach(() => parsley.destroy());
+
+  const rows = () => [...form.querySelectorAll('.celerik-repeater-items > li')];
+  const keys = () => rows().map((row) => row.getAttribute('data-celerik-key'));
+  const labels = () => rows().map((row) => row.querySelector('legend').textContent);
+  const add = () => form.querySelector('[data-celerik-repeater-add]');
+  const addRow = async () => {
+    add().click();
+    // The row's searchable select is set up asynchronously.
+    await new Promise((resolve) => setTimeout(resolve));
+  };
+  const within = (row, selector) => row.querySelector(selector);
+
+  test('Add appends an empty row with the next key, set up like the others, and focuses it', async () => {
+    await setUp();
+    expect(keys()).toEqual(['0']);
+
+    await addRow();
+
+    expect(keys()).toEqual(['0', '1']);
+    expect(labels()).toEqual(['Line 1', 'Line 2']);
+    const row = rows()[1];
+    expect(within(row, 'select').name).toBe('lines[1][product]');
+    expect(row.querySelector('label[for="order-lines-1-qty"]').textContent).toMatch('Quantity');
+    // Its searchable select works, and it has the focus.
+    expect(within(row, 'select').tomselect).toBeDefined();
+    expect(document.activeElement).toBe(within(row, 'select').tomselect.control_input);
+    // Its date range's end follows its own start.
+    const start = within(row, '[name="lines[1][delivery][start]"]');
+    start.value = '2026-05-01';
+    start.dispatchEvent(new Event('change'));
+    expect(within(row, '[name="lines[1][delivery][end]"]').getAttribute('min')).toBe('2026-05-01');
+  });
+
+  test('new rows are validated and listed in the error summary', async () => {
+    await setUp();
+    await addRow();
+
+    expect(parsley.validate()).toBe(false);
+    const links = [...form.querySelectorAll('.celerik-error-summary a')].map((a) => a.getAttribute('href'));
+    expect(links).toEqual(['#order-lines-0-product', '#order-lines-0-qty', '#order-lines-1-product', '#order-lines-1-qty']);
+  });
+
+  test('min and max: Remove and Add are disabled at the limits', async () => {
+    await setUp();
+    expect(within(rows()[0], '[data-celerik-repeater-remove]').disabled).toBe(true);
+
+    await addRow();
+    await addRow();
+    expect(rows()).toHaveLength(3);
+    expect(add().disabled).toBe(true);
+    expect(rows().every((row) => !within(row, '[data-celerik-repeater-remove]').disabled)).toBe(true);
+  });
+
+  test('Remove deletes the row, renames the others and moves focus to the next row', async () => {
+    await setUp();
+    await addRow();
+    await addRow();
+
+    within(rows()[1], '[data-celerik-repeater-remove]').click();
+
+    expect(keys()).toEqual(['0', '2']);
+    expect(labels()).toEqual(['Line 1', 'Line 2']);
+    expect(document.activeElement).toBe(within(rows()[1], 'select').tomselect.control_input);
+    expect(add().disabled).toBe(false);
+    // The removed row's fields are no longer validated.
+    parsley.validate();
+    expect(parsley.fields.some((field) => field.$element[0].name.startsWith('lines[1]'))).toBe(false);
+
+    // The next new key is never reused.
+    await addRow();
+    expect(keys()).toEqual(['0', '2', '3']);
+  });
+
+  test('Move up and Move down reorder the rows and keep the focus', async () => {
+    await setUp();
+    await addRow();
+    const second = rows()[1];
+    const up = within(second, '[data-celerik-repeater-move="up"]');
+    up.focus();
+
+    up.click();
+
+    expect(keys()).toEqual(['1', '0']);
+    expect(labels()).toEqual(['Line 1', 'Line 2']);
+    // Up is now disabled at the top: focus moves to Down.
+    expect(up.disabled).toBe(true);
+    expect(document.activeElement).toBe(within(second, '[data-celerik-repeater-move="down"]'));
+
+    document.activeElement.click();
+    expect(keys()).toEqual(['0', '1']);
+  });
+
+  test('a wizard step checks the rows added to it', async () => {
+    await setUp('form-wizard-repeater');
+    const next = form.querySelector('[data-celerik-wizard="next"]');
+    await addRow();
+
+    next.click();
+    expect(form.querySelector('[data-celerik-step="0"]').hidden).toBe(false);
+    expect(form.querySelector('[name="people[0][name]"]').classList.contains('is-invalid')).toBe(true);
+
+    form.querySelector('[name="people[0][name]"]').value = 'Ada';
+    next.click();
+    expect(form.querySelector('[data-celerik-step="1"]').hidden).toBe(false);
+  });
+});

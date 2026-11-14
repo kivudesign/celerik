@@ -107,6 +107,18 @@ describe('accessibility (axe-core, WCAG 2.1 AA)', () => {
     parsley.destroy();
   });
 
+  test('a repeater, after adding rows and a failed validation', async () => {
+    const form = loadFixture('form-repeater');
+    expect(await violations()).toEqual([]);
+
+    const parsley = await initForm(form, readOptions(form));
+    form.querySelector('[data-celerik-repeater-add]').click();
+    await new Promise((resolve) => setTimeout(resolve));
+    parsley.validate();
+    expect(await violations()).toEqual([]);
+    parsley.destroy();
+  });
+
   test('searchable selects, before and after Tom Select and a failed validation', async () => {
     const form = loadFixture('form-select');
     expect(await violations()).toEqual([]);

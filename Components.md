@@ -46,7 +46,7 @@ The **Phase** column refers to the [roadmap](ROADMAP.md); "–" means not yet sc
 | Tags input (Telerik ChipList) | Tom Select (create mode) | Apache 2.0 | 4 |
 | Rating | Native (radio buttons) | – | 4 |
 | OTP input | Native | – | 4 |
-| Key-value list, repeater (Filament) | Native | – | 4 |
+| Key-value list, repeater (Filament) | Native | – | 4 (repeater ✅ `Repeater::make()`; key-value list to do) |
 | RangeSlider | noUiSlider | MIT | – |
 | ListBox (two lists, move items between them) | Native + SortableJS | MIT | – |
 | DropDownTree | To evaluate | – | – |

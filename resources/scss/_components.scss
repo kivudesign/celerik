@@ -222,6 +222,59 @@
     }
   }
 
+  // Repeater (Repeater::make()): a card per row, its name on the left and its buttons on
+  // the right, then its fields. The last field's margin is the bottom padding.
+  .celerik-repeater-items {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0;
+    margin: 0 0 0.75rem;
+    list-style: none;
+
+    &:empty {
+      margin: 0;
+    }
+  }
+
+  .celerik-repeater-item > .card-body {
+    padding-bottom: 0;
+  }
+
+  // Remove: Bootstrap's outline-danger text is #dc3545, under 4.5:1 on Material's tinted
+  // cards and on dark backgrounds (see .celerik-scheduler-dialog).
+  .celerik-repeater-actions .btn-outline-danger {
+    --bs-btn-color: var(--bs-danger-text-emphasis);
+    --bs-btn-border-color: var(--bs-danger-text-emphasis);
+  }
+
+  // Add: the same for outline-primary, 3.4:1 on Bootstrap's dark background.
+  .celerik-repeater > fieldset > .btn-outline-primary {
+    --bs-btn-color: var(--bs-primary-text-emphasis);
+    --bs-btn-border-color: var(--bs-primary-text-emphasis);
+  }
+
+  .celerik-repeater-label {
+    float: left;
+    width: auto;
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 2rem;
+  }
+
+  .celerik-repeater-actions {
+    display: flex;
+    float: right;
+    // Bootstrap's reboot clears whatever follows a legend.
+    clear: none;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+
+    + * {
+      clear: both;
+    }
+  }
+
   // Wizard (Form::wizard()): the step indicator, numbers joined by a line. The current
   // step uses the theme's subtle primary pair, which has enough contrast in both modes.
   .celerik-wizard-steps {

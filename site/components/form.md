@@ -56,6 +56,36 @@ Each step is a `Section::make()` (not a fieldset, nor collapsible). Inside, use 
 
 On phones, the indicator names only the current step. The wizard needs JavaScript: without it, only the first step shows.
 
+## Repeater
+
+<Demo name="form-repeater" :min-height="620" />
+
+<<< @/demos/form-repeater.php
+
+A repeater is a group of fields the user repeats: order lines, addresses, contacts. Each row submits as `name[key][field]`, here `lines[0][description]`, `lines[0][quantity]`.
+
+| Method | Use |
+|---|---|
+| `Repeater::make($name, $label)` | Added to a form or a section like a field. |
+| `schema(Field ...$fields)` | One row's fields, named relative to the row. Any field except files, rich text and hidden fields. |
+| `columns()`, and `columnSpan()` on the fields | The row's layout. `columnSpan()` on the repeater sets its width in the form. |
+| `min($n)`, `max($n)` | Remove is disabled at `min`, Add at `max`. Check both on the server too. |
+| `defaultItems($n)` | How many empty rows a new form starts with (1; at least `min`). |
+| `reorderable()` | Move up and Move down buttons; rows submit in their order on screen. |
+| `value([...])` | The rows to edit, e.g. a record's lines: a list of `field => value` arrays. |
+| `labels(add:, remove:, up:, down:, item: 'Line %d')`, `help()` | Texts; `item` names each row by its position. |
+
+**Keys are kept.** Rows keep their key when others are removed or moved, and new rows count on from the largest key. After a failed submit, the old input, the errors (`lines.3.quantity`) and the error summary all find their row. The keys may skip numbers: use `array_values($request->input('lines'))` for a plain list. An error on the repeater itself (`lines`, e.g. "add at least one line") shows under it.
+
+```php
+// Laravel
+$request->validate([
+    'lines' => ['required', 'array', 'min:1', 'max:10'],
+    'lines.*.description' => ['required', 'string'],
+    'lines.*.quantity' => ['required', 'integer', 'min:1'],
+]);
+```
+
 ## Fields
 
 ```php
@@ -148,4 +178,5 @@ The choices passed to `select()` are the initial ones: include the selected valu
 - A failed submit focuses the first invalid field, or the error summary, which is announced once instead of one message per field.
 - Required fields are marked with an asterisk hidden from screen readers, plus `required`.
 - Sections are regions named by their heading, fieldsets are groups named by their legend, and a collapsible section's heading is a button that opens it with Enter or Space. Columns never change the reading or tab order.
+- A repeater is a fieldset named by its label; each row is a fieldset named "Line 2", renumbered when rows move. Added rows take the focus; a removed row passes it to the row that takes its place, or to Add. The move buttons keep the focus as the row moves.
 - A wizard's indicator is a list labelled "Progress" whose current step has `aria-current="step"`, and completed steps say so to screen readers. Moving to a step focuses its heading, read as "Step 2 of 3: Company".
