@@ -45,10 +45,11 @@ Dependabot opens weekly pull requests for npm, Composer and GitHub Actions updat
 
 ## Releasing
 
-1. In CHANGELOG.md, rename `## [Unreleased]` to the version and date, e.g. `## [0.2.0] - 2026-12-01`, add an empty `## [Unreleased]` above it, update the compare links at the bottom, and merge that to `main`.
-2. Run the **Release** workflow (Actions > Release > Run workflow) with the version, e.g. `0.2.0`.
+Run the **Release** workflow (Actions > Release > Run workflow) with the version, e.g. `0.2.0`.
 
-The workflow stops if CHANGELOG.md has no section for the version. It runs every check on `main`, builds the bundle, commits it on a release commit that only the tag `v0.2.0` points to (Packagist installs tags), creates the GitHub release with the changelog section followed by the pull requests grouped by label, attaches the source maps, and, with an `NPM_TOKEN` secret, publishes `@celerikui/ui` to npm. Never push a version tag by hand: it would have no bundle.
+The entries under `## [Unreleased]` in CHANGELOG.md become the version's section, `## [0.2.0] - 2026-12-01`, with an empty `## [Unreleased]` above it and the compare links updated; the workflow commits that to `main` (`chore(release): 0.2.0`) once the checks pass. To write the section yourself, e.g. to reword it, merge it before running the workflow: a section already there for the version is used as it is. The workflow stops if there is neither, so a release always has notes.
+
+`main`'s ruleset must have **GitHub Actions** in its bypass list (Settings > Rules > Rulesets), so the workflow can push the changelog commit. The workflow runs every check on `main`, builds the bundle, commits it on a release commit that only the tag `v0.2.0` points to (Packagist installs tags), creates the GitHub release with the changelog section followed by the pull requests grouped by label, attaches the source maps, and, with an `NPM_TOKEN` secret, publishes `@celerikui/ui` to npm. Never push a version tag by hand: it would have no bundle.
 
 ## Adding a New Component
 

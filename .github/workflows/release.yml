@@ -2,6 +2,11 @@ name: Release
 
 # Publishes a version: Actions > Release > Run workflow, with the version (e.g. 0.2.0).
 #
+# The entries under "## [Unreleased]" in CHANGELOG.md become the version's section
+# ("## [0.2.0] - 2026-12-01"), committed to main once the checks pass: main's ruleset
+# must let GitHub Actions bypass it. A section already written for the version is used
+# as it is. The section opens the release notes, above the pull requests grouped by label.
+#
 # main does not track the built bundle (public/). This workflow tests main, builds the
 # bundle, and commits it on a release commit that only the tag points to: Packagist
 # installs tags, so `composer require celerik/ui` gets the bundle, and main stays
@@ -49,24 +54,34 @@ jobs:
             exit 1
           fi
 
-      # CHANGELOG.md must have a section for the version ("## [0.2.0] - 2026-12-01"):
-      # it opens the release notes, above the pull requests grouped by label.
-      - name: Read the changelog
+      - name: Write the changelog section
+        env:
+          REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
+          # The previous release, for the compare link and the list of pull requests:
+          # release tags are not on main's history, so GitHub cannot find it on its own.
+          PREVIOUS=$(git tag --list 'v*' --sort=-version:refname | grep -vx "v$VERSION" | grep -v -- '-' | head -1)
+          echo "PREVIOUS=$PREVIOUS" >> "$GITHUB_ENV"
+          RESULT=$(python3 .github/scripts/changelog-release.py "$VERSION" "$(date -u +%F)" "$PREVIOUS" "$REPOSITORY_URL") || {
+            echo "::error::CHANGELOG.md has no \"## [$VERSION]\" section and nothing under [Unreleased]: add the changes of this release under [Unreleased]."
+            exit 1
+          }
+          if [[ "$RESULT" == written ]]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -q -am "chore(release): $VERSION"
+            echo "PUSH_MAIN=1" >> "$GITHUB_ENV"
+          fi
           awk -v v="$VERSION" '
             index($0, "## [" v "]") == 1 { found = 1; next }
             found && /^## \[/ { exit }
             found && /^\[[^]]+\]: / { exit }
             found { print }
           ' CHANGELOG.md > release-notes.md
-          if [[ ! -s release-notes.md ]] || ! grep -q '[^[:space:]]' release-notes.md; then
-            echo "::error::CHANGELOG.md has no \"## [$VERSION]\" section: rename [Unreleased] to [$VERSION] with the date, merge it, then release."
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "::error::The \"## [$VERSION]\" section of CHANGELOG.md is empty."
             exit 1
           fi
-          # The previous release, for the list of pull requests: release tags are not on
-          # main's history, so GitHub cannot find it on its own.
-          PREVIOUS=$(git tag --list 'v*' --sort=-version:refname | grep -vx "v$VERSION" | grep -v -- '-' | head -1)
-          echo "PREVIOUS=$PREVIOUS" >> "$GITHUB_ENV"
           cat release-notes.md
 
       - uses: shivammathur/setup-php@v2
@@ -105,6 +120,12 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # The changelog commit goes to main first: it fails if main moved during the run,
+          # or if main's ruleset does not let GitHub Actions bypass it. Nothing is tagged then.
+          if [[ -n "${PUSH_MAIN:-}" ]] && ! git push origin HEAD:main; then
+            echo "::error::Could not push the CHANGELOG.md commit to main. Add GitHub Actions to the bypass list of main's ruleset, or run again if main changed."
+            exit 1
+          fi
           git add --force public
           git add package.json package-lock.json
           git commit -q -m "Release v$VERSION (with the built bundle)"
